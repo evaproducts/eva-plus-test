@@ -314,7 +314,7 @@
             box-shadow: 0 5px 15px rgba(216, 27, 96, 0.1);
         }
 
-        /* تنسيق المنتج المحجوز مؤقتاً (مظلل لمدة 24 ساعة) */
+        /* تنسيق المنتج المحجوز مؤقتاً (مظلل للجميع) */
         .product-card.reserved {
             opacity: 0.6;
             background: #f5f5f5;
@@ -560,7 +560,7 @@
 
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-      import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, increment, query, where, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+      import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, increment, query, where, addDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
       const firebaseConfig = {
           apiKey: "AIzaSyAqPpKqqHBEIJZTCGCROFzqZyHOYlnDgP4",
@@ -677,10 +677,8 @@
                   const prodSnap = await getDocs(q);
                   
                   let catProducts = [];
-                  prodSnap.forEach(d => catProducts.push(d.data()));
+                  prodSnap.forEach(d => catProducts.push({ id: d.id, ...d.data() }));
 
-                  // جلب قائمة الحجوزات المؤقتة النشطة (أقل من 24 ساعة)
-                  let reservations = JSON.parse(localStorage.getItem('eva_product_reservations')) || {};
                   const now = new Date().getTime();
 
                   let productsContent = '';
@@ -698,25 +696,19 @@
 
                           let priceHtml = `<span class="price-ex">السعر: ${p.price} ₪</span>`;
 
-                          // فحص حالة الحجز المؤقت (24 ساعة)
+                          // فحص حالة الحجز المؤقت المركزي من قاعدة البيانات مباشرة (24 ساعة)
                           let isReserved = false;
-                          if (reservations[p.code]) {
-                              let reservedTime = reservations[p.code];
-                              // 24 ساعة = 24 * 60 * 60 * 1000 ميلي ثانية
-                              if (now - reservedTime < 24 * 60 * 60 * 1000) {
+                          if (p.reservedUntil) {
+                              if (now < p.reservedUntil) {
                                   isReserved = true;
-                              } else {
-                                  delete reservations[p.code]; // انتهت الـ 24 ساعة
-                                  localStorage.setItem('eva_product_reservations', JSON.stringify(reservations));
                               }
                           }
 
                           let cardClass = isReserved ? "product-card reserved" : "product-card";
                           let badgeStyle = isReserved ? "display: block;" : "display: none;";
                           let btnClass = isReserved ? "whatsapp-btn disabled" : "whatsapp-btn";
-                          let btnText = isReserved ? "محجوز مؤقتاً (قيد الطلب)" : "اطلب واتساب";
+                          let btnText = isReserved ? "محجوز مؤقتاً (قيد المعالجة)" : "اطلب واتساب";
 
-                          // رابط الواتساب مع تفعيل دالة الحجز المؤقت عند النقر
                           let whatsappLink = "#";
                           let clickHandler = isReserved ? "" : `onclick="handleProductOrder('${p.code}', '${p.name}', '${p.price}', event)"`;
 
@@ -756,17 +748,19 @@
           window.scrollTo({ top: 0, behavior: 'smooth' });
       }
 
-      // دالة معالجة الطلب والحجز المؤقت لمدة 24 ساعة وتوجيه رسالة الواتساب للإدارة
+      // دالة معالجة الطلب وتحديث الحجز المؤقت مركزياً في قاعدة البيانات ليراه الجميع
       window.handleProductOrder = async function(code, name, price, event) {
           event.preventDefault();
 
-          // 1. تسجيل الحجز المؤقت في التخزين المحلي وفي فايربيس (ليراه الكتالوج ولوحة الإدارة)
-          let reservations = JSON.parse(localStorage.getItem('eva_product_reservations')) || {};
-          reservations[code] = new Date().getTime();
-          localStorage.setItem('eva_product_reservations', JSON.stringify(reservations));
+          const reservationTime = new Date().getTime() + (24 * 60 * 60 * 1000); // 24 ساعة
 
-          // 2. إرسال الطلب لقاعدة بيانات الطلبات المعلقة في Firestore لكي يظهر في لوحة الإدارة
           try {
+              // 1. تحديث حقل الحجز في وثيقة المنتج في قاعدة البيانات ليصبح مرئياً لجميع الزوار
+              await setDoc(doc(db, "products", code), {
+                  reservedUntil: reservationTime
+              }, { merge: true });
+
+              // 2. إرسال الطلب لقاعدة بيانات الطلبات المعلقة للإدارة
               let currentUser = JSON.parse(localStorage.getItem('eva_current_user')) || {};
               await addDoc(collection(db, "orders"), {
                   productCode: code,
@@ -779,10 +773,10 @@
                   timestamp: new Date().toISOString()
               });
           } catch (err) {
-              console.error("Error saving order to Firestore:", err);
+              console.error("Error updating reservation in Firestore:", err);
           }
 
-          // 3. تحديث واجهة الكتالوج فوراً لتظليل المنتج وتعطيل زره
+          // 3. تحديث واجهة الكتالوج الحالية فوراً
           const card = document.getElementById(`prod-card-${code}`);
           const badge = document.getElementById(`badge-${code}`);
           const btn = document.getElementById(`btn-${code}`);
@@ -793,7 +787,7 @@
               btn.innerText = 'محجوز مؤقتاً (قيد المعالجة)';
           }
 
-          // 4. بناء رسالة الواتساب وتوجيه العميل للرقم الصحيح
+          // 4. توجيه العميل للواتساب
           let currentUser = JSON.parse(localStorage.getItem('eva_current_user')) || {};
           let clientName = currentUser.name || 'عميل عبر الكتالوج';
           let clientPhone = currentUser.phone || 'غير مسجل';
