@@ -3,541 +3,296 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>كتالوج المنتجات | إيفا بلس</title>
-
-    <!-- إعدادات تطبيق الويب (PWA Manifest) -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#880e4f">
-
-    <!-- وسوم المعاينة الاحترافية لفيسبوك (Open Graph Tags) -->
-    <meta property="og:title" content="كتالوج المنتجات">
-    <meta property="og:description" content="التوصيل متوفر لكافة مناطق الضفة والداخل.">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&auto=format&fit=crop&q=80">
-    <meta property="og:url" content="https://evaproducts.github.io/catalog/catalog.html">
-    <meta property="og:type" content="website">
-
+    <title>معرض إيفا | الكتالوج الرقمي</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #fdfbfb 0%, #fce4ec 100%);
-            color: #333;
-            margin: 0;
-            padding: 0;
-            line-height: 1.6;
-            min-height: 100vh;
-        }
+        body { font-family: Arial, sans-serif; background: #fdf2f4; color: #333; margin: 0; padding: 15px; direction: rtl; }
+        .header { text-align: center; padding: 20px; background: #fff; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .header img { max-height: 70px; margin-bottom: 10px; }
+        .notice-bar { background: #880e4f; color: #fff; padding: 10px 15px; border-radius: 8px; text-align: center; font-size: 14px; margin-bottom: 20px; font-weight: bold; }
+        .categories-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 20px; }
+        .cat-btn { background: #fff; border: 1px solid #f8bbd0; color: #880e4f; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; white-space: nowrap; font-size: 13px; }
+        .cat-btn.active { background: #880e4f; color: #fff; }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 15px; }
+        .product-card { background: #fff; border-radius: 12px; padding: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #f8bbd0; display: flex; flex-direction: column; justify-content: space-between; }
+        .product-img-container { width: 100%; height: 220px; border-radius: 8px; overflow: hidden; background: #f9f9f9; position: relative; margin-bottom: 10px; cursor: pointer; }
+        .product-img-container img { width: 100%; height: 100%; object-fit: cover; }
+        .product-title { font-size: 15px; font-weight: bold; color: #333; margin-bottom: 5px; }
+        .product-code { font-size: 12px; color: #888; margin-bottom: 8px; }
+        .product-price { font-size: 16px; font-weight: bold; color: #880e4f; margin-bottom: 12px; }
+        .order-btn { background: #880e4f; color: #fff; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; font-size: 14px; }
+        .order-btn:hover { background: #ad1457; }
+        .reserved-badge { background: #e74c3c; color: #fff; text-align: center; padding: 8px; border-radius: 8px; font-weight: bold; font-size: 13px; margin-top: 10px; }
         
-        header {
-            background: #fff;
-            padding: 25px 20px;
-            text-align: center;
-            border-bottom: 2px solid #f8bbd0;
-            position: relative;
-        }
-
-        .eva-plus-banner {
-            display: none;
-            background: linear-gradient(135deg, #fff9c4 0%, #fffde7 100%);
-            border: 2px dashed #d4af37;
-            padding: 12px;
-            margin: 15px auto 0 auto;
-            max-width: 650px;
-            border-radius: 10px;
-            text-align: center;
-            font-size: 14px;
-            color: #5d4037;
-            font-weight: bold;
-        }
-
-        #installAppBanner {
-            display: none;
-            background: linear-gradient(135deg, #880e4f 0%, #ad1457 100%);
-            color: white;
-            padding: 12px 20px;
-            text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 9999;
-            box-shadow: 0 4px 15px rgba(136, 14, 79, 0.3);
-            border-bottom: 2px solid #d4af37;
-        }
-        .install-banner-content {
-            max-width: 800px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .install-text { font-size: 14px; font-weight: bold; margin: 0; }
-        .install-action-btns { display: flex; gap: 8px; }
-        #installAppBtn {
-            background: #fff; color: #880e4f; border: none; padding: 7px 16px; border-radius: 20px; font-weight: bold; font-size: 13px; cursor: pointer;
-        }
-        #dismissInstallBtn { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.6); padding: 7px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; }
-
-        #display-logo {
-            width: 90px; height: 90px; object-fit: cover; border-radius: 50%; border: 3px solid #d4af37; margin-bottom: 10px; display: none; margin-left: auto; margin-right: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        header h1 { margin: 5px 0; color: #880e4f; font-size: 26px; }
-        header p { color: #ad1457; font-size: 14px; margin: 0; font-weight: bold; }
-
-        .social-promo-box {
-            display: flex; justify-content: center; align-items: center; gap: 8px; margin: 15px 0 10px 0; flex-wrap: wrap;
-        }
-        .social-promo-btn {
-            display: inline-block; background: linear-gradient(135deg, #880e4f 0%, #ad1457 100%); color: #fff; text-decoration: none; padding: 9px 16px; border-radius: 25px; font-size: 13px; font-weight: bold; border: 1px solid #d4af37;
-        }
-
-        .store-payment-badges {
-            display: flex; justify-content: center; align-items: center; gap: 10px; margin: 15px auto 0 auto; flex-wrap: wrap;
-        }
-        .payment-pill {
-            background: #fff; color: #880e4f; border: 1px solid #f8bbd0; padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: bold;
-        }
-        .delivery-notice-bar { text-align: center; margin-top: 12px; font-size: 13px; font-weight: bold; color: #ad1457; }
-
-        .container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
-
-        .admin-notice-box {
-            background: #fff; border-right: 5px solid #ad1457; border-left: 1px solid #f8bbd0; border-top: 1px solid #f8bbd0; border-bottom: 1px solid #f8bbd0; padding: 15px; margin-bottom: 20px; border-radius: 8px; font-size: 14px; color: #444;
-        }
-
-        .back-to-categories {
-            background: #880e4f; color: white; border: none; padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 15px;
-        }
-
-        .categories-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; margin-top: 15px;
-        }
-        .category-card {
-            background: #fff; border: 1px solid #f8bbd0; border-radius: 12px; padding: 15px 10px; text-align: center; cursor: pointer; box-shadow: 0 3px 10px rgba(0,0,0,0.03);
-        }
-        .category-img {
-            width: 70px; height: 70px; object-fit: cover; border-radius: 50%; border: 2px solid #d4af37; margin-bottom: 8px; background-color: #fafafa;
-        }
-        .category-card h3 { font-size: 14px; color: #880e4f; margin: 5px 0 2px 0; }
-        .category-code-tag { font-size: 12px; color: #b8860b; font-weight: bold; }
-
-        .section { display: none; }
-        .section.active-section { display: block; }
-        .section h2 { font-size: 18px; color: #880e4f; margin-bottom: 15px; border-bottom: 2px solid #f8bbd0; padding-bottom: 8px; }
-
-        .products-grid {
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
-        }
-        @media (min-width: 600px) {
-            .products-grid { grid-template-columns: repeat(3, 1fr); gap: 15px; }
-        }
-
-        .product-card {
-            background: #fff; border: 1px solid #f8bbd0; border-radius: 12px; padding: 10px; text-align: center; box-shadow: 0 3px 10px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: space-between; position: relative;
-        }
-        .product-card.reserved { opacity: 0.6; background: #f5f5f5; }
-        .reserved-badge {
-            display: none; background: #d32f2f; color: white; font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 4px; margin-bottom: 8px;
-        }
-
-        .product-images { display: flex; gap: 4px; overflow-x: auto; margin-bottom: 8px; padding-bottom: 3px; }
-        .product-images img { width: 35px; height: 35px; object-fit: cover; border-radius: 4px; cursor: pointer; border: 1px solid #f8bbd0; }
-
-        .main-product-img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 8px; margin-bottom: 8px; cursor: pointer; border: 1px solid #fce4ec; }
-
-        .product-card h3 { font-size: 13px; margin: 4px 0; color: #333; }
-        .prices { font-size: 12px; color: #555; margin: 6px 0; background: #fff0f5; padding: 6px; border-radius: 6px; border: 1px solid #f8bbd0; }
-        .price-ex { color: #333; font-weight: bold; font-size: 13px; display: block; }
-        .product-code { color: #b8860b; font-size: 11px; font-weight: bold; display: block; margin-top: 3px; }
-
-        .whatsapp-btn {
-            background: #25d366; color: white; border: none; padding: 7px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; text-decoration: none; display: block; width: 100%; box-sizing: border-box; font-weight: bold; box-shadow: 0 2px 6px rgba(37, 211, 102, 0.3);
-        }
-        .whatsapp-btn:hover { background: #20ba5a; }
-        .whatsapp-btn.disabled { background: #ccc; pointer-events: none; box-shadow: none; }
-
-        .footer-visitor-box { text-align: center; margin: 30px 0 10px 0; font-size: 14px; color: #666; font-weight: bold; }
-        .footer-link { text-align: center; margin-bottom: 20px; font-size: 14px; }
-        .footer-link a { color: #ad1457; text-decoration: none; font-weight: bold; }
-        footer { text-align: center; color: #888; font-size: 12px; margin-bottom: 25px; }
-
-        .modal { display: none; position: fixed; z-index: 999; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.95); justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
-        .modal img { max-width: 95%; max-height: 90vh; object-fit: contain; border-radius: 8px; }
-        .close-modal { color: #ad1457; font-size: 40px; position: absolute; top: 15px; left: 25px; cursor: pointer; font-weight: bold; z-index: 1000; }
+        /* Modal للتصوير والطلب */
+        .modal { display: none; position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; }
+        .modal-content { background: #fff; width: 100%; max-width: 450px; border-radius: 12px; padding: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px; color: #555; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        .close-modal { float: left; font-size: 20px; font-weight: bold; color: #880e4f; cursor: pointer; }
+        
+        /* معرض الصور المصغر */
+        .image-modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; flex-direction: column; padding: 20px; box-sizing: border-box; }
+        .image-modal img { max-width: 90%; max-height: 75vh; border-radius: 8px; object-fit: contain; }
+        .close-img-modal { position: absolute; top: 20px; left: 25px; color: #fff; font-size: 30px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div id="installAppBanner">
-        <div class="install-banner-content">
-            <p class="install-text">📱 ثبت تطبيق معرض إيفا لسهولة وسرعة التصفح!</p>
-            <div class="install-action-btns">
-                <button id="installAppBtn">تثبيت التطبيق</button>
-                <button id="dismissInstallBtn" onclick="document.getElementById('installAppBanner').style.display='none'">لاحقاً</button>
+    <div class="header">
+        <div id="logoContainer"><h1 style="color: #880e4f; margin:0;">معرض إيفا براند</h1></div>
+        <p style="color: #666; font-size: 13px; margin: 5px 0 0 0;">أرقى العطور، الحقائب، والساعات الفاخرة</p>
+        <div id="partnerBanner" style="display:none; margin-top: 10px; background: #fff0f5; padding: 8px; border-radius: 6px; font-size: 13px; color: #880e4f; font-weight: bold;"></div>
+    </div>
+
+    <div id="adminNoticeBar" class="notice-bar" style="display: none;"></div>
+
+    <div class="categories-nav" id="categoriesNav">
+        <button class="cat-btn active" onclick="filterCategory('ALL')">الكل</button>
+    </div>
+
+    <div class="products-grid" id="productsGrid">
+        <p style="text-align:center; grid-column: 1/-1; color:#888;">جاري تحميل المنتجات...</p>
+    </div>
+
+    <!-- نافذة الطلب -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeOrderModal()">&times;</span>
+            <h3 style="color: #880e4f; margin-top: 0; margin-bottom: 15px;">🛍️ إتمام طلب المنتج</h3>
+            <p id="modalProductName" style="font-weight: bold; color: #333; margin-bottom: 15px; font-size: 14px;"></p>
+            
+            <div class="form-group">
+                <label>الاسم الكامل:</label>
+                <input type="text" id="clientName" placeholder="أدخل اسمك الكريم">
             </div>
+            <div class="form-group">
+                <label>رقم الهاتف (واتساب):</label>
+                <input type="text" id="clientPhone" placeholder="0590000000">
+            </div>
+            <div class="form-group">
+                <label>العنوان (المدينة / الحي):</label>
+                <input type="text" id="clientAddress" placeholder="رام الله - المنارة">
+            </div>
+            
+            <button class="order-btn" onclick="submitOrder()" style="margin-top: 10px;">إرسال وتأكيد الطلب 🌸</button>
         </div>
     </div>
 
-    <header>
-        <img id="display-logo" alt="Logo">
-        <h1>معرض إيفا براند</h1>
-        <p>عالم من الهدايا الفاخرة</p>
-
-        <div id="evaPlusBanner" class="eva-plus-banner">
-            🌸 أهلاً بك في نظام <b>EVA PLUS</b>. أنت تتصفح عبر الشريك المرجع: <span id="sponsorNameDisplay" style="color: #880e4f;"></span>
-        </div>
-
-        <div class="social-promo-box">
-            <a href="https://linky.ps/eva" target="_blank" class="social-promo-btn">✨ تابعونا</a>
-            <a href="https://www.google.com/maps?q=32.1273809,35.1433041&z=17&hl=en" target="_blank" class="social-promo-btn">📍 موقعنا</a>
-            <a href="join.html" id="dynamicPromoBtn" class="social-promo-btn" style="background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);">💼 انضم إلى EVA PLUS</a>
-        </div>
-
-        <div class="store-payment-badges">
-            <div class="payment-pill">Cash</div>
-            <div class="payment-pill">Visa</div>
-            <div class="payment-pill">iBuraq</div>
-        </div>
-
-        <div class="delivery-notice-bar">
-            🚚 متوفر التوصيل لكافة مناطق الضفة، القدس، والداخل 📍
-        </div>
-    </header>
-
-    <div class="container">
-        <div id="adminNoticeBox" class="admin-notice-box" style="display: none;">
-            <strong>📢 </strong> <span id="adminNoticeText"></span>
-        </div>
-
-        <div id="categoriesHomeView">
-            <h2 style="font-size: 18px; color: #880e4f; margin-bottom: 15px; border-bottom: 2px solid #f8bbd0; padding-bottom: 8px;">✨ أقسام المعرض</h2>
-            <div id="categoriesGrid" class="categories-grid">جاري تحميل الأقسام...</div>
-        </div>
-
-        <div id="sectionsContainer"></div>
-
-        <div class="footer-visitor-box">
-            الزيارات: <span id="visitCount">...</span>
-        </div>
-
-        <div class="footer-link">
-            تصفحي روابطنا الأخرى: <a href="https://linky.ps/eva" target="_blank">linky.ps/eva</a>
-        </div>
-    </div>
-
-    <footer>
-        جميع الحقوق محفوظة © معرض إيفا براند 2026
-    </footer>
-
-    <div id="imageModal" class="modal" onclick="closeModal()">
-        <span class="close-modal">&times;</span>
-        <img id="modalImg">
+    <!-- نافذة تكبير الصورة -->
+    <div id="imageModal" class="image-modal">
+        <span class="close-img-modal" onclick="closeImageModal()">&times;</span>
+        <img id="modalFullImg" src="">
+        <div id="imgThumbsContainer" style="display: flex; gap: 8px; margin-top: 15px; overflow-x: auto; max-width: 100%;"></div>
     </div>
 
     <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-      import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, increment, query, where, addDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-      const firebaseConfig = {
-          apiKey: "AIzaSyAqPpKqqHBEIJZTCGCROFzqZyHOYlnDgP4",
-          authDomain: "eva-plus-66b96.firebaseapp.com",
-          projectId: "eva-plus-66b96",
-          storageBucket: "eva-plus-66b96.firebasestorage.app",
-          messagingSenderId: "686798536842",
-          appId: "1:686798536842:web:8c09932cd5869292eb6d73"
-      };
+        const firebaseConfig = {
+            apiKey: "AIzaSyAqPpKqqHBEIJZTCGCROFzqZyHOYlnDgP4",
+            authDomain: "eva-plus-66b96.firebaseapp.com",
+            projectId: "eva-plus-66b96",
+            storageBucket: "eva-plus-66b96.firebasestorage.app",
+            messagingSenderId: "686798536842",
+            appId: "1:686798536842:web:8c09932cd5869292eb6d73"
+        };
 
-      const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-      const urlParams = new URLSearchParams(window.location.search);
-      const refParam = urlParams.get('ref') || urlParams.get('user');
-      if (refParam) {
-          localStorage.setItem('eva_active_sponsor', refParam);
-      }
-      const activeSponsor = refParam || localStorage.getItem('eva_active_sponsor');
+        let allProducts = [];
+        let categoriesData = {};
+        let selectedProductForOrder = null;
+        let urlParams = new URLSearchParams(window.location.search);
+        let partnerUser = urlParams.get('user'); // معرف الشريك إن وجد
 
-      const promoBtn = document.getElementById('dynamicPromoBtn');
+        window.addEventListener('DOMContentLoaded', async () => {
+            if (partnerUser) {
+                try {
+                    let pDoc = await getDoc(doc(db, "partners", partnerUser));
+                    let banner = document.getElementById('partnerBanner');
+                    if (pDoc.exists()) {
+                        banner.style.display = 'block';
+                        banner.innerHTML = `🌸 متجر برعاية الشريك المعتمد: ${pDoc.data().name} (${partnerUser})`;
+                    } else {
+                        partnerUser = null; // إذا لم يكن موجوداً يُعامل كزائر عادي
+                    }
+                } catch(e) { partnerUser = null; }
+            }
 
-      if (activeSponsor) {
-          const banner = document.getElementById('evaPlusBanner');
-          if (banner) {
-              banner.style.display = 'block';
-              document.getElementById('sponsorNameDisplay').innerText = activeSponsor;
-          }
-          promoBtn.href = "partner.html";
-          promoBtn.innerText = "🌳 لوحة شريك EVA PLUS";
-      } else {
-          promoBtn.href = "join.html";
-          promoBtn.innerText = "💼 انضم إلى EVA PLUS";
-      }
+            try {
+                // تحميل اللوغو والإدارة
+                const settingsSnap = await getDocs(collection(db, "settings"));
+                settingsSnap.forEach(d => {
+                    if(d.id === 'logo' && d.data().img) {
+                        document.getElementById('logoContainer').innerHTML = `<img src="${d.data().img}" alt="Logo">`;
+                    }
+                    if(d.id === 'notice' && d.data().text) {
+                        let bar = document.getElementById('adminNoticeBar');
+                        bar.style.display = 'block';
+                        bar.innerText = d.data().text;
+                    }
+                });
 
-      let globalLogoUrl = "";
-      let loadedCategories = [];
+                // تحميل الأقسام
+                const catSnap = await getDocs(collection(db, "categories"));
+                let navHtml = `<button class="cat-btn active" onclick="filterCategory('ALL')">الكل</button>`;
+                catSnap.forEach(d => {
+                    categoriesData[d.id] = d.data().name;
+                    navHtml += `<button class="cat-btn" onclick="filterCategory('${d.id}')">${d.data().name}</button>`;
+                });
+                document.getElementById('categoriesNav').innerHTML = navHtml;
 
-      async function setupVisitorCounter() {
-          try {
-              const statsRef = doc(db, "settings", "stats");
-              const statsDoc = await getDoc(statsRef);
-              let totalVisits = statsDoc.exists() ? (statsDoc.data().visits || 50) : 50;
-              await updateDoc(statsRef, { visits: increment(1) });
-              document.getElementById('visitCount').innerText = totalVisits + 1;
-          } catch (error) {
-              document.getElementById('visitCount').innerText = "50";
-          }
-      }
+                // تحميل المنتجات
+                const prodSnap = await getDocs(collection(db, "products"));
+                allProducts = [];
+                prodSnap.forEach(d => allProducts.push({ id: d.id, ...d.data() }));
 
-      async function initCatalogFast() {
-          setupVisitorCounter();
+                renderProducts(allProducts);
 
-          try {
-              const [logoDoc, noticeDoc, catSnapshot] = await Promise.all([
-                  getDoc(doc(db, "settings", "logo")),
-                  getDoc(doc(db, "settings", "notice")),
-                  getDocs(collection(db, "categories"))
-              ]);
+            } catch (err) {
+                console.error("Error loading catalog:", err);
+                document.getElementById('productsGrid').innerHTML = `<p style="text-align:center; color:red; grid-column:1/-1;">خطأ في تحميل المنتجات.</p>`;
+            }
+        });
 
-              if (logoDoc.exists() && logoDoc.data().img) {
-                  globalLogoUrl = logoDoc.data().img;
-                  const logoEl = document.getElementById('display-logo');
-                  logoEl.src = globalLogoUrl;
-                  logoEl.style.display = 'block';
-              }
+        window.filterCategory = function(catId) {
+            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            if (catId === 'ALL') {
+                renderProducts(allProducts);
+            } else {
+                renderProducts(allProducts.filter(p => p.category === catId));
+            }
+        };
 
-              if (noticeDoc.exists() && noticeDoc.data().text) {
-                  document.getElementById('adminNoticeText').innerText = noticeDoc.data().text;
-                  document.getElementById('adminNoticeBox').style.display = 'block';
-              }
+        function renderProducts(products) {
+            let grid = document.getElementById('productsGrid');
+            if (products.length === 0) {
+                grid.innerHTML = `<p style="text-align:center; color:#888; grid-column:1/-1;">لا توجد منتجات متوفرة حالياً في هذا القسم.</p>`;
+                return;
+            }
 
-              loadedCategories = [];
-              catSnapshot.forEach(docItem => loadedCategories.push({ id: docItem.id, ...docItem.data() }));
+            grid.innerHTML = products.map(p => {
+                let firstImg = (p.images && p.images.length > 0) ? p.images[0] : '';
+                let isReserved = p.reservedUntil && new Date(p.reservedUntil) > new Date();
 
-              const categoriesGrid = document.getElementById('categoriesGrid');
-              let categoriesHtml = '';
+                return `
+                    <div class="product-card">
+                        <div>
+                            <div class="product-img-container" onclick='openImageModal(${JSON.stringify(p.images || [])})'>
+                                <img src="${firstImg}" alt="${p.name}">
+                            </div>
+                            <div class="product-title">${p.name}</div>
+                            <div class="product-code">كود المنتج: ${p.code}</div>
+                            <div class="product-price">${p.price} ₪</div>
+                        </div>
+                        <div>
+                            ${isReserved ? 
+                                `<div class="reserved-badge">محجوز حالياً</div>` : 
+                                `<button class="order-btn" onclick='openOrderModal("${p.code}", "${p.name}")'>اطلب المنتج 🛍️</button>`
+                            }
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
 
-              loadedCategories.forEach(cat => {
-                  let catImg = cat.image ? cat.image : (globalLogoUrl || 'https://via.placeholder.com/70');
-                  categoriesHtml += `
-                      <div class="category-card" onclick="openCategory('${cat.id}', '${cat.name}')">
-                          <img src="${catImg}" class="category-img" alt="${cat.name}">
-                          <h3>${cat.name}</h3>
-                          <span class="category-code-tag">(${cat.id})</span>
-                      </div>
-                  `;
-              });
-              categoriesGrid.innerHTML = categoriesHtml;
+        window.openOrderModal = function(code, name) {
+            selectedProductForOrder = { code, name };
+            document.getElementById('modalProductName').innerText = `المنتج: ${name} (${code})`;
+            document.getElementById('clientName').value = '';
+            document.getElementById('clientPhone').value = '';
+            document.getElementById('clientAddress').value = '';
+            document.getElementById('orderModal').style.display = 'flex';
+        };
 
-          } catch (error) {
-              console.error("Error loading fast catalog data:", error);
-          }
-      }
+        window.closeOrderModal = function() {
+            document.getElementById('orderModal').style.display = 'none';
+        };
 
-      window.openCategory = async function(catId, catName) {
-          document.getElementById('categoriesHomeView').style.display = 'none';
-          
-          let targetSec = document.getElementById(`section-${catId}`);
-          if (!targetSec) {
-              targetSec = document.createElement('div');
-              targetSec.id = `section-${catId}`;
-              targetSec.className = 'section active-section';
-              targetSec.innerHTML = `
-                  <button class="back-to-categories" onclick="backToHome()">⬅ العودة للأقسام</button>
-                  <h2>✨ ${catName} (${catId})</h2>
-                  <p style="text-align:center; color:#880e4f; padding:20px;">جاري تحميل منتجات القسم...</p>
-              `;
-              document.getElementById('sectionsContainer').appendChild(targetSec);
+        // إرسال الطلب (الفصل التام بين الزبون العادي وزبون أيفا بلس)
+        window.submitOrder = async function() {
+            let name = document.getElementById('clientName').value.trim();
+            let phone = document.getElementById('clientPhone').value.trim();
+            let address = document.getElementById('clientAddress').value.trim();
 
-              try {
-                  const prodRef = collection(db, "products");
-                  const q = query(prodRef, where("category", "in", [catId, catName]));
-                  const prodSnap = await getDocs(q);
-                  
-                  let catProducts = [];
-                  prodSnap.forEach(d => catProducts.push({ id: d.id, ...d.data() }));
+            if (!name || !phone || !address) {
+                return alert('الرجاء إدخال كافة البيانات المطلوبة (الاسم، الهاتف، العنوان).');
+            }
 
-                  const now = new Date().getTime();
+            try {
+                let orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
+                let reserveDate = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
-                  let productsContent = '';
-                  if (catProducts.length === 0) {
-                      productsContent = '<p style="color:#880e4f; text-align:center; padding:20px;">لا توجد منتجات في هذا القسم حالياً.</p>';
-                  } else {
-                      productsContent = `<div class="products-grid">` + catProducts.map(p => {
-                          let images = p.images && p.images.length > 0 ? p.images : [];
-                          let mainImg = images.length > 0 ? images[0] : '';
-                          let thumbsHtml = images.length > 1 ? `
-                              <div class="product-images">
-                                  ${images.map(img => `<img src="${img}" onclick="changeMainImage(this, '${p.code}')">`).join('')}
-                              </div>
-                          ` : '';
+                // حجز المنتج مؤقتاً
+                await setDoc(doc(db, "products", selectedProductForOrder.code), {
+                    reservedUntil: reserveDate
+                }, { merge: true });
 
-                          let priceHtml = `<span class="price-ex">السعر: ${p.price} ₪</span>`;
+                if (partnerUser) {
+                    // 🌳 الحالة الثانية: طلب أيفا بلس (عبر رابط شريك)
+                    await setDoc(doc(db, "orders", orderId), {
+                        orderType: 'partner',
+                        productCode: selectedProductForOrder.code,
+                        productName: selectedProductForOrder.name,
+                        clientName: name,
+                        clientPhone: phone,
+                        clientAddress: address,
+                        sponsor: partnerUser, // الشريك صاحب الرابط
+                        createdAt: new Date().toISOString()
+                    });
 
-                          // الاعتماد حصرياً على بيانات Firebase الدقيقة لحالة حجز المنتج
-                          let isReserved = false;
-                          if (p.reservedUntil && now < p.reservedUntil) {
-                              isReserved = true;
-                          }
+                    alert('✅ تم إرسال طلبك بنجاح! سيتم التنسيق معك لتوصيل طلبك قريباً.');
+                    closeOrderModal();
+                    location.reload();
 
-                          let cardClass = isReserved ? "product-card reserved" : "product-card";
-                          let badgeStyle = isReserved ? "display: block;" : "display: none;";
-                          let btnClass = isReserved ? "whatsapp-btn disabled" : "whatsapp-btn";
-                          let btnText = isReserved ? "محجوز مؤقتاً (قيد المعالجة)" : "اطلب واتساب";
+                } else {
+                    // 🛍️ الحالة الأولى: طلب عادي (زائر مباشر بدون رابط شريك)
+                    await setDoc(doc(db, "orders", orderId), {
+                        orderType: 'normal',
+                        productCode: selectedProductForOrder.code,
+                        productName: selectedProductForOrder.name,
+                        clientName: name,
+                        clientPhone: phone,
+                        clientAddress: address,
+                        createdAt: new Date().toISOString()
+                    });
 
-                          let whatsappLink = "#";
-                          let clickHandler = isReserved ? "" : `onclick="handleProductOrder('${p.code}', '${p.name}', '${p.price}', event)"`;
+                    // توجيه تلقائي وفوري للواتساب التجاري
+                    let whatsappMsg = `مرحباً إيفا براند، أريد طلب المنتج رقم [${selectedProductForOrder.code}] - ${selectedProductForOrder.name}.\nالاسم: ${name}\nالهاتف: ${phone}\nالعنوان: ${address}`;
+                    let storeWhatsApp = "0597180456"; // رقم المعرض الأساسي
+                    let waUrl = `https://wa.me/970${storeWhatsApp.replace(/^0/, '')}?text=${encodeURIComponent(whatsappMsg)}`;
 
-                          return `
-                              <div class="${cardClass}" id="prod-card-${p.code}">
-                                  <div>
-                                      <div class="reserved-badge" id="badge-${p.code}" style="${badgeStyle}">⏳ محجوز مؤقتاً (قيد المعالجة)</div>
-                                      ${mainImg ? `<img src="${mainImg}" class="main-product-img" id="main-img-${p.code}" onclick="openModal('${mainImg}')">` : ''}
-                                      ${thumbsHtml}
-                                      <h3>${p.name}</h3>
-                                      <div class="prices">
-                                          ${priceHtml}
-                                          <span class="product-code">رمز المنتج: ${p.code}</span>
-                                      </div>
-                                  </div>
-                                  <a href="${whatsappLink}" ${clickHandler} id="btn-${p.code}" target="_blank" class="${btnClass}">${btnText}</a>
-                              </div>
-                          `;
-                      }).join('') + `</div>`;
-                  }
+                    closeOrderModal();
+                    window.open(waUrl, '_blank');
+                    location.reload();
+                }
 
-                  targetSec.innerHTML = `
-                      <button class="back-to-categories" onclick="backToHome()">⬅ العودة للأقسام</button>
-                      <h2>✨ ${catName} (${catId})</h2>
-                      ${productsContent}
-                  `;
+            } catch (err) {
+                console.error("Error submitting order:", err);
+                alert('حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مرة أخرى.');
+            }
+        };
 
-              } catch (e) {
-                  console.error("Error loading products for category:", e);
-                  targetSec.innerHTML = `<button class="back-to-categories" onclick="backToHome()">⬅ العودة للأقسام</button><p style="text-align:center; color:red;">حدث خطأ في تحميل المنتجات.</p>`;
-              }
-          } else {
-              document.querySelectorAll('.section').forEach(s => s.classList.remove('active-section'));
-              targetSec.classList.add('active-section');
-          }
+        window.openImageModal = function(images) {
+            if(!images || images.length === 0) return;
+            document.getElementById('modalFullImg').src = images[0];
+            let thumbs = document.getElementById('imgThumbsContainer');
+            if(images.length > 1) {
+                thumbs.innerHTML = images.map(img => `<img src="${img}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; cursor: pointer; border: 2px solid #fff;" onclick="document.getElementById('modalFullImg').src='${img}'">`).join('');
+                thumbs.style.display = 'flex';
+            } else {
+                thumbs.style.display = 'none';
+            }
+            document.getElementById('imageModal').style.display = 'flex';
+        };
 
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-
-      window.handleProductOrder = async function(code, name, price, event) {
-          event.preventDefault();
-
-          let currentUser = JSON.parse(localStorage.getItem('eva_current_user')) || {};
-          let isJoinFlow = currentUser.phone ? true : false;
-
-          // فحص دقيق من فايربيس (Orders) لمنع الشريك القادم من الانضمام من حجز أكثر من منتج بنفس رقم الهاتف
-          if (isJoinFlow && currentUser.phone) {
-              try {
-                  const ordersRef = collection(db, "orders");
-                  const qOrders = query(ordersRef, where("clientPhone", "==", currentUser.phone));
-                  const ordersSnap = await getDocs(qOrders);
-                  if (!ordersSnap.empty) {
-                      alert('⚠️ عذراً، لقد قمت مسبقاً بحجز منتج من رابط الانضمام هذا. لا يمكنك حجز منتج آخر حالياً ريثما تتم مراجعة طلبك.');
-                      return;
-                  }
-              } catch (err) {
-                  console.error("Error checking existing orders from firebase:", err);
-              }
-          }
-
-          const reservationTime = new Date().getTime() + (24 * 60 * 60 * 1000); // 24 ساعة حجز
-
-          let msg = "";
-          let orderData = {};
-
-          if (isJoinFlow) {
-              orderData = {
-                  productCode: code,
-                  productName: name,
-                  price: price,
-                  clientName: currentUser.name || 'شريك جديد',
-                  clientPhone: currentUser.phone,
-                  clientAddress: currentUser.address || 'غير محدد',
-                  partnerId: currentUser.partnerId || 'TEMP-' + Math.floor(1000 + Math.random() * 9000),
-                  sponsor: currentUser.sponsor || activeSponsor || 'EVA-ROOT',
-                  status: 'pending',
-                  timestamp: new Date().toISOString()
-              };
-
-              msg = `مرحباً إدارة معرض إيفا 🌸 هذا طلب انضمام جديد لنظام EVA PLUS:\n\n` +
-                    `- اسم العميل: ${currentUser.name}\n` +
-                    `- رقم الهاتف: ${currentUser.phone}\n` +
-                    `- العنوان: ${currentUser.address || 'غير محدد'}\n` +
-                    `- رقم الشريك المؤقت: ${orderData.partnerId}\n` +
-                    `- الداعي / المرجع: ${orderData.sponsor}\n` +
-                    `- المنتج المطلوب للانضمام: ${name} (رمز: ${code}) - السعر: ${price} ₪`;
-          } else {
-              orderData = {
-                  productCode: code,
-                  productName: name,
-                  price: price,
-                  clientName: 'زبون مباشر (عبر الكتالوج العام)',
-                  clientPhone: 'غير مسجل مسبقاً',
-                  clientAddress: 'يُحدد عبر واتساب',
-                  sponsor: activeSponsor || 'الإدارة المركزية',
-                  status: 'direct',
-                  timestamp: new Date().toISOString()
-              };
-
-              msg = `مرحباً إدارة معرض إيفا 🌸 أرغب بطلب المنتج التالي:\n\n` +
-                    `- المنتج: ${name}\n` +
-                    `- رمز المنتج: ${code}\n` +
-                    `- السعر: ${price} ₪\n` +
-                    `- المرجع: ${activeSponsor || 'زيارة مباشرة للكتالوج'}`;
-          }
-
-          try {
-              // تحديث حجز المنتج في قاعدة بيانات Firebase بشكل دقيق
-              await setDoc(doc(db, "products", code), {
-                  reservedUntil: reservationTime
-              }, { merge: true });
-
-              // حفظ الطلب في Firebase
-              await addDoc(collection(db, "orders"), orderData);
-          } catch (err) {
-              console.error("Error saving order to Firestore:", err);
-          }
-
-          const card = document.getElementById(`prod-card-${code}`);
-          const badge = document.getElementById(`badge-${code}`);
-          const btn = document.getElementById(`btn-${code}`);
-          if(card) card.classList.add('reserved');
-          if(badge) badge.style.display = 'block';
-          if(btn) {
-              btn.className = 'whatsapp-btn disabled';
-              btn.innerText = 'محجوز مؤقتاً (قيد المعالجة)';
-          }
-
-          let whatsappLink = `https://wa.me/972559334655?text=${encodeURIComponent(msg)}`;
-          window.open(whatsappLink, '_blank');
-
-          alert('✅ تم حجز المنتج وإرسال طلبك بنجاح! يرجى إتمام الرسالة عبر واتساب للإدارة لتأكيد التنسيق.');
-      }
-
-      window.backToHome = function() {
-          document.querySelectorAll('.section').forEach(s => s.classList.remove('active-section'));
-          document.getElementById('categoriesHomeView').style.display = 'block';
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-
-      window.changeMainImage = function(thumbElement, code) {
-          const mainImg = document.getElementById(`main-img-${code}`);
-          if(mainImg) mainImg.src = thumbElement.src;
-      }
-
-      window.openModal = function(src) { 
-          const modal = document.getElementById('imageModal');
-          const modalImg = document.getElementById('modalImg');
-          modal.style.display = 'flex'; 
-          modalImg.src = src; 
-      }
-      window.closeModal = function() { 
-          document.getElementById('imageModal').style.display = 'none'; 
-      }
-
-      initCatalogFast();
+        window.closeImageModal = function() {
+            document.getElementById('imageModal').style.display = 'none';
+        };
     </script>
 </body>
 </html>
