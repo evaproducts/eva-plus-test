@@ -75,7 +75,6 @@
             margin-top: 20px;
             margin-bottom: 20px;
         }
-        /* تصميم صندوق التسلسل الذكي لمنع تمدد الشاشة */
         #treePathResult {
             margin-top: 12px;
             font-weight: bold;
@@ -87,14 +86,13 @@
             border: 1px solid #90caf9;
             max-height: 100px;
             overflow-y: auto;
-            display: none; /* مخفي افتراضياً لحين الضغط على زر العرض */
+            display: none;
             line-height: 1.6;
         }
     </style>
 </head>
 <body>
 
-    <!-- لوحة التحكم الرئيسية -->
     <div id="adminPanel" class="container">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <h2>🌟 لوحة تحكم شجرة EVA PLUS</h2>
@@ -127,7 +125,7 @@
             <button class="btn" style="margin-top: 10px;" onclick="addNewPartner()">حفظ وإضافة الشريك للنظام</button>
         </div>
 
-        <!-- صندوق بحث وتتبع تسلسل الشجرة الصعودي (بشكل منظم لا يشغل حيزاً كبيراً) -->
+        <!-- صندوق بحث وتتبع تسلسل الشجرة الصعودي -->
         <div class="tree-path-box">
             <h3 style="margin-top:0; color:#1565c0; border-color:#90caf9;">🔍 تتبع السلسلة الصعودية لشريك</h3>
             <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
@@ -136,12 +134,11 @@
                 </select>
                 <button class="btn" style="background: #1976d2;" onclick="showPartnerTreePath()">عرض التسلسل</button>
             </div>
-            <!-- صندوق نتائج التسلسل القابل للتمرير والمخفي افتراضياً لحفظ المساحة -->
             <div id="treePathResult"></div>
         </div>
 
         <!-- جدول عرض الشجرة والشركاء -->
-        <h3 style="margin-top: 30px;">📋 قائمة شركاء الفريـق المسجلين</h3>
+        <h3 style="margin-top: 30px;">📋 قائمة شركاء الفريق المسجلين (الحقيقيين فقط)</h3>
         <table>
             <thead>
                 <tr>
@@ -158,12 +155,10 @@
         </table>
     </div>
 
-    <!-- برمجة الفايربيز وإدارة الشجرة والتسلسل -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // مفاتيح الربط الجديدة الخاصة بمشروع EVA PLUS
         const firebaseConfig = {
             apiKey: "AIzaSyAqPpKqqHBEIJZTCGCROFzqZyHOYlnDgP4",
             authDomain: "eva-plus-66b96.firebaseapp.com",
@@ -205,6 +200,13 @@
                 allPartnersMap = {};
                 snap.forEach(docItem => {
                     let p = docItem.data();
+                    
+                    // 🛡️ فلترة استثنائية: استبعاد أي سجل يعتبر زبون مباشر أو غير تابع للشجرة الحقيقية
+                    let pName = (p.name || "").toString();
+                    if (pName.includes("زبون مباشر") || p.partnerId === "EVA-908" || !p.partnerId || !p.partnerId.startsWith("EVA-")) {
+                        return; // تجاوز هذا السجل وعدم إدراجه في الشجرة
+                    }
+
                     allPartnersMap[p.partnerId] = p;
 
                     if(p.partnerId !== "EVA-001") {
@@ -216,12 +218,16 @@
                         <tr>
                             <td><b>${p.partnerId}</b></td>
                             <td>${p.name}</td>
-                            <td>${p.phone}</td>
-                            <td>${p.address}</td>
-                            <td>${p.uplineId}</td>
+                            <td>${p.phone || 'غير مسجل'}</td>
+                            <td>${p.address || 'غير محدد'}</td>
+                            <td>${p.uplineId || p.sponsor || 'EVA-001'}</td>
                         </tr>
                     `;
                 });
+
+                if(rowsHtml === '') {
+                    rowsHtml = `<tr><td colspan="5" style="text-align:center; color:#888;">لا توجد سجلات شركاء حقيقيين في الشجرة حتى الآن.</td></tr>`;
+                }
 
                 document.getElementById('partnersTableBody').innerHTML = rowsHtml;
                 document.getElementById('uplineSelect').innerHTML = uplineOptions;
@@ -233,7 +239,6 @@
             }
         }
 
-        // دالة عرض التسلسل ضمن صندوق مرتب وذي مساحة محددة مع إمكانية التمرير
         window.showPartnerTreePath = function() {
             let selectedId = document.getElementById('searchPartnerSelect').value;
             let resultBox = document.getElementById('treePathResult');
@@ -251,7 +256,7 @@
             while(currentId && currentId !== "none" && allPartnersMap[currentId] && safetyCounter < 50) {
                 let partner = allPartnersMap[currentId];
                 pathArray.push(`${partner.name} (${partner.partnerId})`);
-                currentId = partner.uplineId;
+                currentId = partner.uplineId || partner.sponsor;
                 safetyCounter++;
             }
 
@@ -288,6 +293,7 @@
                     phone: phone,
                     address: address,
                     uplineId: uplineId,
+                    balance: 0,
                     createdAt: new Date().toISOString()
                 });
 
