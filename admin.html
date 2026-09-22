@@ -34,7 +34,7 @@
     <table class="orders-table">
         <thead>
             <tr>
-                <th>الزبون والمنتج</th>
+                <th>تفاصيل الزبون والطلب والعيون</th>
                 <th>المرجع (الشريك)</th>
                 <th>الإجراء</th>
             </tr>
@@ -115,7 +115,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, getDocs, setDoc, doc, deleteDoc, addDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // مفاتيح الربط الجديدة الخاصة بمشروع EVA PLUS
     const firebaseConfig = {
         apiKey: "AIzaSyAqPpKqqHBEIJZTCGCROFzqZyHOYlnDgP4",
         authDomain: "eva-plus-66b96.firebaseapp.com",
@@ -212,7 +211,12 @@
 
             ordersTable.innerHTML = orders.map(o => `
                 <tr>
-                    <td><b>${o.productName}</b><br><small>${o.clientName} - ${o.clientPhone}</small></td>
+                    <td>
+                        <b>المنتج: ${o.productName}</b> <span style="color:#b8860b;">(${o.productCode || ''})</span><br>
+                        <b>الزبون:</b> ${o.clientName} <br>
+                        <b>الهاتف:</b> ${o.clientPhone} <br>
+                        <b>العنوان:</b> <span style="color:#880e4f; font-weight:bold;">${o.clientAddress || 'غير محدد'}</span>
+                    </td>
                     <td><span style="color:#d4af37; font-weight:bold;">${o.sponsor || 'مباشر (بدون شريك)'}</span></td>
                     <td>
                         <button onclick='confirmAndNotifyOrder(${JSON.stringify(o)})' style="padding: 6px; font-size: 12px; margin-bottom: 4px;">تأكيد وتفعيل 🌸</button>
@@ -226,7 +230,7 @@
         }
     }
 
-    // دالة التأكيد والتفعيل التلقائي وتوليد رسالة الواتساب للشريك الجديد
+    // دالة التأكيد والتفعيل وتوليد حساب الشريك وسؤال الحذف إن كان آخر قطعة
     window.confirmAndNotifyOrder = async function(order) {
         let generatedPartnerId = "EVA-" + Math.floor(100 + Math.random() * 900);
         let generatedPassword = Math.floor(1000 + Math.random() * 9000).toString();
@@ -247,7 +251,21 @@
         window.open(whatsappUrl, '_blank');
 
         await deleteDoc(doc(db, "orders", order.id));
-        alert('تم تأكيد الطلب وتوليد حساب الشريك (' + generatedPartnerId + ') بنجاح! تم فتح الواتساب لتمرير رسالة الترحيب.');
+
+        // السؤال الذكي المنسق للمخزون (حذف المنتج إن كان آخر قطعة)
+        if (order.productCode) {
+            let deleteProductChoice = confirm(`هل تريد حذف المنتج (رمز: ${order.productCode} - ${order.productName}) من الكتالوج؟\n\n(اضغط "موافق" إذا كان آخر قطعة وانتهى المخزون، أو "إلغاء" إذا كان متوفراً بقطع أخرى).`);
+            if (deleteProductChoice) {
+                try {
+                    await deleteDoc(doc(db, "products", order.productCode));
+                    alert(`تم حذف المنتج (${order.productCode}) من الكتالوج بنجاح!`);
+                } catch(err) {
+                    console.error("Error deleting product:", err);
+                }
+            }
+        }
+
+        alert('تم تأكيد الطلب وتوليد حساب الشريك (' + generatedPartnerId + ') بنجاح!');
         loadOrders();
     }
 
