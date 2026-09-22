@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>انضم إلى نظام EVA PLUS | اعمل من المنزل واربح معنا</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #fce4ec 100%);
+            color: #333;
+            margin: 0;
+            padding: 0;
+            line-height: 1.8;
+        }
+        .hero {
+            background: linear-gradient(rgba(136,14,79,0.85), rgba(173,20,87,0.85)), url('https://images.unsplash.com/photo-1513201099705-a9746e1e201f?auto=format&fit=crop&w=1200&q=80') center/cover;
+            color: white;
+            text-align: center;
+            padding: 50px 20px;
+            border-bottom: 4px solid #d4af37;
+        }
+        .logo-img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid #d4af37;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            background: #fff;
+        }
+        .hero h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+        .hero p {
+            font-size: 16px;
+            color: #fffde7;
+            max-width: 650px;
+            margin: 0 auto;
+            font-weight: bold;
+        }
+        .container {
+            max-width: 750px;
+            margin: -30px auto 40px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            position: relative;
+            border: 1px solid #f8bbd0;
+        }
+        /* صندوق تنبيه الداعي أو الحملة الإعلانية */
+        .sponsor-alert-box {
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            color: #0d47a1;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center;
+            display: none;
+        }
+        /* صندوق الفيديو التوضيحي (يوتيوب) */
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* نسبة أبعاد 16:9 */
+            height: 0;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            border: 2px solid #d4af37;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        /* صندوق الفكرة الجوهرية (لا تبيع منتجاً بل تبيع فكرة) */
+        .core-idea-box {
+            background: linear-gradient(135deg, #f8bbd0 0%, #f48fb1 100%);
+            color: #fff;
+            padding: 22px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(136,14,79,0.15);
+        }
+        .core-idea-box h3 {
+            margin-top: 0;
+            font-size: 20px;
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .core-idea-box p {
+            font-size: 15px;
+            margin-bottom: 0;
+            line-height: 1.8;
+            font-weight: bold;
+        }
+        h2 {
+            color: #880e4f;
+            font-size: 18px;
+            margin-bottom: 15px;
+            border-right: 4px solid #ad1457;
+            padding-right: 10px;
+        }
+        .about-text, .details-box {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 25px;
+            text-align: justify;
+        }
+        .details-box {
+            background: #fff0f5;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #f8bbd0;
+        }
+        .details-box ul {
+            padding-right: 20px;
+            margin: 10px 0;
+        }
+        .details-box li {
+            margin-bottom: 12px;
+            color: #444;
+        }
+        /* صندوق تحفيزي يشرح فكرة نظام EVA PLUS والمثال العملي */
+        .evaplus-power-box {
+            background: linear-gradient(135deg, #fff9c4 0%, #fffde7 100%);
+            border: 2px dashed #d4af37;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+        .evaplus-power-box h3 {
+            color: #880e4f;
+            margin-top: 0;
+            font-size: 18px;
+            text-align: center;
+        }
+        .evaplus-power-box p {
+            font-size: 14px;
+            color: #333;
+            line-height: 1.7;
+            margin-bottom: 10px;
+        }
+        .example-box {
+            background: #fff;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #f9a825;
+            font-size: 13px;
+            color: #5d4037;
+            margin-top: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #444;
+            font-size: 14px;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        .register-btn {
+            background: #ad1457;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 15px;
+            font-size: 17px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            display: block;
+            text-decoration: none;
+            margin-top: 20px;
+            box-shadow: 0 4px 12px rgba(173, 20, 87, 0.3);
+            transition: 0.3s;
+        }
+        .register-btn:hover {
+            background: #880e4f;
+        }
+        /* صندوق المساعدة والدعم المباشر */
+        .support-box {
+            background: #fce4ec;
+            border: 1px solid #f8bbd0;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 25px;
+            font-size: 14px;
+            color: #880e4f;
+        }
+        .support-box a {
+            color: #ad1457;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .footer-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .footer-link a {
+            color: #880e4f;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        footer {
+            text-align: center;
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 30px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hero">
+        <img src="logo.jpg" alt="EVA BRAND Logo" class="logo-img" onerror="this.style.display='none'">
+        <h1>معرض إيفا براند | EVA PLUS</h1>
+        <p>✨ ابنِ فريقك.. واجعل أرباحهم مصدر دخلك المتصاعد ✨<br>اربح بلا توقف - اعمل من المنزل واربح معنا</p>
+    </div>
+
+    <div class="container">
+        
+        <!-- صندوق تنبيه الداعي أو الحملة الإعلانية -->
+        <div id="sponsorAlert" class="sponsor-alert-box"></div>
+
+        <!-- فيديو الشرح التوضيحي (يوتيوب) -->
+        <div class="video-container">
+            <iframe src="https://www.youtube.com/embed/XlYOhwowl74" title="دليل الانضمام والعمل في نظام EVA PLUS" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+
+        <!-- الصندوق الجوهري: أنت لا تبيع منتجاً بل تبيع فكرة -->
+        <div class="core-idea-box">
+            <h3>💡 أنت لا تبيع منتجاً.. أنت تبيع فكرة!</h3>
+            <p>
+                سر النجاح الحقيقي في نظام <b>EVA PLUS</b> ليس في عرض السلع، بل في دعوة معارفك وأصدقائك للانضمام إلى نظام الشراكة الذكي لدينا. لا تدعهم للشراء فحسب، بل ادعهم لينضموا للنظام، وحالما يختار كل شريك منتجه الأول ويدخل الشبكة، ستصبح شريكاً في أرباحهم وتتضاعف دخولكم معاً بلا توقف!
+            </p>
+        </div>
+
+        <h2>🔥 لا تفوّت الفرصة.. انضم إلى ثورة التسويق عبر نظام EVA PLUS!</h2>
+        <div class="about-text">
+            إذا كنت تبحث عن استقلال مالي حقيقي وأنت تدير عملك بكل راحة من منزلك وبدون أي رأس مال، فإن نظام <b>EVA PLUS</b> صُم خصيصاً ليغير حياتك. نحن لا نمنحك فرصة بيع تقليدية، بل نبني معك إمبراطورية أرباح تراكمية لا تتوقف ليل نهار!
+        </div>
+
+        <!-- صندوق تحفيزي يشرح فكرة نظام EVA PLUS والمثال العملي -->
+        <div class="evaplus-power-box">
+            <h3>💎 كيف تقلب موازين دخلك مع نظام EVA PLUS؟</h3>
+            <p>
+                عبر نظام <b>EVA PLUS</b>، أنت لا تعمل وحدك أبداً. أرباحك تتضاعف تراكمياً صعوداً وهبوطاً عبر الشجرة؛ فكل شخص تدعوه للانضمام تحت شجرتك تصبح شريكاً معه في أرباحه، وكلما توسعت شبكتك وكبرت الشجرة التي أنت أساسها، أصبحوا هم يعملون لأجلك!
+            </p>
+            <div class="example-box">
+                <b>💡 مثال توضيحي لقوة EVA PLUS:</b><br>
+                لو قمت بدعوة شخص لفريقك وانضم للنظام وقام بشراء منتجه الأول (مثل علبة عطر مميزة أو ساعة فاخرة)، ستكون شريكاً في أرباح هذه البيعة. وإذا قام هذا الشخص بدعوة شخص آخر تحته واشترى منتجاً، فسيكون هو وأنت والشخص الجديد شركاء في العائد! هكذا تتسع شبكتك وتتضاعف أرباحك بلا توقف.
+            </div>
+        </div>
+
+        <h2>📌 خطوتك البسيطة للبدء الفوري مع EVA PLUS:</h2>
+        <div class="details-box">
+            <ul>
+                <li><strong>قدم طلب الانضمام أدناه:</strong> أرسل بياناتك ليتم حفظها ونقلك فوراً لاختيار منتجك الأول من الكتالوج.</li>
+                <li><strong>اختر منتجك الأول:</strong> تصفح الكتالوج اطلب منتجك لتأكيد الطلب ودخولك في نظام EVA PLUS.</li>
+                <li><strong>استلم روابطك الذكية:</strong> فور تأكيد الإدارة لاستلام المنتج، ستقوم الإدارة بتفعيل حسابك وإرسال **رابط الاستقطاب** و**رابط الكتالوج** عبر الواتساب!</li>
+                <li><strong>شارك واجني الأرباح:</strong> بعد استلام روابطك، شارك رابط الكتالوج الخاص بك واحصل على عمولتك من أي عملية شراء تحدث من خلاله، وشارك رابط الاستقطاب لتعريف أصدقائك بالفكرة لينضموا تحتك في الشجرة وتصبح شريكاً في العمولات التي يحصلون عليها من الاستقطاب أو بيع المنتجات.</li>
+            </ul>
+        </div>
+
+        <!-- نموذج التسجيل الذاتي -->
+        <div id="registrationFormSection">
+            <h2>📝 املأ بياناتك الآن وانتقل لاختيار منتجك الأول</h2>
+            <div class="form-group">
+                <label>الاسم الكامل:</label>
+                <input type="text" id="fullName" placeholder="أدخل اسمك الكامل هنا">
+            </div>
+            <div class="form-group">
+                <label>عنوان التوصيل المعتمد (المدينة / المنطقة في الضفة أو القدس أو الداخل):</label>
+                <input type="text" id="address" placeholder="مثال: رام الله - المنارة / أو الأراضي المحتلة">
+            </div>
+            <div class="form-group">
+                <label>رقم الهاتف المعتمد (واتساب):</label>
+                <input type="tel" id="phone" placeholder="مثال: 0590000000">
+            </div>
+
+            <button type="button" onclick="submitAndGoToCatalog()" class="register-btn">
+                🛍️ تسجيل والانتقال لاختيار منتجك الأول من الكتالوج
+            </button>
+        </div>
+
+        <!-- صندوق المساعدة والدعم -->
+        <div class="support-box">
+            ❓ <b>هل تحتاج إلى مساعدة أو استفسار؟</b><br>
+            تواصل معنا مباشرة عبر واتساب الإدارة: <a href="https://wa.me/00970594101632" target="_blank">00970594101632</a> | 
+            البريد الإلكتروني: <a href="mailto:majed-sahban@hotmail.com">majed-sahban@hotmail.com</a>
+        </div>
+
+        <div class="footer-link" style="margin-top: 30px;">
+            تصفح روابطنا الأخرى: <a href="https://linky.ps/eva" target="_blank">linky.ps/eva</a>
+        </div>
+    </div>
+
+    <footer>
+        جميع الحقوق محفوظة © معرض إيفا براند - نظام EVA PLUS 2026
+    </footer>
+
+    <script>
+        // قراءة رابط الإحالة تلقائياً
+        const urlParams = new URLSearchParams(window.location.search);
+        const refId = urlParams.get('ref') || 'EVA-ROOT (الإدارة المركزية)';
+        const alertBox = document.getElementById('sponsorAlert');
+
+        if (urlParams.get('ref')) {
+            alertBox.style.display = 'block';
+            alertBox.innerHTML = `🤝 أنت تسجل الآن بدعوة مباشرة من الشريك في الشبكة: <b>${refId}</b>`;
+        } else {
+            alertBox.style.display = 'block';
+            alertBox.innerHTML = `🌟 أنت تسجل الآن عبر الحملة الإعلانية الرسمية لـ <b>EVA PLUS</b> (تحت إشراف الإدارة المركزية مباشرة).`;
+        }
+
+        function submitAndGoToCatalog() {
+            const name = document.getElementById('fullName').value.trim();
+            const address = document.getElementById('address').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+
+            if(!name || !address || !phone) {
+                alert('الرجاء تعبئة كافة الحقول (الاسم، العنوان، ورقم الهاتف) للانتقال للكتالوج.');
+                return;
+            }
+
+            // توليد رقم تسلسلي مؤقت لطلب العضو الجديد
+            const randomIdNum = Math.floor(1000 + Math.random() * 9000);
+            const newPartnerId = `EVA-${randomIdNum}`;
+
+            // تخزين بيانات العضو والداعي في localStorage ليقرأها الكتالوج تلقائياً
+            const pendingPartnerData = {
+                partnerId: newPartnerId,
+                name: name,
+                address: address,
+                phone: phone,
+                sponsor: refId,
+                status: 'pending',
+                date: new Date().toISOString()
+            };
+
+            // حفظ في قائمة الانتظار للمشترين الجدد
+            let pendingPartners = JSON.parse(localStorage.getItem('eva_pending_partners')) || [];
+            pendingPartners.push(pendingPartnerData);
+            localStorage.setItem('eva_pending_partners', JSON.stringify(pendingPartners));
+
+            // حفظ بيانات المستخدم الحالي في ذاكرة مؤقتة لكي يستخدمها زر الكتالوج والاتصال بالواتساب فوراً
+            localStorage.setItem('eva_current_user', JSON.stringify(pendingPartnerData));
+
+            // الانتقال الفوري لصفحة الكتالوج مع تمرير معلومات الداعي في الرابط للتأكيد
+            window.location.href = `catalog.html?ref=${refId}&user=${newPartnerId}`;
+        }
+    </script>
+
+</body>
+</html>

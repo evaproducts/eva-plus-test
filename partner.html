@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم الشريك | EVA PLUS</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #fce4ec 100%);
+            color: #333;
+            margin: 0;
+            padding: 0;
+            line-height: 1.8;
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, #880e4f 0%, #ad1457 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 4px solid #d4af37;
+        }
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border: 1px solid #f8bbd0;
+        }
+        /* شاشة تسجيل الدخول للشريك */
+        #loginSection {
+            text-align: center;
+            max-width: 400px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            border: 1px solid #f8bbd0;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: right;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #444;
+            font-size: 14px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        .btn {
+            background: #ad1457;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn:hover { background: #880e4f; }
+        
+        /* لوحة تحكم الشريك الداخلية */
+        #dashboardSection { display: none; }
+        
+        .balance-card {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border: 2px solid #4caf50;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 25px;
+            color: #1b5e20;
+        }
+        .balance-card h2 {
+            margin: 0;
+            font-size: 32px;
+            color: #2e7d32;
+        }
+        
+        .info-box, .links-box, .tree-box {
+            background: #fff0f5;
+            border: 1px solid #f8bbd0;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        h3 {
+            color: #880e4f;
+            margin-top: 0;
+            border-bottom: 2px solid #f8bbd0;
+            padding-bottom: 8px;
+            font-size: 16px;
+        }
+        .link-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .link-row input { background: #fff; }
+        .share-btn {
+            background: #25d366;
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        .share-btn:hover { background: #20ba5a; }
+
+        /* تنسيق أرقام الشجرة الخاصة */
+        .tree-nodes {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .tree-node-badge {
+            background: #fff;
+            border: 2px solid #d4af37;
+            color: #880e4f;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .logout-btn {
+            background: #e74c3c;
+            margin-top: 20px;
+        }
+        .logout-btn:hover { background: #c0392b; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>معرض إيفا براند | بوابة الشريك (EVA PLUS)</h1>
+        <p>لوحة التحكم والخصوصية الكاملة لإدارة عملك وأرباحك</p>
+    </div>
+
+    <!-- 1. شاشة تسجيل الدخول للشريك -->
+    <div id="loginSection">
+        <h2 style="color: #880e4f;">تسجيل دخول الشريك</h2>
+        <p style="font-size: 13px; color: #666;">أدخل اسم المستخدم (أو رقمك التسلسلي) وكلمة المرور الخاصة بك.</p>
+        
+        <div class="form-group">
+            <label>اسم المستخدم / رقم الشجرة:</label>
+            <input type="text" id="loginUsername" placeholder="مثال: EVA-102">
+        </div>
+        <div class="form-group">
+            <label>كلمة المرور:</label>
+            <input type="password" id="loginPassword" placeholder="أدخل كلمة المرور">
+        </div>
+        <button class="btn" onclick="handlePartnerLogin()">دخول إلى حسابي</button>
+    </div>
+
+    <!-- 2. لوحة التحكم الرئيسية للشريك (تفتح بعد الدخول الناجح) -->
+    <div class="container" id="dashboardSection">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="color: #880e4f; margin: 0;">أهلاً بك، <span id="displayName"></span> 🌸</h2>
+            <span style="background: #fff0f5; border: 1px solid #ad1457; color: #ad1457; padding: 5px 12px; border-radius: 15px; font-weight: bold;" id="displayPartnerId"></span>
+        </div>
+
+        <!-- رصيد الأرباح -->
+        <div class="balance-card">
+            <span>💰 رصيدك الحالي المتاح في نظام EVA PLUS:</span>
+            <h2 id="displayBalance">0 ₪</h2>
+            <small>(مجموع أرباحك وعمولات الشجرة التراكمية - يتم تصفيرها فور الصرف من الإدارة)</small>
+        </div>
+
+        <!-- الروابط الذكية وزر المشاركة -->
+        <div class="links-box">
+            <h3>🔗 روابطك الذكية للتسويق والعمل</h3>
+            
+            <label style="font-size: 13px; margin-top: 10px;">رابط الكتالوج الخاص بك (للمبيعات بالعمولة):</label>
+            <div class="link-row">
+                <input type="text" id="catalogLink" readonly>
+                <button class="share-btn" onclick="shareLink('catalog')">مشاركة الرابط 📤</button>
+            </div>
+
+            <label style="font-size: 13px; margin-top: 15px;">رابط الاستقطاب الخاص بك (لبناء شجرتك وفريقك):</label>
+            <div class="link-row">
+                <input type="text" id="referralLink" readonly>
+                <button class="share-btn" onclick="shareLink('referral')">مشاركة الرابط 📤</button>
+            </div>
+        </div>
+
+        <!-- تسلسل شجرة الفريق (تظهر بالأرقام فقط للخصوصية) -->
+        <div class="tree-box">
+            <h3>🌳 تسلسل الشجرة الخاصة بك (فريقك المباشر)</h3>
+            <p style="font-size: 13px; color: #555;">الأعضاء الذين انضموا تحت رابط الاستقطاب الخاص بك (للحفاظ على الخصوصية، تظهر الأرقام التعريفية فقط):</p>
+            <div class="tree-nodes" id="treeNodesContainer">
+                <span style="color: #888; font-size: 13px;">لا توجد تسلسلات في الشجرة حتى الآن. شارك رابط الاستقطاب لبناء فريقك!</span>
+            </div>
+        </div>
+
+        <!-- تعديل البيانات الشخصية وكلمة المرور -->
+        <div class="info-box">
+            <h3>⚙️ تعديل معلوماتك الشخصية وكلمة المرور</h3>
+            <div class="form-group">
+                <label>الاسم الكامل:</label>
+                <input type="text" id="editName">
+            </div>
+            <div class="form-group">
+                <label>عنوان التوصيل:</label>
+                <input type="text" id="editAddress">
+            </div>
+            <div class="form-group">
+                <label>رقم الهاتف (واتساب):</label>
+                <input type="text" id="editPhone">
+            </div>
+            <div class="form-group">
+                <label>كلمة المرور الجديدة (اتركها فارغة إذا لم ترد تغييرها):</label>
+                <input type="password" id="editPassword" placeholder="أدخل كلمة مرور جديدة">
+            </div>
+            <button class="btn" onclick="savePartnerUpdates()">حفظ التعديلات</button>
+        </div>
+
+        <button class="btn logout-btn" onclick="partnerLogout()">تسجيل الخروج</button>
+    </div>
+
+    <footer>
+        <p style="text-align: center; color: #888; font-size: 13px; margin-top: 30px;">جميع الحقوق محفوظة © معرض إيفا براند - نظام EVA PLUS 2026</p>
+    </footer>
+
+    <script>
+        // التحقق مما إذا كان الشريك مسجل الدخول مسبقاً في الجلسة الحالية
+        window.onload = function() {
+            let activePartner = JSON.parse(localStorage.getItem('eva_logged_partner'));
+            if(activePartner) {
+                loadPartnerDashboard(activePartner);
+            }
+        };
+
+        function handlePartnerLogin() {
+            let uInput = document.getElementById('loginUsername').value.trim();
+            let pInput = document.getElementById('loginPassword').value.trim();
+
+            if(!uInput || !pInput) {
+                alert('الرجاء إدخال اسم المستخدم وكلمة المرور.');
+                return;
+            }
+
+            // البحث في قاعدة بيانات الشركاء المفعلين المخزنة محلياً (سيتم ربطها بـ Firebase لاحقاً)
+            let partnersDB = JSON.parse(localStorage.getItem('eva_active_partners_db')) || [
+                // حساب تجريبي افتراضي للاختبار
+                { id: "EVA-101", username: "EVA-101", password: "123", name: "ماجد سحبان", address: "رام الله", phone: "0590000000", balance: 250, team: ["EVA-105", "EVA-112"] }
+            ];
+
+            let foundPartner = partnersDB.find(p => (p.id === uInput || p.username === uInput) && p.password === pInput);
+
+            if(foundPartner) {
+                localStorage.setItem('eva_logged_partner', JSON.stringify(foundPartner));
+                loadPartnerDashboard(foundPartner);
+            } else {
+                alert('بيانات الدخول غير صحيحة أو أن الحساب غير مفعل من قِبل الإدارة بعد.');
+            }
+        }
+
+        function loadPartnerDashboard(partner) {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('dashboardSection').style.display = 'block';
+
+            document.getElementById('displayName').innerText = partner.name;
+            document.getElementById('displayPartnerId').innerText = `الرقم: ${partner.id}`;
+            document.getElementById('displayBalance').innerText = (partner.balance || 0) + " ₪";
+
+            // تعبئة حقول التعديل
+            document.getElementById('editName').value = partner.name;
+            document.getElementById('editAddress').value = partner.address;
+            document.getElementById('editPhone').value = partner.phone;
+
+            // توليد الروابط الذكية الخاصة به
+            let baseUrl = window.location.origin + window.location.pathname.replace('partner.html', '');
+            document.getElementById('catalogLink').value = `${baseUrl}catalog.html?user=${partner.id}`;
+            document.getElementById('referralLink').value = `${baseUrl}index.html?ref=${partner.id}`;
+
+            // عرض الشجرة (بالأرقام فقط)
+            let treeContainer = document.getElementById('treeNodesContainer');
+            if(partner.team && partner.team.length > 0) {
+                treeContainer.innerHTML = partner.team.map(nodeId => `<div class="tree-node-badge">👤 ${nodeId}</div>`).join('');
+            } else {
+                treeContainer.innerHTML = `<span style="color: #888; font-size: 13px;">لا توجد تسلسلات في الشجرة حتى الآن.</span>`;
+            }
+        }
+
+        function shareLink(type) {
+            let linkId = type === 'catalog' ? 'catalogLink' : 'referralLink';
+            let linkText = document.getElementById(linkId).value;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'EVA PLUS',
+                    text: 'انضم إلي أو تصفح الكتالوج الخاص بي:',
+                    url: linkText,
+                }).catch(console.error);
+            } else {
+                navigator.clipboard.writeText(linkText);
+                alert('تم نسخ الرابط بنجاح! يمكنك مشاركته الآن.');
+            }
+        }
+
+        function savePartnerUpdates() {
+            let activePartner = JSON.parse(localStorage.getItem('eva_logged_partner'));
+            
+            activePartner.name = document.getElementById('editName').value.trim();
+            activePartner.address = document.getElementById('editAddress').value.trim();
+            activePartner.phone = document.getElementById('editPhone').value.trim();
+            
+            let newPass = document.getElementById('editPassword').value.trim();
+            if(newPass) {
+                activePartner.password = newPass;
+            }
+
+            localStorage.setItem('eva_logged_partner', JSON.stringify(activePartner));
+            alert('تم تحديث بياناتك بنجاح!');
+            loadPartnerDashboard(activePartner);
+        }
+
+        function partnerLogout() {
+            localStorage.removeItem('eva_logged_partner');
+            location.reload();
+        }
+    </script>
+
+</body>
+</html>

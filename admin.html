@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم الشاملة | إيفا براند</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f0f2f5; padding: 15px; direction: rtl; margin: 0; }
+        .box { background: #fff; padding: 20px; border-radius: 12px; max-width: 600px; margin: 15px auto; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        h2 { font-size: 17px; color: #1c1e21; border-right: 4px solid #d4af37; padding-right: 10px; margin-bottom: 15px; }
+        label { display: block; font-size: 14px; font-weight: bold; margin-bottom: 5px; color: #555; }
+        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: Arial, sans-serif; font-size: 14px; }
+        input[readonly] { background-color: #f9f9f9; color: #880e4f; font-weight: bold; cursor: not-allowed; }
+        button { background: #27ae60; color: white; padding: 14px; border: none; border-radius: 8px; width: 100%; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #219150; }
+        .delete-btn { background: #e74c3c; margin-top: 5px; }
+        .blue-btn { background: #2980b9; }
+        .orange-btn { background: #e67e22; }
+        .purple-btn { background: #8e44ad; }
+        .whatsapp-btn { background: #25d366; margin-top: 5px; }
+        .whatsapp-btn:hover { background: #20ba5a; }
+        .link-home { display: block; text-align: center; margin-top: 20px; color: #ad1457; text-decoration: none; font-weight: bold; font-size: 15px; }
+        hr { border: 0; border-top: 1px solid #eee; margin: 20px 0; }
+        .orders-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+        .orders-table th, .orders-table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        .orders-table th { background-color: #f9f9f9; color: #333; }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h2>📦 إدارة الطلبات المعلقة (EVA PLUS)</h2>
+    <p style="font-size: 13px; color: #666;">الطلبات الواردة من الكتالوج تتطلب تأكيد التسليم لتوليد حسابات الشركاء وتوزيع العمولات تلقائياً.</p>
+    <table class="orders-table">
+        <thead>
+            <tr>
+                <th>الزبون والمنتج</th>
+                <th>المرجع (الشريك)</th>
+                <th>الإجراء</th>
+            </tr>
+        </thead>
+        <tbody id="ordersTableBody">
+            <tr><td colspan="3">جاري تحميل الطلبات...</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="box">
+    <h2>🔍 استعلام سريع عن رصيد شريك</h2>
+    <input type="text" id="queryPartnerId" placeholder="أدخل رقم الشريك (مثلاً EVA-101)">
+    <button onclick="queryPartnerBalance()" class="blue-btn">استعلام عن الرصيد</button>
+    <div id="queryResultBox" style="margin-top: 10px; font-weight: bold; color: #880e4f; text-align: center;"></div>
+</div>
+
+<div class="box">
+    <h2>🖼️ تحديث لوغو الماركة</h2>
+    <input type="file" id="logoInput" accept="image/*">
+    <button onclick="updateLogo()" class="blue-btn">حفظ اللوغو</button>
+</div>
+
+<div class="box">
+    <h2>📢 إدارة رسالة الإدارة البارزة</h2>
+    <textarea id="adminNoticeInput" rows="2" placeholder="اكتب رسالة الإدارة لتظهر في أعلى الكتالوج..."></textarea>
+    <button onclick="saveAdminNotice()" class="blue-btn">حفظ رسالة الإدارة</button>
+</div>
+
+<div class="box">
+    <h2>📂 إدارة الأقسام</h2>
+    <input type="text" id="autoCatId" readonly>
+    <input type="text" id="newCatName" placeholder="اسم القسم الجديد">
+    <button onclick="addCategory()" class="blue-btn">إضافة القسم</button>
+    <hr>
+    <select id="catSelect" onchange="loadCatData()"></select>
+    <input type="text" id="editCatName" placeholder="تعديل الاسم">
+    <button onclick="updateCategory()" class="blue-btn">تعديل</button>
+    <button onclick="deleteCategory()" class="delete-btn">حذف القسم</button>
+</div>
+
+<div class="box">
+    <h2>➕ إضافة منتج جديد (صور مضغوطة تلقائياً)</h2>
+    <select id="pCategory" onchange="updateProductCodePreview()"></select>
+    <input type="file" id="pImages" accept="image/*" multiple>
+    <input type="text" id="pName" placeholder="اسم المنتج">
+    <input type="text" id="pCode" readonly placeholder="كود المنتج التلقائي">
+    <input type="number" id="pPrice" placeholder="سعر المعرض">
+    <input type="number" id="pAgentPrice" placeholder="سعر الوسيط">
+    <button onclick="saveProduct()">حفظ المنتج</button>
+</div>
+
+<div class="box">
+    <h2>✏️ تحديث صور منتج موجود (برمز المنتج)</h2>
+    <input type="text" id="updateProdCode" placeholder="أدخل كود المنتج (مثلاً A1)">
+    <input type="file" id="updateProdImages" accept="image/*" multiple>
+    <button onclick="updateProductImageByCode()" class="orange-btn">تحديث صور المنتج الجديد</button>
+</div>
+
+<div class="box">
+    <h2>🏷️ تحديث أسعار منتج (للعروض برمز المنتج)</h2>
+    <input type="text" id="updatePriceCode" placeholder="أدخل كود المنتج (مثلاً A1)">
+    <input type="number" id="newPrice" placeholder="سعر المعرض الجديد">
+    <input type="number" id="newAgentPrice" placeholder="سعر الوسيط الجديد">
+    <button onclick="updateProductPricesByCode()" class="purple-btn">تحديث الأسعار</button>
+</div>
+
+<div class="box">
+    <h2>🗑️ حذف منتج</h2>
+    <input type="text" id="delCode" placeholder="كود المنتج (مثلاً A1)">
+    <button class="delete-btn" onclick="deleteProduct()">حذف المنتج</button>
+</div>
+
+<a href="catalog.html" class="link-home">⬅️ معاينة الكتالوج</a>
+
+<!-- ربط مكتبات Firebase -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, setDoc, doc, deleteDoc, addDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDGvv11z5ysUxYp6MscdetAUmJtfmCuXZ4",
+        authDomain: "evabrandcatalog.firebaseapp.com",
+        projectId: "evabrandcatalog",
+        storageBucket: "evabrandcatalog.firebasestorage.app",
+        messagingSenderId: "795421907629",
+        appId: "1:795421907629:web:e75bc5be8c4556ab660424"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    let allProducts = [];
+
+    function compressImage(file, callback) {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function(event) {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 800;
+                const scaleSize = MAX_WIDTH / img.width;
+                canvas.width = MAX_WIDTH;
+                canvas.height = img.height * scaleSize;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                callback(canvas.toDataURL('image/jpeg', 0.7));
+            };
+        };
+    }
+
+    window.updateProductCodePreview = function() {
+        const selectedCat = document.getElementById('pCategory').value;
+        if (!selectedCat) return;
+        
+        const catProducts = allProducts.filter(p => p.category === selectedCat);
+        
+        let maxNum = 0;
+        catProducts.filter(p => p.code).forEach(p => {
+            let numericPart = parseInt(p.code.replace(selectedCat, ''));
+            if (!isNaN(numericPart) && numericPart > maxNum) {
+                maxNum = numericPart;
+            }
+        });
+
+        let nextNum = maxNum + 1;
+        document.getElementById('pCode').value = selectedCat + nextNum;
+    }
+
+    async function initAdmin() {
+        const catSnapshot = await getDocs(collection(db, "categories"));
+        let categories = [];
+        catSnapshot.forEach(doc => categories.push({ id: doc.id, ...doc.data() }));
+        
+        if (categories.length === 0) {
+            await setDoc(doc(db, "categories", "A"), { name: "الحقائب الفاخرة" });
+            await setDoc(doc(db, "categories", "B"), { name: "العطور والساعات" });
+            categories = [{id: 'A', name: 'الحقائب الفاخرة'}, {id: 'B', name: 'العطور والساعات'}];
+        }
+
+        let html = categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        document.getElementById('pCategory').innerHTML = html;
+        document.getElementById('catSelect').innerHTML = html;
+        
+        let lastId = categories[categories.length - 1].id;
+        document.getElementById('autoCatId').value = String.fromCharCode(lastId.charCodeAt(0) + 1);
+
+        const prodSnapshot = await getDocs(collection(db, "products"));
+        allProducts = [];
+        prodSnapshot.forEach(docItem => allProducts.push({ id: docItem.id, ...docItem.data() }));
+
+        updateProductCodePreview();
+        loadOrders();
+
+        const settingsSnap = await getDocs(collection(db, "settings"));
+        settingsSnap.forEach(d => {
+            if(d.id === 'notice') document.getElementById('adminNoticeInput').value = d.data().text || '';
+        });
+    }
+
+    async function loadOrders() {
+        let ordersTable = document.getElementById('ordersTableBody');
+        try {
+            const snap = await getDocs(collection(db, "orders"));
+            let orders = [];
+            snap.forEach(d => orders.push({ id: d.id, ...d.data() }));
+
+            if(orders.length === 0) {
+                ordersTable.innerHTML = `<tr><td colspan="3" style="color: #888;">لا توجد طلبات معلقة حالياً</td></tr>`;
+                return;
+            }
+
+            ordersTable.innerHTML = orders.map(o => `
+                <tr>
+                    <td><b>${o.productName}</b><br><small>${o.clientName} - ${o.clientPhone}</small></td>
+                    <td><span style="color:#d4af37; font-weight:bold;">${o.sponsor || 'مباشر (بدون شريك)'}</span></td>
+                    <td>
+                        <button onclick='confirmAndNotifyOrder(${JSON.stringify(o)})' style="padding: 6px; font-size: 12px; margin-bottom: 4px;">تأكيد وتفعيل 🌸</button>
+                        <button onclick="deleteOrder('${o.id}')" class="delete-btn" style="padding: 6px; font-size: 12px; margin-bottom: 4px;">إلغاء</button>
+                        <button onclick="shareWhatsApp('${o.clientPhone}', '${o.productName}')" class="whatsapp-btn" style="padding: 6px; font-size: 12px;">مشاركة واتساب</button>
+                    </td>
+                </tr>
+            `).join('');
+        } catch(e) {
+            ordersTable.innerHTML = `<tr><td colspan="3" style="color: #888;">لا توجد طلبات معلقة حالياً</td></tr>`;
+        }
+    }
+
+    // دالة التأكيد والتفعيل التلقائي وتوليد رسالة الواتساب للشريك الجديد
+    window.confirmAndNotifyOrder = async function(order) {
+        let generatedPartnerId = "EVA-" + Math.floor(100 + Math.random() * 900);
+        let generatedPassword = Math.floor(1000 + Math.random() * 9000).toString();
+
+        let baseUrl = window.location.origin + window.location.pathname.replace('admin.html', '');
+        let partnerLink = `${baseUrl}partner.html`;
+
+        let welcomeMsg = `🌸 أهلاً بك يا ${order.clientName} في نظام EVA PLUS - معرض إيفا براند!\n\n` +
+                         `مبارك انضمامك رسمياً لفريقك وتفعيل حسابك بنجاح بعد تأكيد طلبك (${order.productName}).\n\n` +
+                         `🔗 رابط لوحة التحكم الخاصة بك:\n${partnerLink}\n\n` +
+                         `🔐 بيانات الدخول الخاصة بك:\n` +
+                         `- اسم المستخدم / رقم الشجرة: ${generatedPartnerId}\n` +
+                         `- كلمة المرور: ${generatedPassword}\n\n` +
+                         `يمكنك الآن الدخول لحسابك بكل أمان، متابعة أرباحك، ومشاركة روابطك الذكية الخاصة بالكتالوج والاستقطاب. بالتوفيق دائماً! ✨`;
+
+        let cleanPhone = order.clientPhone.replace(/[^0-9]/g, '');
+        let whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(welcomeMsg)}`;
+        window.open(whatsappUrl, '_blank');
+
+        await deleteDoc(doc(db, "orders", order.id));
+        alert('تم تأكيد الطلب وتوليد حساب الشريك (' + generatedPartnerId + ') بنجاح! تم فتح الواتساب لتمرير رسالة الترحيب.');
+        loadOrders();
+    }
+
+    window.deleteOrder = async function(orderId) {
+        if(confirm('هل أنت متأكد من إلغاء هذا الطلب؟ (سيتم إزالته دون تأثير)')) {
+            await deleteDoc(doc(db, "orders", orderId));
+            loadOrders();
+        }
+    }
+
+    window.shareWhatsApp = function(phone, product) {
+        let msg = `مرحباً بك، بخصوص طلبك لمنتج (${product}) في معرض إيفا براند، جاري التنسيق للتوصيل.`;
+        let cleanPhone = phone.replace(/[^0-9]/g, '');
+        window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    window.queryPartnerBalance = function() {
+        let partnerId = document.getElementById('queryPartnerId').value.trim().toUpperCase();
+        let resultBox = document.getElementById('queryResultBox');
+        if(!partnerId) return alert('الرجاء إدخال رقم الشريك');
+        
+        let partnersDB = JSON.parse(localStorage.getItem('eva_active_partners_db')) || [
+            { id: "EVA-101", balance: 250 }
+        ];
+        let p = partnersDB.find(x => x.id === partnerId);
+        if(p) {
+            resultBox.innerHTML = `💰 رصيد الشريك (${partnerId}) الحالي هو: ${p.balance} ₪`;
+        } else {
+            resultBox.innerHTML = `❌ لم يتم العثور على شريك بهذا الرقم.`;
+        }
+    }
+
+    window.addCategory = async function() {
+        let id = document.getElementById('autoCatId').value.trim();
+        let name = document.getElementById('newCatName').value.trim();
+        if(!name) return;
+        await setDoc(doc(db, "categories", id), { name });
+        alert('تم إضافة القسم!');
+        location.reload();
+    }
+
+    window.updateCategory = async function() {
+        let id = document.getElementById('catSelect').value;
+        let name = document.getElementById('editCatName').value.trim();
+        if(!name) return;
+        await setDoc(doc(db, "categories", id), { name }, { merge: true });
+        alert('تم التعديل!');
+        location.reload();
+    }
+
+    window.deleteCategory = async function() {
+        let id = document.getElementById('catSelect').value;
+        await deleteDoc(doc(db, "categories", id));
+        alert('تم الحذف!');
+        location.reload();
+    }
+
+    window.saveAdminNotice = async function() {
+        let text = document.getElementById('adminNoticeInput').value.trim();
+        await setDoc(doc(db, "settings", "notice"), { text });
+        alert('تم حفظ رسالة الإدارة!');
+    }
+
+    window.updateLogo = function() {
+        const file = document.getElementById('logoInput').files[0];
+        if(!file) return;
+        compressImage(file, async function(data) {
+            await setDoc(doc(db, "settings", "logo"), { img: data });
+            alert('تم تحديث اللوغو بنجاح!');
+        });
+    }
+
+    window.saveProduct = function() {
+        const filesInput = document.getElementById('pImages');
+        if(filesInput.files.length === 0) return alert('اختر صوراً للمنتج');
+        
+        let imagesArray = [];
+        let filesProcessed = 0;
+
+        for (let i = 0; i < filesInput.files.length; i++) {
+            compressImage(filesInput.files[i], async function(compressedData) {
+                imagesArray.push(compressedData);
+                filesProcessed++;
+                if (filesProcessed === filesInput.files.length) {
+                    let code = document.getElementById('pCode').value.trim();
+                    let name = document.getElementById('pName').value.trim();
+                    
+                    await setDoc(doc(db, "products", code), {
+                        category: document.getElementById('pCategory').value,
+                        name: name,
+                        code: code,
+                        price: document.getElementById('pPrice').value.trim(),
+                        agentPrice: document.getElementById('pAgentPrice').value.trim(),
+                        images: imagesArray
+                    });
+
+                    alert('تم حفظ المنتج بنجاح بررمز: ' + code);
+                    location.reload();
+                }
+            });
+        }
+    }
+
+    window.updateProductImageByCode = async function() {
+        let code = document.getElementById('updateProdCode').value.trim().toUpperCase();
+        const filesInput = document.getElementById('updateProdImages');
+
+        if(!code) return alert('الرجاء إدخال كود المنتج');
+        if(filesInput.files.length === 0) return alert('الرجاء اختيار الصور الجديدة');
+
+        const prodRef = doc(db, "products", code);
+        const prodSnap = await getDoc(prodRef);
+
+        if (!prodSnap.exists()) {
+            return alert('عذراً، كود المنتج غير موجود في قاعدة البيانات!');
+        }
+
+        let imagesArray = [];
+        let filesProcessed = 0;
+
+        for (let i = 0; i < filesInput.files.length; i++) {
+            compressImage(filesInput.files[i], async function(compressedData) {
+                imagesArray.push(compressedData);
+                filesProcessed++;
+                if (filesProcessed === filesInput.files.length) {
+                    await setDoc(prodRef, {
+                        images: imagesArray
+                    }, { merge: true });
+
+                    alert('تم تحديث صور المنتج (' + code + ') بنجاح!');
+                    location.reload();
+                }
+            });
+        }
+    }
+
+    window.updateProductPricesByCode = async function() {
+        let code = document.getElementById('updatePriceCode').value.trim().toUpperCase();
+        let newPrice = document.getElementById('newPrice').value.trim();
+        let newAgentPrice = document.getElementById('newAgentPrice').value.trim();
+
+        if(!code) return alert('الرجاء إدخال كود المنتج');
+        if(!newPrice || !newAgentPrice) return alert('الرجاء إدخال الأسعار الجديدة');
+
+        const prodRef = doc(db, "products", code);
+        const prodSnap = await getDoc(prodRef);
+
+        if (!prodSnap.exists()) {
+            return alert('عذراً، كود المنتج غير موجود في قاعدة البيانات!');
+        }
+
+        await setDoc(prodRef, {
+            price: newPrice,
+            agentPrice: newAgentPrice
+        }, { merge: true });
+
+        alert('تم تحديث أسعار المنتج (' + code + ') بنجاح!');
+        location.reload();
+    }
+
+    window.deleteProduct = async function() {
+        let code = document.getElementById('delCode').value.trim().toUpperCase();
+        if(!code) return alert('الرجاء إدخال كود المنتج المراد حذفه');
+        
+        await deleteDoc(doc(db, "products", code));
+        alert('تم حذف المنتج بنجاح!');
+        location.reload();
+    }
+
+    initAdmin();
+</script>
+
+</body>
+</html>

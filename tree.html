@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة شجرة شركاء EVA PLUS</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            direction: rtl;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        h2, h3 {
+            color: #880e4f;
+            border-bottom: 2px solid #f8bbd0;
+            padding-bottom: 8px;
+        }
+        .btn {
+            background: #ad1457;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn:hover { background: #880e4f; }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #f8bbd0;
+            padding: 10px;
+            text-align: center;
+            font-size: 14px;
+        }
+        th {
+            background: #fff0f5;
+            color: #880e4f;
+        }
+        .tree-path-box {
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        /* تصميم صندوق التسلسل الذكي لمنع تمدد الشاشة */
+        #treePathResult {
+            margin-top: 12px;
+            font-weight: bold;
+            color: #0d47a1;
+            font-size: 14px;
+            background: #fff;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #90caf9;
+            max-height: 100px;
+            overflow-y: auto;
+            display: none; /* مخفي افتراضياً لحين الضغط على زر العرض */
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- لوحة التحكم الرئيسية -->
+    <div id="adminPanel" class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>🌟 لوحة تحكم شجرة EVA PLUS</h2>
+            <span style="color: #666; font-size: 14px;">وضع التطوير (بدون كلمة مرور)</span>
+        </div>
+
+        <!-- نموذج إضافة شريك جديد -->
+        <div style="background: #fff0f5; padding: 20px; border-radius: 8px; margin-top: 20px; border: 1px solid #f8bbd0;">
+            <h3>➕ إضافة شريك جديد للشجرة</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px;">
+                <div class="form-group">
+                    <label>الاسم الكامل للشريك:</label>
+                    <input type="text" id="partnerName" placeholder="مثال: مريم أبو عيشة">
+                </div>
+                <div class="form-group">
+                    <label>رقم الهاتف المعتمد:</label>
+                    <input type="text" id="partnerPhone" placeholder="0590000000">
+                </div>
+                <div class="form-group">
+                    <label>العنوان (المنطقة):</label>
+                    <input type="text" id="partnerAddress" placeholder="رام الله - المنارة">
+                </div>
+                <div class="form-group">
+                    <label>المُحيل المباشر (Upline):</label>
+                    <select id="uplineSelect">
+                        <option value="EVA-001">EVA-001 (إيفا - رأس الهرم)</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn" style="margin-top: 10px;" onclick="addNewPartner()">حفظ وإضافة الشريك للنظام</button>
+        </div>
+
+        <!-- صندوق بحث وتتبع تسلسل الشجرة الصعودي (بشكل منظم لا يشغل حيزاً كبيراً) -->
+        <div class="tree-path-box">
+            <h3 style="margin-top:0; color:#1565c0; border-color:#90caf9;">🔍 تتبع السلسلة الصعودية لشريك</h3>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                <select id="searchPartnerSelect" style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #90caf9;">
+                    <option value="">-- اختر الشريك لمعرفة تسلسله في الشجرة --</option>
+                </select>
+                <button class="btn" style="background: #1976d2;" onclick="showPartnerTreePath()">عرض التسلسل</button>
+            </div>
+            <!-- صندوق نتائج التسلسل القابل للتمرير والمخفي افتراضياً لحفظ المساحة -->
+            <div id="treePathResult"></div>
+        </div>
+
+        <!-- جدول عرض الشجرة والشركاء -->
+        <h3 style="margin-top: 30px;">📋 قائمة شركاء الفريـق المسجلين</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>الرمز التسلسلي (ID)</th>
+                    <th>اسم الشريك</th>
+                    <th>رقم الهاتف</th>
+                    <th>العنوان</th>
+                    <th>الداعي (Upline)</th>
+                </tr>
+            </thead>
+            <tbody id="partnersTableBody">
+                <tr><td colspan="5" style="text-align:center;">جاري تحميل الشجرة...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- برمجة الفايربيز وإدارة الشجرة والتسلسل -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDGvv11z5ysUxYp6MscdetAUmJtfmCuXZ4",
+            authDomain: "evabrandcatalog.firebaseapp.com",
+            projectId: "evabrandcatalog",
+            storageBucket: "evabrandcatalog.firebasestorage.app",
+            messagingSenderId: "795421907629",
+            appId: "1:795421907629:web:e75bc5be8c4556ab660424"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let allPartnersMap = {};
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadPartnersData();
+        });
+
+        async function loadPartnersData() {
+            try {
+                const evaRootRef = doc(db, "partners", "EVA-001");
+                const evaRootSnap = await getDoc(evaRootRef);
+                if(!evaRootSnap.exists()) {
+                    await setDoc(evaRootRef, {
+                        partnerId: "EVA-001",
+                        name: "معرض إيفا (رأس الهرم)",
+                        phone: "0597180456",
+                        address: "المركز الرئيسي",
+                        uplineId: "none",
+                        createdAt: new Date().toISOString()
+                    });
+                }
+
+                const snap = await getDocs(collection(db, "partners"));
+                let rowsHtml = '';
+                let uplineOptions = '<option value="EVA-001">EVA-001 (إيفا - رأس الهرم)</option>';
+                let searchOptions = '<option value="">-- اختر الشريك لمعرفة تسلسله في الشجرة --</option>';
+
+                allPartnersMap = {};
+                snap.forEach(docItem => {
+                    let p = docItem.data();
+                    allPartnersMap[p.partnerId] = p;
+
+                    if(p.partnerId !== "EVA-001") {
+                        uplineOptions += `<option value="${p.partnerId}">${p.partnerId} - ${p.name}</option>`;
+                    }
+                    searchOptions += `<option value="${p.partnerId}">${p.partnerId} (${p.name})</option>`;
+
+                    rowsHtml += `
+                        <tr>
+                            <td><b>${p.partnerId}</b></td>
+                            <td>${p.name}</td>
+                            <td>${p.phone}</td>
+                            <td>${p.address}</td>
+                            <td>${p.uplineId}</td>
+                        </tr>
+                    `;
+                });
+
+                document.getElementById('partnersTableBody').innerHTML = rowsHtml;
+                document.getElementById('uplineSelect').innerHTML = uplineOptions;
+                document.getElementById('searchPartnerSelect').innerHTML = searchOptions;
+
+            } catch (error) {
+                console.error("Error loading partners:", error);
+                document.getElementById('partnersTableBody').innerHTML = `<tr><td colspan="5" style="color:red;">خطأ في تحميل بيانات الشجرة.</td></tr>`;
+            }
+        }
+
+        // دالة عرض التسلسل ضمن صندوق مرتب وذي مساحة محددة مع إمكانية التمرير
+        window.showPartnerTreePath = function() {
+            let selectedId = document.getElementById('searchPartnerSelect').value;
+            let resultBox = document.getElementById('treePathResult');
+
+            if(!selectedId) {
+                resultBox.style.display = 'none';
+                alert('الرجاء اختيار شريك أولاً.');
+                return;
+            }
+
+            let pathArray = [];
+            let currentId = selectedId;
+            let safetyCounter = 0;
+
+            while(currentId && currentId !== "none" && allPartnersMap[currentId] && safetyCounter < 50) {
+                let partner = allPartnersMap[currentId];
+                pathArray.push(`${partner.name} (${partner.partnerId})`);
+                currentId = partner.uplineId;
+                safetyCounter++;
+            }
+
+            resultBox.style.display = 'block';
+            resultBox.innerHTML = `📍 تسلسل الشجرة:<br>` + pathArray.join(' ⬅ ');
+        };
+
+        window.addNewPartner = async function() {
+            let name = document.getElementById('partnerName').value.trim();
+            let phone = document.getElementById('partnerPhone').value.trim();
+            let address = document.getElementById('partnerAddress').value.trim();
+            let uplineId = document.getElementById('uplineSelect').value;
+
+            if(!name || !phone) {
+                alert('يرجى تعبئة الحقول الأساسية (اسم الشريك ورقم الهاتف).');
+                return;
+            }
+
+            try {
+                const snap = await getDocs(collection(db, "partners"));
+                let nextIdNum = 101 + snap.size;
+                let newPartnerId = `EVA-${nextIdNum}`;
+
+                let checkDoc = await getDoc(doc(db, "partners", newPartnerId));
+                while(checkDoc.exists()) {
+                    nextIdNum++;
+                    newPartnerId = `EVA-${nextIdNum}`;
+                    checkDoc = await getDoc(doc(db, "partners", newPartnerId));
+                }
+
+                await setDoc(doc(db, "partners", newPartnerId), {
+                    partnerId: newPartnerId,
+                    name: name,
+                    phone: phone,
+                    address: address,
+                    uplineId: uplineId,
+                    createdAt: new Date().toISOString()
+                });
+
+                alert(`تم بنجاح إضافة الشريك برمز تسلسلي: ${newPartnerId}`);
+                location.reload();
+
+            } catch (err) {
+                console.error("Error adding partner:", err);
+                alert('حدث خطأ أثناء إضافة الشريك.');
+            }
+        };
+    </script>
+</body>
+</html>
