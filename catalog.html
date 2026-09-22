@@ -711,7 +711,7 @@
 
                           let priceHtml = `<span class="price-ex">السعر: ${p.price} ₪</span>`;
 
-                          // إعداد رابط الواتساب التجريبي برقمك الجديد
+                          // إعداد رابط الواتساب بالرقم الدولي الصحيح والجديد
                           let whatsappLink = "";
                           if (activeSponsor) {
                               let currentUser = JSON.parse(localStorage.getItem('eva_current_user')) || {};
@@ -724,9 +724,9 @@
                                         `- اسم العميل: ${clientName}\n` +
                                         `- رقم الهاتف: ${clientPhone}\n` +
                                         `- الشريك المرجع (الداعي): ${activeSponsor}`;
-                              whatsappLink = `https://wa.me/970559334655?text=${encodeURIComponent(msg)}`;
+                              whatsappLink = `https://wa.me/00972559334655?text=${encodeURIComponent(msg)}`;
                           } else {
-                              whatsappLink = `https://wa.me/970559334655?text=${encodeURIComponent(`أود طلب المنتج برمز ${p.code} (${p.name}) بسعر ${p.price} ₪`)}`;
+                              whatsappLink = `https://wa.me/00972559334655?text=${encodeURIComponent(`أود طلب المنتج برمز ${p.code} (${p.name}) بسعر ${p.price} ₪`)}`;
                           }
 
                           return `
