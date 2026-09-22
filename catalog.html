@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>كتالوج المنتجات | إيفا براند</title>
+    <title>كتالوج المنتجات | إيفا بلس</title>
 
     <!-- إعدادات تطبيق الويب (PWA Manifest) -->
     <link rel="manifest" href="manifest.json">
@@ -542,13 +542,14 @@
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
       import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, increment, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+      // مفاتيح الربط الجديدة الخاصة بمشروع EVA PLUS
       const firebaseConfig = {
-          apiKey: "AIzaSyDGvv11z5ysUxYp6MscdetAUmJtfmCuXZ4",
-          authDomain: "evabrandcatalog.firebaseapp.com",
-          projectId: "evabrandcatalog",
-          storageBucket: "evabrandcatalog.firebasestorage.app",
-          messagingSenderId: "795421907629",
-          appId: "1:795421907629:web:e75bc5be8c4556ab660424"
+          apiKey: "AIzaSyAqPpKqqHBEIJZTCGCROFzqZyHOYlnDgP4",
+          authDomain: "eva-plus-66b96.firebaseapp.com",
+          projectId: "eva-plus-66b96",
+          storageBucket: "eva-plus-66b96.firebasestorage.app",
+          messagingSenderId: "686798536842",
+          appId: "1:686798536842:web:8c09932cd5869292eb6d73"
       };
 
       const app = initializeApp(firebaseConfig);
@@ -725,7 +726,7 @@
                                         `- الشريك المرجع (الداعي): ${activeSponsor}`;
                               whatsappLink = `https://wa.me/970559334655?text=${encodeURIComponent(msg)}`;
                           } else {
-                              whatsappLink = `https://wa.me/970559334655?text=${encodeURIComponent(`أود طلب المنتج بررمز ${p.code} (${p.name}) بسعر ${p.price} ₪`)}`;
+                              whatsappLink = `https://wa.me/970559334655?text=${encodeURIComponent(`أود طلب المنتج برمز ${p.code} (${p.name}) بسعر ${p.price} ₪`)}`;
                           }
 
                           return `
