@@ -230,12 +230,11 @@
         }
     }
 
-    // دالة التأكيد والتفعيل وتوليد حساب الشريك وحفظه في قاعدة البيانات ليتمكن من تسجيل الدخول فوراً
+    // دالة التأكيد والتفعيل وتوليد حساب الشريك وحفظه في قاعدة البيانات ليتمكن من الدخول فوراً
     window.confirmAndNotifyOrder = async function(order) {
         let generatedPartnerId = "EVA-" + Math.floor(100 + Math.random() * 900);
         let generatedPassword = Math.floor(1000 + Math.random() * 9000).toString();
 
-        // حفظ الشريك الجديد في قاعدة بيانات Firestore ضمن مجموعة partners ليتسنى له الدخول فوراً
         try {
             await setDoc(doc(db, "partners", generatedPartnerId), {
                 partnerId: generatedPartnerId,
@@ -261,7 +260,6 @@
                          `- كلمة المرور: ${generatedPassword}\n\n` +
                          `يمكنك الآن الدخول لحسابك بكل أمان، متابعة أرباحك، ومشاركة روابطك الذكية الخاصة بالكتالوج والاستقطاب. بالتوفيق دائماً! ✨`;
 
-        // إصلاح وتطهير رقم الهاتف ليتوافق مع واتساب تماماً
         let rawPhone = (order.clientPhone || '').toString().trim();
         if (rawPhone.startsWith('00')) {
             rawPhone = rawPhone.substring(2);
@@ -273,7 +271,6 @@
 
         await deleteDoc(doc(db, "orders", order.id));
 
-        // السؤال الذكي للمخزون (حذف المنتج إن كان آخر قطعة)
         if (order.productCode) {
             let deleteProductChoice = confirm(`هل تريد حذف المنتج (رمز: ${order.productCode} - ${order.productName}) من الكتالوج؟\n\n(اضغط "موافق" إذا كان آخر قطعة وانتهى المخزون، أو "إلغاء" إذا كان متوفراً بقطع أخرى).`);
             if (deleteProductChoice) {
