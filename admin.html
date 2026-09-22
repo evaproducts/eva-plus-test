@@ -70,7 +70,7 @@
     <input type="text" id="newCatName" placeholder="اسم القسم الجديد">
     <button onclick="addCategory()" class="blue-btn">إضافة القسم</button>
     <hr>
-    <select id="catSelect" onchange="loadCatData()"></select>
+    <select id="catSelect" onchange="fillCategoryEditName()"></select>
     <input type="text" id="editCatName" placeholder="تعديل الاسم">
     <button onclick="updateCategory()" class="blue-btn">تعديل</button>
     <button onclick="deleteCategory()" class="delete-btn">حذف القسم</button>
@@ -91,7 +91,7 @@
     <h2>✏️ تحديث صور منتج موجود (برمز المنتج)</h2>
     <input type="text" id="updateProdCode" placeholder="أدخل كود المنتج (مثلاً A1)">
     <input type="file" id="updateProdImages" accept="image/*" multiple>
-    <button onclick="updateProductImageByCode()" class="orange-btn">تحديث صور المنتج الجديد</button>
+    <button onclick="updateProductImageByCode()" class="orange-btn">تحديث صور المنتج</button>
 </div>
 
 <div class="box">
@@ -128,6 +128,7 @@
     const db = getFirestore(app);
 
     let allProducts = [];
+    let loadedCategoriesData = [];
 
     function compressImage(file, callback) {
         const reader = new FileReader();
@@ -166,23 +167,37 @@
         document.getElementById('pCode').value = selectedCat + nextNum;
     }
 
+    window.fillCategoryEditName = function() {
+        const selectEl = document.getElementById('catSelect');
+        const editInput = document.getElementById('editCatName');
+        const selectedId = selectEl.value;
+        const found = loadedCategoriesData.find(c => c.id === selectedId);
+        if (found) {
+            editInput.value = found.name;
+        }
+    }
+
     async function initAdmin() {
         const catSnapshot = await getDocs(collection(db, "categories"));
-        let categories = [];
-        catSnapshot.forEach(doc => categories.push({ id: doc.id, ...doc.data() }));
+        loadedCategoriesData = [];
+        catSnapshot.forEach(docItem => loadedCategoriesData.push({ id: docItem.id, ...docItem.data() }));
         
-        if (categories.length === 0) {
+        if (loadedCategoriesData.length === 0) {
             await setDoc(doc(db, "categories", "A"), { name: "الحقائب الفاخرة" });
             await setDoc(doc(db, "categories", "B"), { name: "العطور والساعات" });
-            categories = [{id: 'A', name: 'الحقائب الفاخرة'}, {id: 'B', name: 'العطور والساعات'}];
+            loadedCategoriesData = [{id: 'A', name: 'الحقائب الفاخرة'}, {id: 'B', name: 'العطور والساعات'}];
         }
 
-        let html = categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        let html = loadedCategoriesData.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
         document.getElementById('pCategory').innerHTML = html;
         document.getElementById('catSelect').innerHTML = html;
         
-        let lastId = categories[categories.length - 1].id;
-        document.getElementById('autoCatId').value = String.fromCharCode(lastId.charCodeAt(0) + 1);
+        if (loadedCategoriesData.length > 0) {
+            document.getElementById('editCatName').value = loadedCategoriesData[0].name;
+            let lastId = loadedCategoriesData[loadedCategoriesData.length - 1].id;
+            let nextCharCode = String.fromCharCode(lastId.charCodeAt(0) + 1);
+            document.getElementById('autoCatId').value = nextCharCode;
+        }
 
         const prodSnapshot = await getDocs(collection(db, "products"));
         allProducts = [];
@@ -230,7 +245,6 @@
         }
     }
 
-    // دالة التأكيد والتفعيل وتوليد حساب الشريك والتوجيه لواتساب برسالة جاهزة
     window.confirmAndNotifyOrder = async function(order) {
         let generatedPartnerId = "EVA-" + Math.floor(100 + Math.random() * 900);
         let generatedPassword = Math.floor(1000 + Math.random() * 9000).toString();
@@ -269,7 +283,6 @@
         let whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(welcomeMsg)}`;
         window.open(whatsappUrl, '_blank');
 
-        // حذف الطلب من قائمة المعلقات
         await deleteDoc(doc(db, "orders", order.id));
 
         alert('✅ تم تأكيد الطلب وتوليد حساب الشريك (' + generatedPartnerId + ') بنجاح!');
