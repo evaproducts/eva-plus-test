@@ -574,6 +574,15 @@
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
 
+      // التحقق الفوري فور فتح الكتالوج من تسجيل بيانات العميل
+      window.addEventListener('DOMContentLoaded', () => {
+          let currentUser = JSON.parse(localStorage.getItem('eva_current_user'));
+          if (!currentUser || !currentUser.phone) {
+              alert('⚠️ عذراً، يجب تسجيل بياناتك عبر صفحة الانضمام أولاً لتتمكن من تصفح الكتالوج واختيار منتجك الأول.');
+              window.location.href = 'join.html';
+          }
+      });
+
       const urlParams = new URLSearchParams(window.location.search);
       const refParam = urlParams.get('ref') || urlParams.get('user');
       if (refParam) {
@@ -703,6 +712,11 @@
                               }
                           }
 
+                          let currentUser = JSON.parse(localStorage.getItem('eva_current_user')) || {};
+                          if (currentUser.hasOrdered) {
+                              isReserved = true; // تفعيل التعطيل الشامل إذا طلب مسبقاً
+                          }
+
                           let cardClass = isReserved ? "product-card reserved" : "product-card";
                           let badgeStyle = isReserved ? "display: block;" : "display: none;";
                           let btnClass = isReserved ? "whatsapp-btn disabled" : "whatsapp-btn";
@@ -747,13 +761,18 @@
           window.scrollTo({ top: 0, behavior: 'smooth' });
       }
 
-      // دالة معالجة الطلب وسحب العنوان والاسم ورقم الهاتف لإرسالها للواتساب وقاعدة البيانات
+      // دالة معالجة الطلب مع منع تكرار الحجز لنفس المستخدم
       window.handleProductOrder = async function(code, name, price, event) {
           event.preventDefault();
 
+          let currentUser = JSON.parse(localStorage.getItem('eva_current_user')) || {};
+          if (currentUser.hasOrdered) {
+              alert('⚠️ عذراً، لقد قمت مسبقاً بطلب منتج وتجميده. لا يمكنك طلب منتج آخر حتى تقوم الإدارة بتأكيد طلبك الحالي وتفعيل حسابك.');
+              return;
+          }
+
           const reservationTime = new Date().getTime() + (24 * 60 * 60 * 1000); // 24 ساعة
 
-          let currentUser = JSON.parse(localStorage.getItem('eva_current_user')) || {};
           let clientName = currentUser.name || 'عميل مباشر';
           let clientPhone = currentUser.phone || 'غير مسجل';
           let clientAddress = currentUser.address || currentUser.location || 'غير محدد';
@@ -776,11 +795,16 @@
                   status: 'pending',
                   timestamp: new Date().toISOString()
               });
+
+              // تسجيل أن المستخدم قد قام بطلب منتج لمنعه من تكرار الطلبات
+              currentUser.hasOrdered = true;
+              localStorage.setItem('eva_current_user', JSON.stringify(currentUser));
+
           } catch (err) {
               console.error("Error updating reservation in Firestore:", err);
           }
 
-          // 3. تحديث واجهة الكتالوج الحالية فوراً
+          // 3. تحديث واجهة الكتالوج الحالية فوراً وتعديل كافة أزرار الطلب للتعطيل
           const card = document.getElementById(`prod-card-${code}`);
           const badge = document.getElementById(`badge-${code}`);
           const btn = document.getElementById(`btn-${code}`);
@@ -790,6 +814,12 @@
               btn.className = 'whatsapp-btn disabled';
               btn.innerText = 'محجوز مؤقتاً (قيد المعالجة)';
           }
+
+          // تعطيل بقية الأزرار في الصفحة لمنع أي محاولة طلب إضافية
+          document.querySelectorAll('.whatsapp-btn').forEach(b => {
+              b.className = 'whatsapp-btn disabled';
+              b.innerText = 'محجوز مؤقتاً (قيد المعالجة)';
+          });
 
           // 4. توجيه العميل للواتساب مع تضمين العنوان بوضوح
           let msg = `مرحباً إدارة معرض إيفا 🌸 أرغب بطلب المنتج التالي:\n\n` +
@@ -803,6 +833,8 @@
 
           let whatsappLink = `https://wa.me/972559334655?text=${encodeURIComponent(msg)}`;
           window.open(whatsappLink, '_blank');
+
+          alert('✅ تم إرسال طلبك بنجاح وحجز المنتج! يرجى إتمام إرسال الرسالة عبر واتساب للإدارة لتأكيد طلبك وتفعيل حسابك.');
       }
 
       window.backToHome = function() {
