@@ -39,8 +39,6 @@
         .btn:hover { background: #880e4f; }
         .blue-btn { background: #1976d2; }
         .blue-btn:hover { background: #115293; }
-        .green-btn { background: #2e7d32; }
-        .green-btn:hover { background: #1b5e20; }
         .form-group {
             margin-bottom: 15px;
         }
@@ -111,7 +109,7 @@
         .modal-content {
             background: #fff;
             width: 100%;
-            max-width: 600px;
+            max-width: 650px;
             border-radius: 12px;
             padding: 25px;
             box-shadow: 0 5px 25px rgba(0,0,0,0.2);
@@ -143,26 +141,7 @@
     <div id="adminPanel" class="container">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <h2>🌟 لوحة تحكم شجرة EVA PLUS</h2>
-            <span style="color: #666; font-size: 14px;">إدارة الشركاء والاطلاع على بيانات الحسابات وتوزيع الأرباح</span>
-        </div>
-
-        <!-- صندوق محاكاة توزيع أرباح بيعة تصاعدياً -->
-        <div style="background: #e8f5e9; padding: 20px; border-radius: 8px; margin-top: 20px; border: 1px solid #81c784;">
-            <h3 style="color: #2e7d32; border-color: #a5d6a7; margin-top: 0;">💵 محاكاة توزيع أرباح بيعة عبر السلسلة</h3>
-            <p style="font-size: 13px; color: #1b5e20;">اختر الشريك الذي أتم البيع، وأدخل إجمالي قيمة الربح (مثلاً 10 ₪)، ليقوم النظام بتوزيعها بالتساوي على الشريك وكل من في سلسلته الصعودية حتى رأس الهرم (`EVA-001`).</p>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px;">
-                <div class="form-group" style="margin-bottom:0;">
-                    <label>اختر الشريك البائع:</label>
-                    <select id="simulatePartnerSelect">
-                        <option value="">-- اختر الشريك --</option>
-                    </select>
-                </div>
-                <div class="form-group" style="margin-bottom:0;">
-                    <label>إجمالي ربح البيعة (₪):</label>
-                    <input type="number" id="simulateProfitAmount" value="10" placeholder="10">
-                </div>
-            </div>
-            <button class="btn green-btn" style="margin-top: 15px;" onclick="simulateAndDistributeProfit()">توزيع الأرباح على السلسلة فوراً</button>
+            <span style="color: #666; font-size: 14px;">إدارة الشركاء والاطلاع على بيانات الحسابات</span>
         </div>
 
         <!-- نموذج إضافة شريك جديد -->
@@ -204,7 +183,7 @@
         </div>
 
         <!-- جدول عرض الشجرة والشركاء -->
-        <h3 style="margin-top: 30px;">📋 قائمة شركاء الفريق المسجلين (مع بيانات الحسابات والأرصدة)</h3>
+        <h3 style="margin-top: 30px;">📋 قائمة شركاء الفريق المسجلين</h3>
         <table>
             <thead>
                 <tr>
@@ -223,11 +202,11 @@
         </table>
     </div>
 
-    <!-- نافذة منبثقة (Modal) لعرض تفاصيل حساب الشريك مطابقة لشاشته -->
+    <!-- نافذة منبثقة (Modal) لعرض تفاصيل حساب الشريك مع شريط الحركات والأرباح -->
     <div id="partnerModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closePartnerModal()">&times;</span>
-            <h3 style="color: #880e4f; margin-top: 0; border-bottom: 2px solid #f8bbd0; padding-bottom: 8px;">👤 معاينة حساب الشريك</h3>
+            <h3 style="color: #880e4f; margin-top: 0; border-bottom: 2px solid #f8bbd0; padding-bottom: 8px;">👤 معاينة حساب الشريك وسجل الحركات</h3>
             
             <div class="partner-preview-card">
                 <p><b>اسم الشريك:</b> <span id="mName"></span></p>
@@ -240,6 +219,24 @@
             <div style="background: #e8f5e9; border: 1px solid #81c784; padding: 12px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
                 <span style="font-size: 13px; color: #1b5e20; font-weight: bold;">💰 الرصيد الحالي المتاح:</span>
                 <h3 id="mBalance" style="margin: 5px 0 0 0; color: #2e7d32; border: none;">0 ₪</h3>
+            </div>
+
+            <!-- شريط وسجل الحركات المالية للشريك (مقتصرة على الحقول الأربعة المطلوبة تماماً) -->
+            <h4 style="color: #880e4f; margin-bottom: 8px;">📊 شريط الحركات والأرباح</h4>
+            <div style="max-height: 180px; overflow-y: auto; border: 1px solid #f8bbd0; border-radius: 8px; margin-bottom: 15px;">
+                <table style="margin-top: 0;">
+                    <thead>
+                        <tr>
+                            <th>التاريخ والوقت (date)</th>
+                            <th>عدد الشركاء (chainLength)</th>
+                            <th>إجمالي الربح (totalProfit)</th>
+                            <th>حصة الشريك (shareAmount)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mTransactionsBody">
+                        <tr><td colspan="4" style="color: #888; text-align: center;">لا توجد حركات أرباح مسجلة حتى الآن.</td></tr>
+                    </tbody>
+                </table>
             </div>
 
             <div class="form-group">
@@ -258,7 +255,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAqPpKqqHBEIJZTCGCROFzqZyHOYlnDgP4",
@@ -290,6 +287,7 @@
                         address: "المركز الرئيسي",
                         password: "EVA001ROOT",
                         balance: 0,
+                        transactions: [],
                         uplineId: "none",
                         createdAt: new Date().toISOString()
                     });
@@ -299,7 +297,6 @@
                 let rowsHtml = '';
                 let uplineOptions = '<option value="EVA-001">EVA-001 (إيفا - رأس الهرم)</option>';
                 let searchOptions = '<option value="">-- اختر الشريك لمعرفة تسلسله في الشجرة --</option>';
-                let simulateOptions = '<option value="">-- اختر الشريك البائع --</option>';
 
                 allPartnersMap = {};
                 snap.forEach(docItem => {
@@ -315,7 +312,6 @@
                         uplineOptions += `<option value="${p.partnerId}">${p.partnerId} - ${p.name}</option>`;
                     }
                     searchOptions += `<option value="${p.partnerId}">${p.partnerId} (${p.name})</option>`;
-                    simulateOptions += `<option value="${p.partnerId}">${p.partnerId} (${p.name})</option>`;
 
                     rowsHtml += `
                         <tr>
@@ -339,73 +335,12 @@
                 document.getElementById('partnersTableBody').innerHTML = rowsHtml;
                 document.getElementById('uplineSelect').innerHTML = uplineOptions;
                 document.getElementById('searchPartnerSelect').innerHTML = searchOptions;
-                document.getElementById('simulatePartnerSelect').innerHTML = simulateOptions;
 
             } catch (error) {
                 console.error("Error loading partners:", error);
                 document.getElementById('partnersTableBody').innerHTML = `<tr><td colspan="7" style="color:red;">خطأ في تحميل بيانات الشجرة.</td></tr>`;
             }
         }
-
-        // دالة توزيع الأرباح التصاعدية (قسمة الربح بالتساوي على السلسلة من البائع حتى EVA-001)
-        window.simulateAndDistributeProfit = async function() {
-            let sellerId = document.getElementById('simulatePartnerSelect').value;
-            let profitAmount = parseFloat(document.getElementById('simulateProfitAmount').value);
-
-            if(!sellerId) {
-                return alert('الرجاء اختيار الشريك الذي حقق البيعة.');
-            }
-            if(isNaN(profitAmount) || profitAmount <= 0) {
-                return alert('الرجاء إدخال قيمة ربح صحيحة.');
-            }
-
-            // 1. تتبع السلسلة الصعودية من البائع حتى رأس الهرم
-            let chainArray = [];
-            let currentId = sellerId;
-            let safetyCounter = 0;
-
-            while(currentId && currentId !== "none" && allPartnersMap[currentId] && safetyCounter < 50) {
-                chainArray.push(currentId);
-                let partner = allPartnersMap[currentId];
-                currentId = partner.uplineId || partner.sponsor || "EVA-001";
-                // إذا وصلنا لرأس الهرم ولم يتم إضافته بعد، نضيفه ونتوقف
-                if(currentId === "EVA-001" && !chainArray.includes("EVA-001")) {
-                    chainArray.push("EVA-001");
-                    break;
-                }
-                safetyCounter++;
-            }
-
-            // التأكد من وجود رأس الهرم في النهاية كضمانة
-            if(!chainArray.includes("EVA-001") && allPartnersMap["EVA-001"]) {
-                chainArray.push("EVA-001");
-            }
-
-            let chainLength = chainArray.length;
-            if(chainLength === 0) return alert('حدث خطأ في تحديد السلسلة.');
-
-            let sharePerPerson = parseFloat((profitAmount / chainLength).toFixed(2));
-
-            try {
-                // 2. تحديث أرصدة كل أفراد السلسلة في قاعدة بيانات Firebase
-                for(let partnerId of chainArray) {
-                    let partnerDocRef = doc(db, "partners", partnerId);
-                    let partnerDocSnap = await getDoc(partnerDocRef);
-                    if(partnerDocSnap.exists()) {
-                        let currentBalance = parseFloat(partnerDocSnap.data().balance || 0);
-                        let newBalance = parseFloat((currentBalance + sharePerPerson).toFixed(2));
-                        await updateDoc(partnerDocRef, { balance: newBalance });
-                    }
-                }
-
-                alert(`✅ تمت عملية توزيع الأرباح بنجاح!\n\n- إجمالي الربح: ${profitAmount} ₪\n- عدد أفراد السلسلة: ${chainLength}\n- حصة كل فرد (من البائع وحتى رأس الهرم): ${sharePerPerson} ₪\n\n(تم تحديث الأرصدة في قاعدة البيانات تلقائياً).`);
-                location.reload();
-
-            } catch(err) {
-                console.error("Error distributing profit:", err);
-                alert('حدث خطأ أثناء توزع الأرباح في قاعدة البيانات.');
-            }
-        };
 
         window.openPartnerPreview = function(partnerId) {
             let p = allPartnersMap[partnerId];
@@ -417,6 +352,21 @@
             document.getElementById('mPhone').innerText = p.phone || 'غير مسجل';
             document.getElementById('mAddress').innerText = p.address || 'غير محدد';
             document.getElementById('mBalance').innerText = (p.balance || 0) + " ₪";
+
+            let txBody = document.getElementById('mTransactionsBody');
+            let txs = p.transactions || [];
+            if(txs.length > 0) {
+                txBody.innerHTML = txs.slice().reverse().map(t => `
+                    <tr>
+                        <td>${t.date}</td>
+                        <td>${t.chainLength} أفراد</td>
+                        <td>${t.totalProfit} ₪</td>
+                        <td><b style="color: #2e7d32;">+${t.shareAmount} ₪</b></td>
+                    </tr>
+                `).join('');
+            } else {
+                txBody.innerHTML = `<tr><td colspan="4" style="color: #888; text-align: center;">لا توجد حركات أرباح مسجلة حتى الآن.</td></tr>`;
+            }
 
             let baseUrl = window.location.origin + window.location.pathname.replace('tree.html', '');
             document.getElementById('mCatalogLink').value = `${baseUrl}catalog.html?user=${p.partnerId}`;
@@ -502,6 +452,7 @@
                     address: address,
                     password: randomPass,
                     balance: 0,
+                    transactions: [],
                     uplineId: uplineId,
                     createdAt: new Date().toISOString()
                 });
