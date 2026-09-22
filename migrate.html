@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ترحيل بيانات EVA PLUS</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f0f2f5; text-align: center; padding: 50px; direction: rtl; }
+        .box { background: #fff; padding: 30px; border-radius: 12px; max-width: 500px; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        button { background: #27ae60; color: white; padding: 15px 30px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        button:hover { background: #219150; }
+        #status { margin-top: 20px; font-weight: bold; color: #880e4f; }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h2>🚀 أداة ترحيل البيانات إلى EVA PLUS</h2>
+    <p>اضغط على الزر أدناه لبدء نسخ الأقسام والمنتجات إلى قاعدة البيانات الجديدة.</p>
+    <button onclick="startMigration()">بدء الترحيل الآن</button>
+    <div id="status"></div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // 1. الاتصال بالمشروع القديم (للقراءة فقط)
+    const oldApp = initializeApp({
+        apiKey: "AIzaSyDGvv11z5ysUxYp6MscdetAUmJtfmCuXZ4",
+        authDomain: "evabrandcatalog.firebaseapp.com",
+        projectId: "evabrandcatalog",
+        storageBucket: "evabrandcatalog.firebasestorage.app",
+        messagingSenderId: "795421907629",
+        appId: "1:795421907629:web:e75bc5be8c4556ab660424"
+    }, "oldProject");
+    const oldDb = getFirestore(oldApp);
+
+    // 2. الاتصال بالمشروع الجديد EVA PLUS (للكتابة)
+    const newApp = initializeApp({
+        apiKey: "AIzaSyAqPpKqqHBEIJZTCGCROFzqZyHOYlnDgP4",
+        authDomain: "eva-plus-66b96.firebaseapp.com",
+        projectId: "eva-plus-66b96",
+        storageBucket: "eva-plus-66b96.firebasestorage.app",
+        messagingSenderId: "686798536842",
+        appId: "1:686798536842:web:8c09932cd5869292eb6d73"
+    }, "newProject");
+    const newDb = getFirestore(newApp);
+
+    window.startMigration = async function() {
+        const statusEl = document.getElementById('status');
+        statusEl.innerHTML = "جاري سحب البيانات من المشروع القديم...";
+
+        try {
+            // ترحيل الأقسام (Categories)
+            const catSnap = await getDocs(collection(oldDb, "categories"));
+            let catCount = 0;
+            for (let d of catSnap.docs) {
+                await setDoc(doc(newDb, "categories", d.id), d.data());
+                catCount++;
+            }
+
+            // ترحيل المنتجات (Products)
+            statusEl.innerHTML = `تم ترحيل (${catCount}) أقسام. جاري ترحيل المنتجات...`;
+            const prodSnap = await getDocs(collection(oldDb, "products"));
+            let prodCount = 0;
+            for (let d of prodSnap.docs) {
+                await setDoc(doc(newDb, "products", d.id), d.data());
+                prodCount++;
+            }
+
+            // ترحيل الإعدادات مثل اللوغو والرسالة
+            const settingsSnap = await getDocs(collection(oldDb, "settings"));
+            for (let d of settingsSnap.docs) {
+                await setDoc(doc(newDb, "settings", d.id), d.data());
+            }
+
+            statusEl.innerHTML = `🎉 تم الترحيل بنجاح تام!<br>تم نقل (${catCount}) أقسام و (${prodCount}) منتجاً إلى بيئة EVA PLUS الجديدة.`;
+        } catch (error) {
+            console.error(error);
+            statusEl.innerHTML = "❌ حدث خطأ أثناء الترحيل. تأكد من صلاحيات القراءة والكتابة.";
+        }
+    }
+</script>
+
+</body>
+</html>
