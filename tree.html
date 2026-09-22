@@ -14,7 +14,7 @@
             direction: rtl;
         }
         .container {
-            max-width: 1000px;
+            max-width: 1050px;
             margin: 0 auto;
             background: #fff;
             padding: 25px;
@@ -30,12 +30,15 @@
             background: #ad1457;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 8px 15px;
             border-radius: 6px;
             font-weight: bold;
             cursor: pointer;
+            font-size: 13px;
         }
         .btn:hover { background: #880e4f; }
+        .blue-btn { background: #1976d2; }
+        .blue-btn:hover { background: #115293; }
         .form-group {
             margin-bottom: 15px;
         }
@@ -61,7 +64,7 @@
             border: 1px solid #f8bbd0;
             padding: 10px;
             text-align: center;
-            font-size: 14px;
+            font-size: 13px;
         }
         th {
             background: #fff0f5;
@@ -89,6 +92,49 @@
             display: none;
             line-height: 1.6;
         }
+        /* تصميم النافذة المنبثقة (Modal) لعرض صفحة الشريك */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+        .modal-content {
+            background: #fff;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+            border-top: 5px solid #880e4f;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #880e4f;
+            cursor: pointer;
+        }
+        .partner-preview-card {
+            background: #fff0f5;
+            border: 1px solid #f8bbd0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
     </style>
 </head>
 <body>
@@ -96,7 +142,7 @@
     <div id="adminPanel" class="container">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <h2>🌟 لوحة تحكم شجرة EVA PLUS</h2>
-            <span style="color: #666; font-size: 14px;">وضع التطوير (بدون كلمة مرور)</span>
+            <span style="color: #666; font-size: 14px;">إدارة الشركاء والاطلاع على بيانات الحسابات</span>
         </div>
 
         <!-- نموذج إضافة شريك جديد -->
@@ -132,27 +178,61 @@
                 <select id="searchPartnerSelect" style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #90caf9;">
                     <option value="">-- اختر الشريك لمعرفة تسلسله في الشجرة --</option>
                 </select>
-                <button class="btn" style="background: #1976d2;" onclick="showPartnerTreePath()">عرض التسلسل</button>
+                <button class="btn blue-btn" onclick="showPartnerTreePath()">عرض التسلسل</button>
             </div>
             <div id="treePathResult"></div>
         </div>
 
         <!-- جدول عرض الشجرة والشركاء -->
-        <h3 style="margin-top: 30px;">📋 قائمة شركاء الفريق المسجلين (الحقيقيين فقط)</h3>
+        <h3 style="margin-top: 30px;">📋 قائمة شركاء الفريق المسجلين (مع بيانات الحسابات)</h3>
         <table>
             <thead>
                 <tr>
-                    <th>الرمز التسلسلي (ID)</th>
+                    <th>الرمز (ID)</th>
                     <th>اسم الشريك</th>
                     <th>رقم الهاتف</th>
-                    <th>العنوان</th>
-                    <th>الداعي (Upline)</th>
+                    <th>كلمة المرور</th>
+                    <th>الداعي</th>
+                    <th>إجراءات الدعم</th>
                 </tr>
             </thead>
             <tbody id="partnersTableBody">
-                <tr><td colspan="5" style="text-align:center;">جاري تحميل الشجرة...</td></tr>
+                <tr><td colspan="6" style="text-align:center;">جاري تحميل الشجرة...</td></tr>
             </tbody>
         </table>
+    </div>
+
+    <!-- نافذة منبثقة (Modal) لعرض تفاصيل حساب الشريك مطابقة لشاشته -->
+    <div id="partnerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closePartnerModal()">&times;</span>
+            <h3 style="color: #880e4f; margin-top: 0; border-bottom: 2px solid #f8bbd0; padding-bottom: 8px;">👤 معاينة حساب الشريك</h3>
+            
+            <div class="partner-preview-card">
+                <p><b>اسم الشريك:</b> <span id="mName"></span></p>
+                <p><b>رقم الشريك (اليوزر):</b> <span id="mId" style="color: #880e4f; font-weight: bold;"></span></p>
+                <p><b>كلمة المرور:</b> <span id="mPass" style="color: #2e7d32; font-weight: bold;"></span></p>
+                <p><b>رقم الهاتف:</b> <span id="mPhone"></span></p>
+                <p><b>العنوان:</b> <span id="mAddress"></span></p>
+            </div>
+
+            <div style="background: #e8f5e9; border: 1px solid #81c784; padding: 12px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
+                <span style="font-size: 13px; color: #1b5e20; font-weight: bold;">💰 الرصيد الحالي المتاح:</span>
+                <h3 id="mBalance" style="margin: 5px 0 0 0; color: #2e7d32; border: none;">0 ₪</h3>
+            </div>
+
+            <div class="form-group">
+                <label style="font-size: 13px;">رابط الكتالوج الخاص بالشريك:</label>
+                <input type="text" id="mCatalogLink" readonly style="background: #f9f9f9; font-size: 12px;">
+            </div>
+
+            <div class="form-group">
+                <label style="font-size: 13px;">رابط الاستقطاب الخاص بالشريك:</label>
+                <input type="text" id="mReferralLink" readonly style="background: #f9f9f9; font-size: 12px;">
+            </div>
+
+            <button class="btn blue-btn" style="width: 100%; margin-top: 10px;" onclick="copyPartnerInfoToClipboard()">📋 نسخ معلومات الحساب لإرسالها للعميل</button>
+        </div>
     </div>
 
     <script type="module">
@@ -187,6 +267,8 @@
                         name: "معرض إيفا (رأس الهرم)",
                         phone: "0597180456",
                         address: "المركز الرئيسي",
+                        password: "EVA001ROOT",
+                        balance: 0,
                         uplineId: "none",
                         createdAt: new Date().toISOString()
                     });
@@ -200,11 +282,9 @@
                 allPartnersMap = {};
                 snap.forEach(docItem => {
                     let p = docItem.data();
-                    
-                    // 🛡️ فلترة استثنائية: استبعاد أي سجل يعتبر زبون مباشر أو غير تابع للشجرة الحقيقية
                     let pName = (p.name || "").toString();
                     if (pName.includes("زبون مباشر") || p.partnerId === "EVA-908" || !p.partnerId || !p.partnerId.startsWith("EVA-")) {
-                        return; // تجاوز هذا السجل وعدم إدراجه في الشجرة
+                        return;
                     }
 
                     allPartnersMap[p.partnerId] = p;
@@ -219,14 +299,17 @@
                             <td><b>${p.partnerId}</b></td>
                             <td>${p.name}</td>
                             <td>${p.phone || 'غير مسجل'}</td>
-                            <td>${p.address || 'غير محدد'}</td>
+                            <td><code style="background:#eee; padding:2px 6px; border-radius:4px; color:#c2185b;">${p.password || 'غير محدد'}</code></td>
                             <td>${p.uplineId || p.sponsor || 'EVA-001'}</td>
+                            <td>
+                                <button class="btn" onclick='openPartnerPreview("${p.partnerId}")'>👁️ عرض الحساب</button>
+                            </td>
                         </tr>
                     `;
                 });
 
                 if(rowsHtml === '') {
-                    rowsHtml = `<tr><td colspan="5" style="text-align:center; color:#888;">لا توجد سجلات شركاء حقيقيين في الشجرة حتى الآن.</td></tr>`;
+                    rowsHtml = `<tr><td colspan="6" style="text-align:center; color:#888;">لا توجد سجلات شركاء حقيقيين في الشجرة حتى الآن.</td></tr>`;
                 }
 
                 document.getElementById('partnersTableBody').innerHTML = rowsHtml;
@@ -235,9 +318,49 @@
 
             } catch (error) {
                 console.error("Error loading partners:", error);
-                document.getElementById('partnersTableBody').innerHTML = `<tr><td colspan="5" style="color:red;">خطأ في تحميل بيانات الشجرة.</td></tr>`;
+                document.getElementById('partnersTableBody').innerHTML = `<tr><td colspan="6" style="color:red;">خطأ في تحميل بيانات الشجرة.</td></tr>`;
             }
         }
+
+        // فتح نافذة المعاينة المنبثقة لبيانات الشريك
+        window.openPartnerPreview = function(partnerId) {
+            let p = allPartnersMap[partnerId];
+            if(!p) return alert('لم يتم العثور على بيانات الشريك.');
+
+            document.getElementById('mName').innerText = p.name || 'بدون اسم';
+            document.getElementById('mId').innerText = p.partnerId;
+            document.getElementById('mPass').innerText = p.password || 'غير محدد';
+            document.getElementById('mPhone').innerText = p.phone || 'غير مسجل';
+            document.getElementById('mAddress').innerText = p.address || 'غير محدد';
+            document.getElementById('mBalance').innerText = (p.balance || 0) + " ₪";
+
+            let baseUrl = window.location.origin + window.location.pathname.replace('tree.html', '');
+            document.getElementById('mCatalogLink').value = `${baseUrl}catalog.html?user=${p.partnerId}`;
+            document.getElementById('mReferralLink').value = `${baseUrl}join.html?ref=${p.partnerId}`;
+
+            document.getElementById('partnerModal').style.display = 'flex';
+        };
+
+        window.closePartnerModal = function() {
+            document.getElementById('partnerModal').style.display = 'none';
+        };
+
+        window.copyPartnerInfoToClipboard = function() {
+            let name = document.getElementById('mName').innerText;
+            let id = document.getElementById('mId').innerText;
+            let pass = document.getElementById('mPass').innerText;
+            let catalog = document.getElementById('mCatalogLink').value;
+            let referral = document.getElementById('mReferralLink').value;
+
+            let textToCopy = `🌸 أهلاً بك يا ${name} في نظام EVA PLUS:\n\n` +
+                             `- رقم الحساب / اليوزر: ${id}\n` +
+                             `- كلمة المرور: ${pass}\n\n` +
+                             `🔗 رابط الكتالوج الخاص بك:\n${catalog}\n\n` +
+                             `🌳 رابط الاستقطاب لفريقك:\n${referral}`;
+
+            navigator.clipboard.writeText(textToCopy);
+            alert('✅ تم نسخ معلومات الحساب بالكامل! يمكنك لصقها مباشرة في رسالة واتساب للعميل.');
+        };
 
         window.showPartnerTreePath = function() {
             let selectedId = document.getElementById('searchPartnerSelect').value;
@@ -279,6 +402,7 @@
                 const snap = await getDocs(collection(db, "partners"));
                 let nextIdNum = 101 + snap.size;
                 let newPartnerId = `EVA-${nextIdNum}`;
+                let randomPass = Math.floor(1000 + Math.random() * 9000).toString();
 
                 let checkDoc = await getDoc(doc(db, "partners", newPartnerId));
                 while(checkDoc.exists()) {
@@ -292,12 +416,13 @@
                     name: name,
                     phone: phone,
                     address: address,
-                    uplineId: uplineId,
+                    password: randomPass,
                     balance: 0,
+                    uplineId: uplineId,
                     createdAt: new Date().toISOString()
                 });
 
-                alert(`تم بنجاح إضافة الشريك برمز تسلسلي: ${newPartnerId}`);
+                alert(`تم بنجاح إضافة الشريك برمز: ${newPartnerId} وكلمة مرور: ${randomPass}`);
                 location.reload();
 
             } catch (err) {
