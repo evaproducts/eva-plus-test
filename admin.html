@@ -30,7 +30,7 @@
 
 <div class="box">
     <h2>📦 إدارة الطلبات المعلقة (EVA PLUS)</h2>
-    <p style="font-size: 13px; color: #666;">الطلبات الواردة لتأكيد التوصيل أو تفعيل حسابات الشركاء الجدد وتوليد بياناتهم.</p>
+    <p style="font-size: 13px; color: #666;">الطلبات الواردة لتأكيد التوصيل أو تفعيل حسابات الشركاء وتوزيع سعر الوسيط على الشجرة.</p>
     <table class="orders-table">
         <thead>
             <tr>
@@ -113,7 +113,7 @@
 <!-- ربط مكتبات Firebase -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, setDoc, doc, deleteDoc, addDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, setDoc, doc, deleteDoc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyAqPpKqqHBEIJZTCGCROFzqZyHOYlnDgP4",
@@ -245,29 +245,99 @@
         }
     }
 
+    // دالة تأكيد وتفعيل الطلب وقراءة سعر الوسيط وتقسيمه على الشجرة تلقائياً
     window.confirmAndNotifyOrder = async function(order) {
         let generatedPartnerId = "EVA-" + Math.floor(100 + Math.random() * 900);
         let generatedPassword = Math.floor(1000 + Math.random() * 9000).toString();
 
         try {
+            // 1. إنشاء حساب الشريك الجديد
+            let sellerId = order.sponsor && order.sponsor !== "الإدارة المركزية" && order.sponsor !== "EVA-ROOT" ? order.sponsor : "EVA-001";
+            
             await setDoc(doc(db, "partners", generatedPartnerId), {
                 partnerId: generatedPartnerId,
                 name: order.clientName,
                 phone: order.clientPhone,
                 password: generatedPassword,
-                sponsor: order.sponsor || 'EVA-ROOT',
+                address: order.clientAddress || 'غير محدد',
+                uplineId: sellerId,
                 balance: 0,
+                transactions: [],
                 createdAt: new Date().toISOString()
             });
 
-            // تفريغ حجز المنتج ليعود متاحاً في الكتالوج بعد التأكيد (أو حسب رغبتك)
+            // 2. قراءة سعر الوسيط (agentPrice) للمنتج المطلوب وتوزيعه على السلسلة
             if (order.productCode) {
+                let prodRef = doc(db, "products", order.productCode);
+                let prodSnap = await getDoc(prodRef);
+                
+                if (prodSnap.exists()) {
+                    let prodData = prodSnap.data();
+                    let agentPrice = parseFloat(prodData.agentPrice || 0);
+
+                    if (agentPrice > 0) {
+                        // جلب كافة الشركاء لتتبع السلسلة الصعودية
+                        let partnersSnap = await getDocs(collection(db, "partners"));
+                        let partnersMap = {};
+                        partnersSnap.forEach(d => partnersMap[d.id] = d.data());
+                        // التأكد من تضمين الشريك الجديد
+                        partnersMap[generatedPartnerId] = { uplineId: sellerId };
+
+                        let chainArray = [];
+                        let currentId = generatedPartnerId;
+                        let safetyCounter = 0;
+
+                        while(currentId && currentId !== "none" && partnersMap[currentId] && safetyCounter < 50) {
+                            chainArray.push(currentId);
+                            let partner = partnersMap[currentId];
+                            currentId = partner.uplineId || partner.sponsor || "EVA-001";
+                            if(currentId === "EVA-001" && !chainArray.includes("EVA-001")) {
+                                chainArray.push("EVA-001");
+                                break;
+                            }
+                            safetyCounter++;
+                        }
+
+                        if(!chainArray.includes("EVA-001") && partnersMap["EVA-001"]) {
+                            chainArray.push("EVA-001");
+                        }
+
+                        let chainLength = chainArray.length;
+                        let shareAmount = parseFloat((agentPrice / chainLength).toFixed(2));
+                        let dateNow = new Date().toLocaleString('ar-EG');
+
+                        // تحديث أرصدة أفراد السلسلة وسجل الحركات بالحقول الأربعة المحددة
+                        for(let partnerId of chainArray) {
+                            let pDocRef = doc(db, "partners", partnerId);
+                            let pDocSnap = await getDoc(pDocRef);
+                            if(pDocSnap.exists()) {
+                                let pData = pDocSnap.data();
+                                let currentBal = parseFloat(pData.balance || 0);
+                                let newBal = parseFloat((currentBal + shareAmount).toFixed(2));
+
+                                let newTx = {
+                                    date: dateNow,
+                                    chainLength: chainLength,
+                                    totalProfit: agentPrice,
+                                    shareAmount: shareAmount
+                                };
+
+                                await updateDoc(pDocRef, {
+                                    balance: newBal,
+                                    transactions: arrayUnion(newTx)
+                                });
+                            }
+                        }
+                    }
+                }
+
+                // تفريغ حجز المنتج في الكتالوج
                 await setDoc(doc(db, "products", order.productCode), {
                     reservedUntil: null
                 }, { merge: true });
             }
         } catch (err) {
-            console.error("Error saving partner to Firestore:", err);
+            console.error("Error processing order activation:", err);
         }
 
         let baseUrl = window.location.origin + window.location.pathname.replace('admin.html', '');
@@ -292,7 +362,7 @@
 
         await deleteDoc(doc(db, "orders", order.id));
 
-        alert('✅ تم تأكيد الطلب وتوليد حساب الشريك (' + generatedPartnerId + ') بنجاح!');
+        alert('✅ تم تأكيد الطلب، توزيع سعر الوسيط على السلسلة، وتوليد حساب الشريك (' + generatedPartnerId + ') بنجاح!');
         loadOrders();
     }
 
@@ -328,15 +398,16 @@
         let resultBox = document.getElementById('queryResultBox');
         if(!partnerId) return alert('الرجاء إدخال رقم الشريك');
         
-        let partnersDB = JSON.parse(localStorage.getItem('eva_active_partners_db')) || [
-            { id: "EVA-101", balance: 250 }
-        ];
-        let p = partnersDB.find(x => x.id === partnerId);
-        if(p) {
-            resultBox.innerHTML = `💰 رصيد الشريك (${partnerId}) الحالي هو: ${p.balance} ₪`;
-        } else {
-            resultBox.innerHTML = `❌ لم يتم العثور على شريك بهذا الرقم.`;
-        }
+        getDoc(doc(db, "partners", partnerId)).then(docSnap => {
+            if(docSnap.exists()) {
+                let p = docSnap.data();
+                resultBox.innerHTML = `💰 رصيد الشريك (${partnerId}) الحالي هو: ${p.balance || 0} ₪`;
+            } else {
+                resultBox.innerHTML = `❌ لم يتم العثور على شريك بهذا الرقم.`;
+            }
+        }).catch(err => {
+            resultBox.innerHTML = `❌ حدث خطأ أثناء الاستعلام.`;
+        });
     }
 
     window.addCategory = async function() {
