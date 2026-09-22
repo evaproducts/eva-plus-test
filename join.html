@@ -87,7 +87,29 @@
             height: 100%;
             border: none;
         }
-        /* صندوق الفكرة الجوهرية (لا تبيع منتجاً بل تبيع فكرة) */
+        /* الهوك المخصص لوسيطات شي ان والفرق الجذري */
+        .shein-hook-box {
+            background: linear-gradient(135deg, #fff3e0 100%, #ffe0b2 0%);
+            border: 2px solid #ffb74d;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            color: #e65100;
+        }
+        .shein-hook-box h3 {
+            margin-top: 0;
+            font-size: 19px;
+            color: #ef6c00;
+            text-align: center;
+        }
+        .shein-hook-box p {
+            font-size: 14px;
+            line-height: 1.8;
+            margin-bottom: 10px;
+            color: #4e342e;
+            font-weight: bold;
+        }
+        /* صندوق الفكرة الجوهرية */
         .core-idea-box {
             background: linear-gradient(135deg, #f8bbd0 0%, #f48fb1 100%);
             color: #fff;
@@ -135,6 +157,27 @@
         .details-box li {
             margin-bottom: 12px;
             color: #444;
+        }
+        /* صندوق تفاصيل العمولات والدفع (أرباحك ونقاط السحب) */
+        .payout-box {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border: 2px solid #81c784;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            color: #1b5e20;
+        }
+        .payout-box h3 {
+            margin-top: 0;
+            font-size: 18px;
+            color: #2e7d32;
+            text-align: center;
+        }
+        .payout-box p {
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 0;
+            font-weight: bold;
         }
         /* صندوق تحفيزي يشرح فكرة نظام EVA PLUS والمثال العملي */
         .evaplus-power-box {
@@ -229,13 +272,13 @@
             text-decoration: none;
             font-weight: bold;
         }
-        footer {
+        <footer>
             text-align: center;
             color: #888;
             font-size: 13px;
             margin-bottom: 30px;
             margin-top: 30px;
-        }
+        </footer>
     </style>
 </head>
 <body>
@@ -251,9 +294,18 @@
         <!-- صندوق تنبيه الداعي أو الحملة الإعلانية -->
         <div id="sponsorAlert" class="sponsor-alert-box"></div>
 
-        <!-- فيديو الشرح التوضيحي (يوتيوب) - الرابط المحدث -->
+        <!-- فيديو الشرح التوضيحي (يوتيوب) -->
         <div class="video-container">
             <iframe src="https://www.youtube.com/embed/XlYoHwowL74" title="دليل الانضمام والعمل في نظام EVA PLUS" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+
+        <!-- الهوك المخصص لوسيطات شي ان وتنافس السوق -->
+        <div class="shein-hook-box">
+            <h3>🛍️ هل تعبتِ من دوامة الطلبات، وجع رأس التوصيل، وتنافس أكواد الخصم؟</h3>
+            <p>
+                إذا كنتِ وسيطة (شي ان أو غيره) وتتعبين في جمع الطلبات، متابعة الطرود، مشاكل التوصيل، وهامش الربح البسيط وسط تنافس الأسعار الشديد... <b>لدينا الحل الجذري!</b><br>
+                في نظام <b>EVA PLUS</b>، لا توجد طرود ولا استلام وتسيلم؛ أنتِ تعتمدين على <b>النشاط الرقمي وبناء الفريق فقط</b>. كل شخص تشتركين في جذبه تحت شبكتك أو يشتري من رابط الكتالوج الخاص بكِ، تحصلين على عمولتك المباشرة بذكاء وسهولة تامة من منزلك!
+            </p>
         </div>
 
         <!-- الصندوق الجوهري: أنت لا تبيع منتجاً بل تبيع فكرة -->
@@ -261,6 +313,14 @@
             <h3>💡 أنت لا تبيع منتجاً.. أنت تبيع فكرة!</h3>
             <p>
                 سر النجاح الحقيقي في نظام <b>EVA PLUS</b> ليس في عرض السلع، بل في دعوة معارفك وأصدقائك للانضمام إلى نظام الشراكة الذكي لدينا. لا تدعهم للشراء فحسب، بل ادعهم لينضموا للنظام، وحالما يختار كل شريك منتجه الأول ويدخل الشبكة، ستصبح شريكاً في أرباحهم وتتضاعف دخولكم معاً بلا توقف!
+            </p>
+        </div>
+
+        <!-- صندوق تفاصيل العمولات وطريقة الدفع -->
+        <div class="payout-box">
+            <h3>💵 كيف ومتى تقبضين أرباحك وعمولاتك؟</h3>
+            <p>
+                الأرباح تُسجل في حسابك فوراً وبشكل آلي مع كل عملية بيع من كتالوجك أو انضمام جديد في شبكتك. وبمجرد وصول رصيدك المتراكم إلى <b>100 شيقل فقط</b>، يتم تحويل المبلغ مباشرة إلى حسابك أو استلامه **نقداً (كاش)** بكل سهولة من معرض إيفا! لا توجد تعقيدات مالية، أرباحك مضمونة وواضحة.
             </p>
         </div>
 
