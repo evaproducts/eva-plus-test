@@ -230,10 +230,25 @@
         }
     }
 
-    // دالة التأكيد والتفعيل مع إصلاح رقم الهاتف وتمريره لواتساب والسؤال الذكي للمخزون
+    // دالة التأكيد والتفعيل وتوليد حساب الشريك وحفظه في قاعدة البيانات ليتمكن من تسجيل الدخول فوراً
     window.confirmAndNotifyOrder = async function(order) {
         let generatedPartnerId = "EVA-" + Math.floor(100 + Math.random() * 900);
         let generatedPassword = Math.floor(1000 + Math.random() * 9000).toString();
+
+        // حفظ الشريك الجديد في قاعدة بيانات Firestore ضمن مجموعة partners ليتسنى له الدخول فوراً
+        try {
+            await setDoc(doc(db, "partners", generatedPartnerId), {
+                partnerId: generatedPartnerId,
+                name: order.clientName,
+                phone: order.clientPhone,
+                password: generatedPassword,
+                sponsor: order.sponsor || 'EVA-ROOT',
+                balance: 0,
+                createdAt: new Date().toISOString()
+            });
+        } catch (err) {
+            console.error("Error saving partner to Firestore:", err);
+        }
 
         let baseUrl = window.location.origin + window.location.pathname.replace('admin.html', '');
         let partnerLink = `${baseUrl}partner.html`;
@@ -271,7 +286,7 @@
             }
         }
 
-        alert('تم تأكيد الطلب وتوليد حساب الشريك (' + generatedPartnerId + ') بنجاح!');
+        alert('تم تأكيد الطلب وتوليد وتفعيل حساب الشريك (' + generatedPartnerId + ') بنجاح!');
         loadOrders();
     }
 
