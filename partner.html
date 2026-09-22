@@ -3,250 +3,281 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم الشريك | EVA PLUS</title>
+    <title>إدارة شجرة شركاء EVA PLUS</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #fdfbfb 0%, #fce4ec 100%);
+            background: #f8f9fa;
             color: #333;
             margin: 0;
-            padding: 0;
-            line-height: 1.8;
-            min-height: 100vh;
-        }
-        .header {
-            background: linear-gradient(135deg, #880e4f 0%, #ad1457 100%);
-            color: white;
             padding: 20px;
-            text-align: center;
-            border-bottom: 4px solid #d4af37;
+            direction: rtl;
         }
         .container {
-            max-width: 800px;
-            margin: 30px auto;
+            max-width: 1050px;
+            margin: 0 auto;
             background: #fff;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            border: 1px solid #f8bbd0;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
-        /* شاشة تسجيل الدخول للشريك */
-        #loginSection {
-            text-align: center;
-            max-width: 400px;
-            margin: 40px auto;
-            background: #fff;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            border: 1px solid #f8bbd0;
-        }
-        .form-group {
-            margin-bottom: 15px;
-            text-align: right;
-        }
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #444;
-            font-size: 14px;
-        }
-        input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 14px;
+        h2, h3 {
+            color: #880e4f;
+            border-bottom: 2px solid #f8bbd0;
+            padding-bottom: 8px;
         }
         .btn {
             background: #ad1457;
             color: white;
             border: none;
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
+            padding: 8px 15px;
+            border-radius: 6px;
             font-weight: bold;
-            border-radius: 8px;
             cursor: pointer;
-            transition: 0.3s;
+            font-size: 13px;
         }
         .btn:hover { background: #880e4f; }
-        
-        /* لوحة تحكم الشريك الداخلية */
-        #dashboardSection { display: none; }
-        
-        .balance-card {
-            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-            border: 2px solid #4caf50;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-            margin-bottom: 25px;
-            color: #1b5e20;
+        .blue-btn { background: #1976d2; }
+        .blue-btn:hover { background: #115293; }
+        .green-btn { background: #2e7d32; }
+        .green-btn:hover { background: #1b5e20; }
+        .form-group {
+            margin-bottom: 15px;
         }
-        .balance-card h2 {
-            margin: 0;
-            font-size: 32px;
-            color: #2e7d32;
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
         }
-        
-        .info-box, .links-box, .tree-box {
-            background: #fff0f5;
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
             border: 1px solid #f8bbd0;
-            padding: 20px;
-            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+            font-size: 13px;
+        }
+        th {
+            background: #fff0f5;
+            color: #880e4f;
+        }
+        .tree-path-box {
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
             margin-bottom: 20px;
         }
-        h3 {
-            color: #880e4f;
-            margin-top: 0;
-            border-bottom: 2px solid #f8bbd0;
-            padding-bottom: 8px;
-            font-size: 16px;
-        }
-        .link-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-            align-items: center;
-        }
-        .link-row input { background: #fff; }
-        .share-btn {
-            background: #25d366;
-            color: white;
-            border: none;
-            padding: 12px 18px;
-            border-radius: 8px;
-            cursor: pointer;
+        #treePathResult {
+            margin-top: 12px;
             font-weight: bold;
-            white-space: nowrap;
-        }
-        .share-btn:hover { background: #20ba5a; }
-
-        /* تنسيق أرقام الشجرة الخاصة */
-        .tree-nodes {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 10px;
-        }
-        .tree-node-badge {
-            background: #fff;
-            border: 2px solid #d4af37;
-            color: #880e4f;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-weight: bold;
+            color: #0d47a1;
             font-size: 14px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            background: #fff;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #90caf9;
+            max-height: 100px;
+            overflow-y: auto;
+            display: none;
+            line-height: 1.6;
         }
-        .logout-btn {
-            background: #e74c3c;
-            margin-top: 20px;
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            box-sizing: border-box;
         }
-        .logout-btn:hover { background: #c0392b; }
+        .modal-content {
+            background: #fff;
+            width: 100%;
+            max-width: 650px;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+            border-top: 5px solid #880e4f;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #880e4f;
+            cursor: pointer;
+        }
+        .partner-preview-card {
+            background: #fff0f5;
+            border: 1px solid #f8bbd0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>معرض إيفا براند | بوابة الشريك (EVA PLUS)</h1>
-        <p>لوحة التحكم والخصوصية الكاملة لإدارة عملك وأرباحك</p>
+    <div id="adminPanel" class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>🌟 لوحة تحكم شجرة EVA PLUS</h2>
+            <span style="color: #666; font-size: 14px;">إدارة الشركاء وتوزيع الأرباح وسجل الحركات</span>
+        </div>
+
+        <!-- صندوق محاكاة توزيع أرباح بيعة تصاعدياً وتوليد الحركات -->
+        <div style="background: #e8f5e9; padding: 20px; border-radius: 8px; margin-top: 20px; border: 1px solid #81c784;">
+            <h3 style="color: #2e7d32; border-color: #a5d6a7; margin-top: 0;">💵 محاكاة توزيع أرباح بيعة وتسجيل الحركات</h3>
+            <p style="font-size: 13px; color: #1b5e20;">اختر الشريك البائع وأدخل إجمالي ربح البيعة لتوزيع الحصص بالتساوي على السلسلة حتى رأس الهرم (`EVA-001`).</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px;">
+                <div class="form-group" style="margin-bottom:0;">
+                    <label>الشريك البائع:</label>
+                    <select id="simulatePartnerSelect">
+                        <option value="">-- اختر الشريك --</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label>إجمالي ربح البيعة (totalProfit):</label>
+                    <input type="number" id="simulateProfitAmount" value="10" placeholder="10">
+                </div>
+            </div>
+            <button class="btn green-btn" style="margin-top: 15px;" onclick="simulateAndDistributeProfit()">توزيع الأرباح وتسجيل الحركات فوراً</button>
+        </div>
+
+        <!-- نموذج إضافة شريك جديد -->
+        <div style="background: #fff0f5; padding: 20px; border-radius: 8px; margin-top: 20px; border: 1px solid #f8bbd0;">
+            <h3>➕ إضافة شريك جديد للشجرة</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px;">
+                <div class="form-group">
+                    <label>الاسم الكامل للشريك:</label>
+                    <input type="text" id="partnerName" placeholder="مثال: مريم أبو عيشة">
+                </div>
+                <div class="form-group">
+                    <label>رقم الهاتف المعتمد:</label>
+                    <input type="text" id="partnerPhone" placeholder="0590000000">
+                </div>
+                <div class="form-group">
+                    <label>العنوان (المنطقة):</label>
+                    <input type="text" id="partnerAddress" placeholder="رام الله - المنارة">
+                </div>
+                <div class="form-group">
+                    <label>المُحيل المباشر (Upline):</label>
+                    <select id="uplineSelect">
+                        <option value="EVA-001">EVA-001 (إيفا - رأس الهرم)</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn" style="margin-top: 10px;" onclick="addNewPartner()">حفظ وإضافة الشريك للنظام</button>
+        </div>
+
+        <!-- صندوق بحث وتتبع تسلسل الشجرة الصعودي -->
+        <div class="tree-path-box">
+            <h3 style="margin-top:0; color:#1565c0; border-color:#90caf9;">🔍 تتبع السلسلة الصعودية لشريك</h3>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                <select id="searchPartnerSelect" style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #90caf9;">
+                    <option value="">-- اختر الشريك لمعرفة تسلسله في الشجرة --</option>
+                </select>
+                <button class="btn blue-btn" onclick="showPartnerTreePath()">عرض التسلسل</button>
+            </div>
+            <div id="treePathResult"></div>
+        </div>
+
+        <!-- جدول عرض الشجرة والشركاء -->
+        <h3 style="margin-top: 30px;">📋 قائمة شركاء الفريق المسجلين</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>الرمز (ID)</th>
+                    <th>اسم الشريك</th>
+                    <th>رقم الهاتف</th>
+                    <th>الرصيد الحالي</th>
+                    <th>كلمة المرور</th>
+                    <th>الداعي</th>
+                    <th>إجراءات الدعم</th>
+                </tr>
+            </thead>
+            <tbody id="partnersTableBody">
+                <tr><td colspan="7" style="text-align:center;">جاري تحميل الشجرة...</td></tr>
+            </tbody>
+        </table>
     </div>
 
-    <!-- 1. شاشة تسجيل الدخول للشريك -->
-    <div id="loginSection">
-        <h2 style="color: #880e4f;">تسجيل دخول الشريك</h2>
-        <p style="font-size: 13px; color: #666;">أدخل اسم المستخدم (أو رقمك التسلسلي) وكلمة المرور الخاصة بك.</p>
-        
-        <div class="form-group">
-            <label>اسم المستخدم / رقم الشجرة:</label>
-            <input type="text" id="loginUsername" placeholder="مثال: EVA-102">
-        </div>
-        <div class="form-group">
-            <label>كلمة المرور:</label>
-            <input type="password" id="loginPassword" placeholder="أدخل كلمة المرور">
-        </div>
-        <button class="btn" onclick="handlePartnerLogin()">دخول إلى حسابي</button>
-    </div>
-
-    <!-- 2. لوحة التحكم الرئيسية للشريك (تفتح بعد الدخول الناجح) -->
-    <div class="container" id="dashboardSection">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2 style="color: #880e4f; margin: 0;">أهلاً بك، <span id="displayName"></span> 🌸</h2>
-            <span style="background: #fff0f5; border: 1px solid #ad1457; color: #ad1457; padding: 5px 12px; border-radius: 15px; font-weight: bold;" id="displayPartnerId"></span>
-        </div>
-
-        <!-- رصيد الأرباح -->
-        <div class="balance-card">
-            <span>💰 رصيدك الحالي المتاح في نظام EVA PLUS:</span>
-            <h2 id="displayBalance">0 ₪</h2>
-            <small>(مجموع أرباحك وعمولات الشجرة التراكمية - يتم تصفيرها فور الصرف من الإدارة)</small>
-        </div>
-
-        <!-- الروابط الذكية وزر المشاركة -->
-        <div class="links-box">
-            <h3>🔗 روابطك الذكية للتسويق والعمل</h3>
+    <!-- نافذة منبثقة (Modal) لعرض تفاصيل حساب الشريك مع شريط الحركات والأرباح -->
+    <div id="partnerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closePartnerModal()">&times;</span>
+            <h3 style="color: #880e4f; margin-top: 0; border-bottom: 2px solid #f8bbd0; padding-bottom: 8px;">👤 معاينة حساب الشريك وسجل الحركات</h3>
             
-            <label style="font-size: 13px; margin-top: 10px;">رابط الكتالوج الخاص بك (للمبيعات بالعمولة):</label>
-            <div class="link-row">
-                <input type="text" id="catalogLink" readonly>
-                <button class="share-btn" onclick="shareLink('catalog')">مشاركة الرابط 📤</button>
+            <div class="partner-preview-card">
+                <p><b>اسم الشريك:</b> <span id="mName"></span></p>
+                <p><b>رقم الشريك (اليوزر):</b> <span id="mId" style="color: #880e4f; font-weight: bold;"></span></p>
+                <p><b>كلمة المرور:</b> <span id="mPass" style="color: #2e7d32; font-weight: bold;"></span></p>
+                <p><b>رقم الهاتف:</b> <span id="mPhone"></span></p>
+                <p><b>العنوان:</b> <span id="mAddress"></span></p>
             </div>
 
-            <label style="font-size: 13px; margin-top: 15px;">رابط الاستقطاب الخاص بك (لبناء شجرتك وفريقك):</label>
-            <div class="link-row">
-                <input type="text" id="referralLink" readonly>
-                <button class="share-btn" onclick="shareLink('referral')">مشاركة الرابط 📤</button>
+            <div style="background: #e8f5e9; border: 1px solid #81c784; padding: 12px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
+                <span style="font-size: 13px; color: #1b5e20; font-weight: bold;">💰 الرصيد الحالي المتاح:</span>
+                <h3 id="mBalance" style="margin: 5px 0 0 0; color: #2e7d32; border: none;">0 ₪</h3>
             </div>
+
+            <!-- شريط وسجل الحركات المالية للشريك (مقتصرة على الحقول الأربعة المطلوبة تماماً) -->
+            <h4 style="color: #880e4f; margin-bottom: 8px;">📊 شريط الحركات والأرباح</h4>
+            <div style="max-height: 180px; overflow-y: auto; border: 1px solid #f8bbd0; border-radius: 8px; margin-bottom: 15px;">
+                <table style="margin-top: 0;">
+                    <thead>
+                        <tr>
+                            <th>التاريخ والوقت (date)</th>
+                            <th>عدد الشركاء (chainLength)</th>
+                            <th>إجمالي الربح (totalProfit)</th>
+                            <th>حصة الشريك (shareAmount)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mTransactionsBody">
+                        <tr><td colspan="4" style="color: #888; text-align: center;">لا توجد حركات أرباح مسجلة حتى الآن.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="form-group">
+                <label style="font-size: 13px;">رابط الكتالوج الخاص بالشريك:</label>
+                <input type="text" id="mCatalogLink" readonly style="background: #f9f9f9; font-size: 12px;">
+            </div>
+
+            <div class="form-group">
+                <label style="font-size: 13px;">رابط الاستقطاب الخاص بالشريك:</label>
+                <input type="text" id="mReferralLink" readonly style="background: #f9f9f9; font-size: 12px;">
+            </div>
+
+            <button class="btn blue-btn" style="width: 100%; margin-top: 10px;" onclick="copyPartnerInfoToClipboard()">📋 نسخ معلومات الحساب لإرسالها للعميل</button>
         </div>
-
-        <!-- تسلسل شجرة الفريق (تظهر بالأرقام فقط للخصوصية) -->
-        <div class="tree-box">
-            <h3>🌳 تسلسل الشجرة الخاصة بك (فريقك المباشر)</h3>
-            <p style="font-size: 13px; color: #555;">الأعضاء الذين انضموا تحت رابط الاستقطاب الخاص بك (للحفاظ على الخصوصية، تظهر الأرقام التعريفية فقط):</p>
-            <div class="tree-nodes" id="treeNodesContainer">
-                <span style="color: #888; font-size: 13px;">لا توجد تسلسلات في الشجرة حتى الآن. شارك رابط الاستقطاب لبناء فريقك!</span>
-            </div>
-        </div>
-
-        <!-- تعديل البيانات الشخصية وكلمة المرور -->
-        <div class="info-box">
-            <h3>⚙️ تعديل معلوماتك الشخصية وكلمة المرور</h3>
-            <div class="form-group">
-                <label>الاسم الكامل:</label>
-                <input type="text" id="editName">
-            </div>
-            <div class="form-group">
-                <label>عنوان التوصيل:</label>
-                <input type="text" id="editAddress">
-            </div>
-            <div class="form-group">
-                <label>رقم الهاتف (واتساب):</label>
-                <input type="text" id="editPhone">
-            </div>
-            <div class="form-group">
-                <label>كلمة المرور الجديدة (اتركها فارغة إذا لم ترد تغييرها):</label>
-                <input type="password" id="editPassword" placeholder="أدخل كلمة مرور جديدة">
-            </div>
-            <button class="btn" onclick="savePartnerUpdates()">حفظ التعديلات</button>
-        </div>
-
-        <button class="btn logout-btn" onclick="partnerLogout()">تسجيل الخروج</button>
     </div>
 
-    <footer>
-        <p style="text-align: center; color: #888; font-size: 13px; margin-top: 30px;">جميع الحقوق محفوظة © معرض إيفا براند - نظام EVA PLUS 2026</p>
-    </footer>
-
-    <!-- ربط مكتبات Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, query, where, getDocs, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // مفاتيح الربط الجديدة الخاصة بمشروع EVA PLUS
         const firebaseConfig = {
             apiKey: "AIzaSyAqPpKqqHBEIJZTCGCROFzqZyHOYlnDgP4",
             authDomain: "eva-plus-66b96.firebaseapp.com",
@@ -259,140 +290,277 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // التحقق مما إذا كان الشريك مسجل الدخول مسبقاً
-        window.onload = async function() {
-            let activePartnerId = localStorage.getItem('eva_logged_partner_id');
-            if(activePartnerId) {
-                try {
-                    const docRef = doc(db, "partners", activePartnerId);
-                    const docSnap = await getDoc(docRef);
-                    if(docSnap.exists()) {
-                        loadPartnerDashboard(docSnap.data(), docSnap.id);
-                    } else {
-                        localStorage.removeItem('eva_logged_partner_id');
-                    }
-                } catch(e) {
-                    console.error("خطأ في جلب بيانات الشريك:", e);
+        let allPartnersMap = {};
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadPartnersData();
+        });
+
+        async function loadPartnersData() {
+            try {
+                const evaRootRef = doc(db, "partners", "EVA-001");
+                const evaRootSnap = await getDoc(evaRootRef);
+                if(!evaRootSnap.exists()) {
+                    await setDoc(evaRootRef, {
+                        partnerId: "EVA-001",
+                        name: "معرض إيفا (رأس الهرم)",
+                        phone: "0597180456",
+                        address: "المركز الرئيسي",
+                        password: "EVA001ROOT",
+                        balance: 0,
+                        transactions: [],
+                        uplineId: "none",
+                        createdAt: new Date().toISOString()
+                    });
                 }
+
+                const snap = await getDocs(collection(db, "partners"));
+                let rowsHtml = '';
+                let uplineOptions = '<option value="EVA-001">EVA-001 (إيفا - رأس الهرم)</option>';
+                let searchOptions = '<option value="">-- اختر الشريك لمعرفة تسلسله في الشجرة --</option>';
+                let simulateOptions = '<option value="">-- اختر الشريك البائع --</option>';
+
+                allPartnersMap = {};
+                snap.forEach(docItem => {
+                    let p = docItem.data();
+                    let pName = (p.name || "").toString();
+                    if (pName.includes("زبون مباشر") || p.partnerId === "EVA-908" || !p.partnerId || !p.partnerId.startsWith("EVA-")) {
+                        return;
+                    }
+
+                    allPartnersMap[p.partnerId] = p;
+
+                    if(p.partnerId !== "EVA-001") {
+                        uplineOptions += `<option value="${p.partnerId}">${p.partnerId} - ${p.name}</option>`;
+                    }
+                    searchOptions += `<option value="${p.partnerId}">${p.partnerId} (${p.name})</option>`;
+                    simulateOptions += `<option value="${p.partnerId}">${p.partnerId} (${p.name})</option>`;
+
+                    rowsHtml += `
+                        <tr>
+                            <td><b>${p.partnerId}</b></td>
+                            <td>${p.name}</td>
+                            <td>${p.phone || 'غير مسجل'}</td>
+                            <td><b style="color: #2e7d32;">${p.balance || 0} ₪</b></td>
+                            <td><code style="background:#eee; padding:2px 6px; border-radius:4px; color:#c2185b;">${p.password || 'غير محدد'}</code></td>
+                            <td>${p.uplineId || p.sponsor || 'EVA-001'}</td>
+                            <td>
+                                <button class="btn" onclick='openPartnerPreview("${p.partnerId}")'>👁️ عرض الحساب</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                if(rowsHtml === '') {
+                    rowsHtml = `<tr><td colspan="7" style="text-align:center; color:#888;">لا توجد سجلات شركاء حقيقيين في الشجرة حتى الآن.</td></tr>`;
+                }
+
+                document.getElementById('partnersTableBody').innerHTML = rowsHtml;
+                document.getElementById('uplineSelect').innerHTML = uplineOptions;
+                document.getElementById('searchPartnerSelect').innerHTML = searchOptions;
+                document.getElementById('simulatePartnerSelect').innerHTML = simulateOptions;
+
+            } catch (error) {
+                console.error("Error loading partners:", error);
+                document.getElementById('partnersTableBody').innerHTML = `<tr><td colspan="7" style="color:red;">خطأ في تحميل بيانات الشجرة.</td></tr>`;
+            }
+        }
+
+        // دالة توزيع الأرباح وتحديث الأرصدة وإدراج الحركات بالحقول الأربعة المحددة بدقة
+        window.simulateAndDistributeProfit = async function() {
+            let sellerId = document.getElementById('simulatePartnerSelect').value;
+            let totalProfit = parseFloat(document.getElementById('simulateProfitAmount').value);
+
+            if(!sellerId) {
+                return alert('الرجاء اختيار الشريك الذي حقق البيعة.');
+            }
+            if(isNaN(totalProfit) || totalProfit <= 0) {
+                return alert('الرجاء إدخال إجمالي ربح صحيح.');
+            }
+
+            // 1. تتبع السلسلة الصعودية من البائع حتى رأس الهرم
+            let chainArray = [];
+            let currentId = sellerId;
+            let safetyCounter = 0;
+
+            while(currentId && currentId !== "none" && allPartnersMap[currentId] && safetyCounter < 50) {
+                chainArray.push(currentId);
+                let partner = allPartnersMap[currentId];
+                currentId = partner.uplineId || partner.sponsor || "EVA-001";
+                if(currentId === "EVA-001" && !chainArray.includes("EVA-001")) {
+                    chainArray.push("EVA-001");
+                    break;
+                }
+                safetyCounter++;
+            }
+
+            if(!chainArray.includes("EVA-001") && allPartnersMap["EVA-001"]) {
+                chainArray.push("EVA-001");
+            }
+
+            let chainLength = chainArray.length;
+            if(chainLength === 0) return alert('حدث خطأ في تحديد السلسلة.');
+
+            let shareAmount = parseFloat((totalProfit / chainLength).toFixed(2));
+            let dateNow = new Date().toLocaleString('ar-EG');
+
+            try {
+                // 2. تحديث أرصدة أفراد السلسلة وإضافة الحركة المالية المقتصرة على الحقول الأربعة
+                for(let partnerId of chainArray) {
+                    let partnerDocRef = doc(db, "partners", partnerId);
+                    let partnerDocSnap = await getDoc(partnerDocRef);
+                    if(partnerDocSnap.exists()) {
+                        let data = partnerDocSnap.data();
+                        let currentBalance = parseFloat(data.balance || 0);
+                        let newBalance = parseFloat((currentBalance + shareAmount).toFixed(2));
+
+                        let newTransaction = {
+                            date: dateNow,
+                            chainLength: chainLength,
+                            totalProfit: totalProfit,
+                            shareAmount: shareAmount
+                        };
+
+                        await updateDoc(partnerDocRef, {
+                            balance: newBalance,
+                            transactions: arrayUnion(newTransaction)
+                        });
+                    }
+                }
+
+                alert(`✅ تمت عملية توزيع الأرباح بنجاح!\n\n- إجمالي الربح (totalProfit): ${totalProfit} ₪\n- عدد الشركاء (chainLength): ${chainLength}\n- حصة الفرد (shareAmount): ${shareAmount} ₪\n- التاريخ (date): ${dateNow}`);
+                location.reload();
+
+            } catch(err) {
+                console.error("Error distributing profit:", err);
+                alert('حدث خطأ أثناء توزيع الأرباح وتسجيل الحركات.');
             }
         };
 
-        window.handlePartnerLogin = async function() {
-            let uInput = document.getElementById('loginUsername').value.trim().toUpperCase();
-            let pInput = document.getElementById('loginPassword').value.trim();
+        window.openPartnerPreview = function(partnerId) {
+            let p = allPartnersMap[partnerId];
+            if(!p) return alert('لم يتم العثور على بيانات الشريك.');
 
-            if(!uInput || !pInput) {
-                alert('الرجاء إدخال اسم المستخدم وكلمة المرور.');
+            document.getElementById('mName').innerText = p.name || 'بدون اسم';
+            document.getElementById('mId').innerText = p.partnerId;
+            document.getElementById('mPass').innerText = p.password || 'غير محدد';
+            document.getElementById('mPhone').innerText = p.phone || 'غير مسجل';
+            document.getElementById('mAddress').innerText = p.address || 'غير محدد';
+            document.getElementById('mBalance').innerText = (p.balance || 0) + " ₪";
+
+            // عرض سجل الحركات المالية مقتصرة على الحقول الأربعة فقط
+            let txBody = document.getElementById('mTransactionsBody');
+            let txs = p.transactions || [];
+            if(txs.length > 0) {
+                txBody.innerHTML = txs.slice().reverse().map(t => `
+                    <tr>
+                        <td>${t.date}</td>
+                        <td>${t.chainLength} أفراد</td>
+                        <td>${t.totalProfit} ₪</td>
+                        <td><b style="color: #2e7d32;">+${t.shareAmount} ₪</b></td>
+                    </tr>
+                `).join('');
+            } else {
+                txBody.innerHTML = `<tr><td colspan="4" style="color: #888; text-align: center;">لا توجد حركات أرباح مسجلة حتى الآن.</td></tr>`;
+            }
+
+            let baseUrl = window.location.origin + window.location.pathname.replace('tree.html', '');
+            document.getElementById('mCatalogLink').value = `${baseUrl}catalog.html?user=${p.partnerId}`;
+            document.getElementById('mReferralLink').value = `${baseUrl}join.html?ref=${p.partnerId}`;
+
+            document.getElementById('partnerModal').style.display = 'flex';
+        };
+
+        window.closePartnerModal = function() {
+            document.getElementById('partnerModal').style.display = 'none';
+        };
+
+        window.copyPartnerInfoToClipboard = function() {
+            let name = document.getElementById('mName').innerText;
+            let id = document.getElementById('mId').innerText;
+            let pass = document.getElementById('mPass').innerText;
+            let catalog = document.getElementById('mCatalogLink').value;
+            let referral = document.getElementById('mReferralLink').value;
+
+            let textToCopy = `🌸 أهلاً بك يا ${name} في نظام EVA PLUS:\n\n` +
+                             `- رقم الحساب / اليوزر: ${id}\n` +
+                             `- كلمة المرور: ${pass}\n\n` +
+                             `🔗 رابط الكتالوج الخاص بك:\n${catalog}\n\n` +
+                             `🌳 رابط الاستقطاب لفريقك:\n${referral}`;
+
+            navigator.clipboard.writeText(textToCopy);
+            alert('✅ تم نسخ معلومات الحساب بالكامل! يمكنك لصقها مباشرة في رسالة واتساب للعميل.');
+        };
+
+        window.showPartnerTreePath = function() {
+            let selectedId = document.getElementById('searchPartnerSelect').value;
+            let resultBox = document.getElementById('treePathResult');
+
+            if(!selectedId) {
+                resultBox.style.display = 'none';
+                alert('الرجاء اختيار شريك أولاً.');
+                return;
+            }
+
+            let pathArray = [];
+            let currentId = selectedId;
+            let safetyCounter = 0;
+
+            while(currentId && currentId !== "none" && allPartnersMap[currentId] && safetyCounter < 50) {
+                let partner = allPartnersMap[currentId];
+                pathArray.push(`${partner.name} (${partner.partnerId})`);
+                currentId = partner.uplineId || partner.sponsor;
+                safetyCounter++;
+            }
+
+            resultBox.style.display = 'block';
+            resultBox.innerHTML = `📍 تسلسل الشجرة:<br>` + pathArray.join(' ⬅ ');
+        };
+
+        window.addNewPartner = async function() {
+            let name = document.getElementById('partnerName').value.trim();
+            let phone = document.getElementById('partnerPhone').value.trim();
+            let address = document.getElementById('partnerAddress').value.trim();
+            let uplineId = document.getElementById('uplineSelect').value;
+
+            if(!name || !phone) {
+                alert('يرجى تعبئة الحقول الأساسية (اسم الشريك ورقم الهاتف).');
                 return;
             }
 
             try {
-                // محاولة البحث عن الشريك باستخدام معرّف الوثيقة (ID)
-                const docRef = doc(db, "partners", uInput);
-                const docSnap = await getDoc(docRef);
+                const snap = await getDocs(collection(db, "partners"));
+                let nextIdNum = 101 + snap.size;
+                let newPartnerId = `EVA-${nextIdNum}`;
+                let randomPass = Math.floor(1000 + Math.random() * 9000).toString();
 
-                if (docSnap.exists() && docSnap.data().password === pInput) {
-                    localStorage.setItem('eva_logged_partner_id', docSnap.id);
-                    loadPartnerDashboard(docSnap.data(), docSnap.id);
-                } else {
-                    // إذا لم يتم العثور عليه كمعرف وثيقة، يتم البحث كحقل (id)
-                    const q = query(collection(db, "partners"), where("id", "==", uInput), where("password", "==", pInput));
-                    const querySnapshot = await getDocs(q);
-                    
-                    if (!querySnapshot.empty) {
-                        const pDoc = querySnapshot.docs[0];
-                        localStorage.setItem('eva_logged_partner_id', pDoc.id);
-                        loadPartnerDashboard(pDoc.data(), pDoc.id);
-                    } else {
-                        alert('بيانات الدخول غير صحيحة أو أن الحساب غير مفعل من قِبل الإدارة بعد.');
-                    }
+                let checkDoc = await getDoc(doc(db, "partners", newPartnerId));
+                while(checkDoc.exists()) {
+                    nextIdNum++;
+                    newPartnerId = `EVA-${nextIdNum}`;
+                    checkDoc = await getDoc(doc(db, "partners", newPartnerId));
                 }
-            } catch (e) {
-                console.error("خطأ أثناء تسجيل الدخول:", e);
-                alert('حدث خطأ في الاتصال بقاعدة البيانات.');
+
+                await setDoc(doc(db, "partners", newPartnerId), {
+                    partnerId: newPartnerId,
+                    name: name,
+                    phone: phone,
+                    address: address,
+                    password: randomPass,
+                    balance: 0,
+                    transactions: [],
+                    uplineId: uplineId,
+                    createdAt: new Date().toISOString()
+                });
+
+                alert(`تم بنجاح إضافة الشريك برمز: ${newPartnerId} وكلمة مرور: ${randomPass}`);
+                location.reload();
+
+            } catch (err) {
+                console.error("Error adding partner:", err);
+                alert('حدث خطأ أثناء إضافة الشريك.');
             }
-        }
-
-        function loadPartnerDashboard(partner, docId) {
-            document.getElementById('loginSection').style.display = 'none';
-            document.getElementById('dashboardSection').style.display = 'block';
-
-            // تخزين معرّف الوثيقة في الحقل المخفي للتعديل
-            document.getElementById('editName').dataset.docId = docId;
-
-            document.getElementById('displayName').innerText = partner.name || 'شريك';
-            document.getElementById('displayPartnerId').innerText = `الرقم: ${partner.id || docId}`;
-            document.getElementById('displayBalance').innerText = (partner.balance || 0) + " ₪";
-
-            // تعبئة حقول التعديل
-            document.getElementById('editName').value = partner.name || '';
-            document.getElementById('editAddress').value = partner.address || '';
-            document.getElementById('editPhone').value = partner.phone || '';
-
-            // توليد الروابط الذكية الخاصة به
-            let baseUrl = window.location.origin + window.location.pathname.replace('partner.html', '');
-            document.getElementById('catalogLink').value = `${baseUrl}catalog.html?user=${partner.id || docId}`;
-            document.getElementById('referralLink').value = `${baseUrl}join.html?ref=${partner.id || docId}`;
-
-            // عرض الشجرة (بالأرقام فقط)
-            let treeContainer = document.getElementById('treeNodesContainer');
-            if(partner.team && partner.team.length > 0) {
-                treeContainer.innerHTML = partner.team.map(nodeId => `<div class="tree-node-badge">👤 ${nodeId}</div>`).join('');
-            } else {
-                treeContainer.innerHTML = `<span style="color: #888; font-size: 13px;">لا توجد تسلسلات في الشجرة حتى الآن. شارك رابط الاستقطاب لبناء فريقك!</span>`;
-            }
-        }
-
-        window.shareLink = function(type) {
-            let linkId = type === 'catalog' ? 'catalogLink' : 'referralLink';
-            let linkText = document.getElementById(linkId).value;
-            
-            if (navigator.share) {
-                navigator.share({
-                    title: 'EVA PLUS',
-                    text: 'انضم إلي أو تصفح الكتالوج الخاص بي:',
-                    url: linkText,
-                }).catch(console.error);
-            } else {
-                navigator.clipboard.writeText(linkText);
-                alert('تم نسخ الرابط بنجاح! يمكنك مشاركته الآن.');
-            }
-        }
-
-        window.savePartnerUpdates = async function() {
-            let docId = document.getElementById('editName').dataset.docId;
-            let name = document.getElementById('editName').value.trim();
-            let address = document.getElementById('editAddress').value.trim();
-            let phone = document.getElementById('editPhone').value.trim();
-            let newPass = document.getElementById('editPassword').value.trim();
-
-            if(!docId) return;
-
-            let updateData = { name, address, phone };
-            if(newPass) {
-                updateData.password = newPass;
-            }
-
-            try {
-                const partnerRef = doc(db, "partners", docId);
-                await updateDoc(partnerRef, updateData);
-                
-                alert('تم تحديث بياناتك بنجاح!');
-                document.getElementById('editPassword').value = '';
-                
-                // تحديث واجهة المستخدم بالاسم الجديد
-                document.getElementById('displayName').innerText = name;
-            } catch(e) {
-                console.error("خطأ في تحديث البيانات:", e);
-                alert('حدث خطأ أثناء تحديث البيانات.');
-            }
-        }
-
-        window.partnerLogout = function() {
-            localStorage.removeItem('eva_logged_partner_id');
-            location.reload();
-        }
+        };
     </script>
-
 </body>
 </html>
