@@ -235,7 +235,7 @@
                     <td><span style="color:#d4af37; font-weight:bold;">${o.sponsor || 'مباشر (بدون شريك)'}</span></td>
                     <td>
                         <button onclick='confirmAndNotifyOrder(${JSON.stringify(o)})' style="padding: 6px; font-size: 12px; margin-bottom: 4px;">تأكيد وتفعيل 🌸</button>
-                        <button onclick="deleteOrder('${o.id}')" class="delete-btn" style="padding: 6px; font-size: 12px; margin-bottom: 4px;">إلغاء</button>
+                        <button onclick="deleteOrder('${o.id}', '${o.productCode || ''}')" class="delete-btn" style="padding: 6px; font-size: 12px; margin-bottom: 4px;">إلغاء وإتاحة المنتج</button>
                         <button onclick="shareWhatsApp('${o.clientPhone}', '${o.productName}')" class="whatsapp-btn" style="padding: 6px; font-size: 12px;">مشاركة واتساب</button>
                     </td>
                 </tr>
@@ -259,6 +259,13 @@
                 balance: 0,
                 createdAt: new Date().toISOString()
             });
+
+            // تفريغ حجز المنتج ليعود متاحاً في الكتالوج بعد التأكيد (أو حسب رغبتك)
+            if (order.productCode) {
+                await setDoc(doc(db, "products", order.productCode), {
+                    reservedUntil: null
+                }, { merge: true });
+            }
         } catch (err) {
             console.error("Error saving partner to Firestore:", err);
         }
@@ -289,10 +296,20 @@
         loadOrders();
     }
 
-    window.deleteOrder = async function(orderId) {
-        if(confirm('هل أنت متأكد من إلغاء هذا الطلب؟ (سيتم إزالته وإتاحة المنتج من جديد)')) {
-            await deleteDoc(doc(db, "orders", orderId));
-            loadOrders();
+    window.deleteOrder = async function(orderId, productCode) {
+        if(confirm('هل أنت متأكد من إلغاء هذا الطلب؟ (سيتم إزالة الحجز وإتاحة المنتج في الكتالوج فوراً)')) {
+            try {
+                if (productCode) {
+                    await setDoc(doc(db, "products", productCode), {
+                        reservedUntil: null
+                    }, { merge: true });
+                }
+                await deleteDoc(doc(db, "orders", orderId));
+                alert('✅ تم إلغاء الطلب وإتاحة المنتج من جديد.');
+                loadOrders();
+            } catch(err) {
+                console.error("Error deleting order:", err);
+            }
         }
     }
 
@@ -383,7 +400,8 @@
                         code: code,
                         price: document.getElementById('pPrice').value.trim(),
                         agentPrice: document.getElementById('pAgentPrice').value.trim(),
-                        images: imagesArray
+                        images: imagesArray,
+                        reservedUntil: null
                     });
 
                     alert('تم حفظ المنتج بنجاح برمز: ' + code);
