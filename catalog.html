@@ -696,7 +696,6 @@
 
                           let priceHtml = `<span class="price-ex">السعر: ${p.price} ₪</span>`;
 
-                          // فحص حالة الحجز المؤقت المركزي من قاعدة البيانات مباشرة (24 ساعة)
                           let isReserved = false;
                           if (p.reservedUntil) {
                               if (now < p.reservedUntil) {
@@ -748,26 +747,31 @@
           window.scrollTo({ top: 0, behavior: 'smooth' });
       }
 
-      // دالة معالجة الطلب وتحديث الحجز المؤقت مركزياً في قاعدة البيانات ليراه الجميع
+      // دالة معالجة الطلب وسحب العنوان والاسم ورقم الهاتف لإرسالها للواتساب وقاعدة البيانات
       window.handleProductOrder = async function(code, name, price, event) {
           event.preventDefault();
 
           const reservationTime = new Date().getTime() + (24 * 60 * 60 * 1000); // 24 ساعة
 
+          let currentUser = JSON.parse(localStorage.getItem('eva_current_user')) || {};
+          let clientName = currentUser.name || 'عميل مباشر';
+          let clientPhone = currentUser.phone || 'غير مسجل';
+          let clientAddress = currentUser.address || currentUser.location || 'غير محدد';
+
           try {
-              // 1. تحديث حقل الحجز في وثيقة المنتج في قاعدة البيانات ليصبح مرئياً لجميع الزوار
+              // 1. تحديث حقل الحجز في وثيقة المنتج في قاعدة البيانات ليظهر مظللاً للجميع
               await setDoc(doc(db, "products", code), {
                   reservedUntil: reservationTime
               }, { merge: true });
 
-              // 2. إرسال الطلب لقاعدة بيانات الطلبات المعلقة للإدارة
-              let currentUser = JSON.parse(localStorage.getItem('eva_current_user')) || {};
+              // 2. إرسال الطلب مع العنوان لقاعدة بيانات الطلبات المعلقة للإدارة
               await addDoc(collection(db, "orders"), {
                   productCode: code,
                   productName: name,
                   price: price,
-                  clientName: currentUser.name || 'عميل مباشر',
-                  clientPhone: currentUser.phone || 'غير مسجل',
+                  clientName: clientName,
+                  clientPhone: clientPhone,
+                  clientAddress: clientAddress,
                   sponsor: activeSponsor || 'الإدارة المركزية',
                   status: 'pending',
                   timestamp: new Date().toISOString()
@@ -787,16 +791,14 @@
               btn.innerText = 'محجوز مؤقتاً (قيد المعالجة)';
           }
 
-          // 4. توجيه العميل للواتساب
-          let currentUser = JSON.parse(localStorage.getItem('eva_current_user')) || {};
-          let clientName = currentUser.name || 'عميل عبر الكتالوج';
-          let clientPhone = currentUser.phone || 'غير مسجل';
+          // 4. توجيه العميل للواتساب مع تضمين العنوان بوضوح
           let msg = `مرحباً إدارة معرض إيفا 🌸 أرغب بطلب المنتج التالي:\n\n` +
                     `- المنتج: ${name}\n` +
                     `- رمز المنتج: ${code}\n` +
                     `- السعر: ${price} ₪\n` +
                     `- اسم العميل: ${clientName}\n` +
                     `- رقم الهاتف: ${clientPhone}\n` +
+                    `- العنوان: ${clientAddress}\n` +
                     `- الشريك المرجع: ${activeSponsor || 'مباشر'}`;
 
           let whatsappLink = `https://wa.me/972559334655?text=${encodeURIComponent(msg)}`;
