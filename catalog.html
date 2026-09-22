@@ -704,9 +704,8 @@
                           }
 
                           let currentUser = JSON.parse(localStorage.getItem('eva_current_user')) || {};
-                          let isJoinFlow = currentUser.phone && currentUser.status === 'pending';
+                          let isJoinFlow = currentUser.phone ? true : false;
 
-                          // تعطيل المنتجات للكل إذا كان المنتج محجوزاً، أو إذا كان شريكاً قادماً من الانضمام وطلب مسبقاً
                           if (currentUser.hasOrdered && isJoinFlow) {
                               isReserved = true;
                           }
@@ -755,12 +754,12 @@
           window.scrollTo({ top: 0, behavior: 'smooth' });
       }
 
-      // دالة معالجة الطلب المميزة (تفرق بين الكتالوج الأساسي وكتالوج شريك الانضمام)
+      // دالة معالجة الطلب (تفرق بدقة بين مسار شريك الانضمام ومسار الكتالوج العام)
       window.handleProductOrder = async function(code, name, price, event) {
           event.preventDefault();
 
           let currentUser = JSON.parse(localStorage.getItem('eva_current_user')) || {};
-          let isJoinFlow = currentUser.phone && currentUser.status === 'pending';
+          let isJoinFlow = currentUser.phone ? true : false;
 
           if (isJoinFlow && currentUser.hasOrdered) {
               alert('⚠️ عذراً، لقد قمت مسبقاً بطلب منتج وتجميده للانضمام. يجدر الانتظار ريثما تقوم الإدارة بمراجعة وتأكيد طلبك.');
@@ -773,15 +772,15 @@
           let orderData = {};
 
           if (isJoinFlow) {
-              // 1. مسار شريك الانضمام (قادم من join.html)
+              // 1. مسار شريك الانضمام (قادم من join.html ولديه رقم هاتف مسجل)
               orderData = {
                   productCode: code,
                   productName: name,
                   price: price,
-                  clientName: currentUser.name,
+                  clientName: currentUser.name || 'شريك جديد',
                   clientPhone: currentUser.phone,
-                  clientAddress: currentUser.address,
-                  partnerId: currentUser.partnerId,
+                  clientAddress: currentUser.address || 'غير محدد',
+                  partnerId: currentUser.partnerId || 'TEMP-' + Math.floor(1000 + Math.random() * 9000),
                   sponsor: currentUser.sponsor || activeSponsor || 'EVA-ROOT',
                   status: 'pending',
                   timestamp: new Date().toISOString()
@@ -790,9 +789,9 @@
               msg = `مرحباً إدارة معرض إيفا 🌸 هذا طلب انضمام جديد لنظام EVA PLUS:\n\n` +
                     `- اسم العميل: ${currentUser.name}\n` +
                     `- رقم الهاتف: ${currentUser.phone}\n` +
-                    `- العنوان: ${currentUser.address}\n` +
-                    `- رقم الشريك المؤقت: ${currentUser.partnerId}\n` +
-                    `- الداعي / المرجع: ${currentUser.sponsor || 'الإدارة المركزية'}\n` +
+                    `- العنوان: ${currentUser.address || 'غير محدد'}\n` +
+                    `- رقم الشريك المؤقت: ${orderData.partnerId}\n` +
+                    `- الداعي / المرجع: ${orderData.sponsor}\n` +
                     `- المنتج المطلوب للانضمام: ${name} (رمز: ${code}) - السعر: ${price} ₪`;
 
               currentUser.hasOrdered = true;
@@ -825,7 +824,7 @@
                   reservedUntil: reservationTime
               }, { merge: true });
 
-              // إضافة الطلب إلى قاعدة البيانات (معلق للانضمام أو مباشر)
+              // إضافة الطلب إلى قاعدة البيانات للإدارة
               await addDoc(collection(db, "orders"), orderData);
 
           } catch (err) {
