@@ -307,10 +307,27 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            position: relative;
         }
         .product-card:hover {
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(216, 27, 96, 0.1);
+        }
+
+        /* تنسيق المنتج المحجوز مؤقتاً (مظلل لمدة 24 ساعة) */
+        .product-card.reserved {
+            opacity: 0.6;
+            background: #f5f5f5;
+        }
+        .reserved-badge {
+            display: none;
+            background: #d32f2f;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
         }
 
         .product-images {
@@ -391,6 +408,11 @@
         }
         .whatsapp-btn:hover {
             background: #20ba5a;
+        }
+        .whatsapp-btn.disabled {
+            background: #ccc;
+            pointer-events: none;
+            box-shadow: none;
         }
 
         .footer-visitor-box {
@@ -485,7 +507,6 @@
             <a href="https://www.google.com/maps?q=32.1273809,35.1433041&z=17&hl=en" target="_blank" class="social-promo-btn">
                 📍 موقعنا
             </a>
-            <!-- زر ديناميكي ينقل لشاشة الشريك أو شاشة الانضمام -->
             <a href="join.html" id="dynamicPromoBtn" class="social-promo-btn" style="background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);">
                 💼 انضم إلى EVA PLUS
             </a>
@@ -537,12 +558,10 @@
         <img id="modalImg">
     </div>
 
-    <!-- برمجة الكتالوج والزر الديناميكي بدون طلب كلمة مرور هنا -->
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-      import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, increment, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+      import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, increment, query, where, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-      // مفاتيح الربط الجديدة الخاصة بمشروع EVA PLUS
       const firebaseConfig = {
           apiKey: "AIzaSyAqPpKqqHBEIJZTCGCROFzqZyHOYlnDgP4",
           authDomain: "eva-plus-66b96.firebaseapp.com",
@@ -555,7 +574,6 @@
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
 
-      // فحص ما إذا كان الزائر دخل عبر رابط شريك أو إحالة لـ EVA PLUS
       const urlParams = new URLSearchParams(window.location.search);
       const refParam = urlParams.get('ref') || urlParams.get('user');
       if (refParam) {
@@ -571,46 +589,11 @@
               banner.style.display = 'block';
               document.getElementById('sponsorNameDisplay').innerText = activeSponsor;
           }
-
-          // إذا كان الزائر شريكاً، فالزر ينقله مباشرة إلى شاشة الشريك الخاصة به (partner.html)
           promoBtn.href = "partner.html";
           promoBtn.innerText = "🌳 لوحة شريك EVA PLUS";
       } else {
           promoBtn.href = "join.html";
           promoBtn.innerText = "💼 انضم إلى EVA PLUS";
-      }
-
-      let deferredPrompt;
-      window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        const installBanner = document.getElementById('installAppBanner');
-        if (installBanner) {
-            installBanner.style.display = 'block';
-        }
-      });
-
-      const installBtn = document.getElementById('installAppBtn');
-      if (installBtn) {
-        installBtn.addEventListener('click', async () => {
-          if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-              console.log('User accepted the install prompt');
-            }
-            deferredPrompt = null;
-            document.getElementById('installAppBanner').style.display = 'none';
-          }
-        });
-      }
-
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('sw.js')
-            .then(reg => console.log('Service Worker registered! Scope:', reg.scope))
-            .catch(err => console.log('Service Worker registration failed:', err));
-        });
       }
 
       let globalLogoUrl = "";
@@ -696,6 +679,10 @@
                   let catProducts = [];
                   prodSnap.forEach(d => catProducts.push(d.data()));
 
+                  // جلب قائمة الحجوزات المؤقتة النشطة (أقل من 24 ساعة)
+                  let reservations = JSON.parse(localStorage.getItem('eva_product_reservations')) || {};
+                  const now = new Date().getTime();
+
                   let productsContent = '';
                   if (catProducts.length === 0) {
                       productsContent = '<p style="color:#880e4f; text-align:center; padding:20px;">لا توجد منتجات في هذا القسم حالياً.</p>';
@@ -711,27 +698,32 @@
 
                           let priceHtml = `<span class="price-ex">السعر: ${p.price} ₪</span>`;
 
-                          // إعداد رابط الواتساب بالرقم الصحيح (بدون أصفار زائدة)
-                          let whatsappLink = "";
-                          if (activeSponsor) {
-                              let currentUser = JSON.parse(localStorage.getItem('eva_current_user')) || {};
-                              let clientName = currentUser.name || 'عميل عبر رابط إحالة';
-                              let clientPhone = currentUser.phone || 'غير مسجل';
-                              let msg = `مرحباً إدارة معرض إيفا 🌸 أرغب بطلب المنتج التالي ضمن نظام EVA PLUS:\n\n` +
-                                        `- المنتج: ${p.name}\n` +
-                                        `- رمز المنتج: ${p.code}\n` +
-                                        `- السعر: ${p.price} ₪\n` +
-                                        `- اسم العميل: ${clientName}\n` +
-                                        `- رقم الهاتف: ${clientPhone}\n` +
-                                        `- الشريك المرجع (الداعي): ${activeSponsor}`;
-                              whatsappLink = `https://wa.me/972559334655?text=${encodeURIComponent(msg)}`;
-                          } else {
-                              whatsappLink = `https://wa.me/972559334655?text=${encodeURIComponent(`أود طلب المنتج برمز ${p.code} (${p.name}) بسعر ${p.price} ₪`)}`;
+                          // فحص حالة الحجز المؤقت (24 ساعة)
+                          let isReserved = false;
+                          if (reservations[p.code]) {
+                              let reservedTime = reservations[p.code];
+                              // 24 ساعة = 24 * 60 * 60 * 1000 ميلي ثانية
+                              if (now - reservedTime < 24 * 60 * 60 * 1000) {
+                                  isReserved = true;
+                              } else {
+                                  delete reservations[p.code]; // انتهت الـ 24 ساعة
+                                  localStorage.setItem('eva_product_reservations', JSON.stringify(reservations));
+                              }
                           }
 
+                          let cardClass = isReserved ? "product-card reserved" : "product-card";
+                          let badgeStyle = isReserved ? "display: block;" : "display: none;";
+                          let btnClass = isReserved ? "whatsapp-btn disabled" : "whatsapp-btn";
+                          let btnText = isReserved ? "محجوز مؤقتاً (قيد الطلب)" : "اطلب واتساب";
+
+                          // رابط الواتساب مع تفعيل دالة الحجز المؤقت عند النقر
+                          let whatsappLink = "#";
+                          let clickHandler = isReserved ? "" : `onclick="handleProductOrder('${p.code}', '${p.name}', '${p.price}', event)"`;
+
                           return `
-                              <div class="product-card">
+                              <div class="${cardClass}" id="prod-card-${p.code}">
                                   <div>
+                                      <div class="reserved-badge" id="badge-${p.code}" style="${badgeStyle}">⏳ محجوز مؤقتاً (قيد المعالجة)</div>
                                       ${mainImg ? `<img src="${mainImg}" class="main-product-img" id="main-img-${p.code}" onclick="openModal('${mainImg}')">` : ''}
                                       ${thumbsHtml}
                                       <h3>${p.name}</h3>
@@ -740,7 +732,7 @@
                                           <span class="product-code">رمز المنتج: ${p.code}</span>
                                       </div>
                                   </div>
-                                  <a href="${whatsappLink}" target="_blank" class="whatsapp-btn">اطلب واتساب</a>
+                                  <a href="${whatsappLink}" ${clickHandler} id="btn-${p.code}" target="_blank" class="${btnClass}">${btnText}</a>
                               </div>
                           `;
                       }).join('') + `</div>`;
@@ -762,6 +754,59 @@
           }
 
           window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      // دالة معالجة الطلب والحجز المؤقت لمدة 24 ساعة وتوجيه رسالة الواتساب للإدارة
+      window.handleProductOrder = async function(code, name, price, event) {
+          event.preventDefault();
+
+          // 1. تسجيل الحجز المؤقت في التخزين المحلي وفي فايربيس (ليراه الكتالوج ولوحة الإدارة)
+          let reservations = JSON.parse(localStorage.getItem('eva_product_reservations')) || {};
+          reservations[code] = new Date().getTime();
+          localStorage.setItem('eva_product_reservations', JSON.stringify(reservations));
+
+          // 2. إرسال الطلب لقاعدة بيانات الطلبات المعلقة في Firestore لكي يظهر في لوحة الإدارة
+          try {
+              let currentUser = JSON.parse(localStorage.getItem('eva_current_user')) || {};
+              await addDoc(collection(db, "orders"), {
+                  productCode: code,
+                  productName: name,
+                  price: price,
+                  clientName: currentUser.name || 'عميل مباشر',
+                  clientPhone: currentUser.phone || 'غير مسجل',
+                  sponsor: activeSponsor || 'الإدارة المركزية',
+                  status: 'pending',
+                  timestamp: new Date().toISOString()
+              });
+          } catch (err) {
+              console.error("Error saving order to Firestore:", err);
+          }
+
+          // 3. تحديث واجهة الكتالوج فوراً لتظليل المنتج وتعطيل زره
+          const card = document.getElementById(`prod-card-${code}`);
+          const badge = document.getElementById(`badge-${code}`);
+          const btn = document.getElementById(`btn-${code}`);
+          if(card) card.classList.add('reserved');
+          if(badge) badge.style.display = 'block';
+          if(btn) {
+              btn.className = 'whatsapp-btn disabled';
+              btn.innerText = 'محجوز مؤقتاً (قيد المعالجة)';
+          }
+
+          // 4. بناء رسالة الواتساب وتوجيه العميل للرقم الصحيح
+          let currentUser = JSON.parse(localStorage.getItem('eva_current_user')) || {};
+          let clientName = currentUser.name || 'عميل عبر الكتالوج';
+          let clientPhone = currentUser.phone || 'غير مسجل';
+          let msg = `مرحباً إدارة معرض إيفا 🌸 أرغب بطلب المنتج التالي:\n\n` +
+                    `- المنتج: ${name}\n` +
+                    `- رمز المنتج: ${code}\n` +
+                    `- السعر: ${price} ₪\n` +
+                    `- اسم العميل: ${clientName}\n` +
+                    `- رقم الهاتف: ${clientPhone}\n` +
+                    `- الشريك المرجع: ${activeSponsor || 'مباشر'}`;
+
+          let whatsappLink = `https://wa.me/972559334655?text=${encodeURIComponent(msg)}`;
+          window.open(whatsappLink, '_blank');
       }
 
       window.backToHome = function() {
