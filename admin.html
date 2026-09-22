@@ -34,7 +34,7 @@
     <table class="orders-table">
         <thead>
             <tr>
-                <th>تفاصيل الزبون والطلب والعيون</th>
+                <th>تفاصيل الزبون والطلب والعنوان</th>
                 <th>المرجع (الشريك)</th>
                 <th>الإجراء</th>
             </tr>
@@ -226,11 +226,11 @@
                 </tr>
             `).join('');
         } catch(e) {
-            ordersTable.innerHTML = `<tr><td colspan="3" style="color: #888;">لا توجد طلبات معلقة حالياً</td></tr>`;
+            ordersTable.innerHTML = `<tr><td colspan="3" style="color: #888;">لا توجد الطلبات المعلقة حالياً</td></tr>`;
         }
     }
 
-    // دالة التأكيد والتفعيل وتوليد حساب الشريك وسؤال الحذف إن كان آخر قطعة
+    // دالة التأكيد والتفعيل مع إصلاح رقم الهاتف وتمريره لواتساب والسؤال الذكي للمخزون
     window.confirmAndNotifyOrder = async function(order) {
         let generatedPartnerId = "EVA-" + Math.floor(100 + Math.random() * 900);
         let generatedPassword = Math.floor(1000 + Math.random() * 9000).toString();
@@ -246,13 +246,19 @@
                          `- كلمة المرور: ${generatedPassword}\n\n` +
                          `يمكنك الآن الدخول لحسابك بكل أمان، متابعة أرباحك، ومشاركة روابطك الذكية الخاصة بالكتالوج والاستقطاب. بالتوفيق دائماً! ✨`;
 
-        let cleanPhone = order.clientPhone.replace(/[^0-9]/g, '');
+        // إصلاح وتطهير رقم الهاتف ليتوافق مع واتساب تماماً
+        let rawPhone = (order.clientPhone || '').toString().trim();
+        if (rawPhone.startsWith('00')) {
+            rawPhone = rawPhone.substring(2);
+        }
+        let cleanPhone = rawPhone.replace(/[^0-9]/g, '');
+
         let whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(welcomeMsg)}`;
         window.open(whatsappUrl, '_blank');
 
         await deleteDoc(doc(db, "orders", order.id));
 
-        // السؤال الذكي المنسق للمخزون (حذف المنتج إن كان آخر قطعة)
+        // السؤال الذكي للمخزون (حذف المنتج إن كان آخر قطعة)
         if (order.productCode) {
             let deleteProductChoice = confirm(`هل تريد حذف المنتج (رمز: ${order.productCode} - ${order.productName}) من الكتالوج؟\n\n(اضغط "موافق" إذا كان آخر قطعة وانتهى المخزون، أو "إلغاء" إذا كان متوفراً بقطع أخرى).`);
             if (deleteProductChoice) {
@@ -278,7 +284,11 @@
 
     window.shareWhatsApp = function(phone, product) {
         let msg = `مرحباً بك، بخصوص طلبك لمنتج (${product}) في معرض إيفا براند، جاري التنسيق للتوصيل.`;
-        let cleanPhone = phone.replace(/[^0-9]/g, '');
+        let rawPhone = (phone || '').toString().trim();
+        if (rawPhone.startsWith('00')) {
+            rawPhone = rawPhone.substring(2);
+        }
+        let cleanPhone = rawPhone.replace(/[^0-9]/g, '');
         window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
