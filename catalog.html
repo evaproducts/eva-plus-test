@@ -574,15 +574,6 @@
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
 
-      // التحقق الفوري فور فتح الكتالوج من تسجيل بيانات العميل
-      window.addEventListener('DOMContentLoaded', () => {
-          let currentUser = JSON.parse(localStorage.getItem('eva_current_user'));
-          if (!currentUser || !currentUser.phone) {
-              alert('⚠️ عذراً، يجب تسجيل بياناتك عبر صفحة الانضمام أولاً لتتمكن من تصفح الكتالوج واختيار منتجك الأول.');
-              window.location.href = 'join.html';
-          }
-      });
-
       const urlParams = new URLSearchParams(window.location.search);
       const refParam = urlParams.get('ref') || urlParams.get('user');
       if (refParam) {
@@ -714,7 +705,7 @@
 
                           let currentUser = JSON.parse(localStorage.getItem('eva_current_user')) || {};
                           if (currentUser.hasOrdered) {
-                              isReserved = true; // تفعيل التعطيل الشامل إذا طلب مسبقاً
+                              isReserved = true;
                           }
 
                           let cardClass = isReserved ? "product-card reserved" : "product-card";
@@ -761,7 +752,7 @@
           window.scrollTo({ top: 0, behavior: 'smooth' });
       }
 
-      // دالة معالجة الطلب مع منع تكرار الحجز لنفس المستخدم
+      // دالة معالجة الطلب لتناسب الشركاء والزبائن العاديين مع منع التكرار
       window.handleProductOrder = async function(code, name, price, event) {
           event.preventDefault();
 
@@ -771,11 +762,23 @@
               return;
           }
 
-          const reservationTime = new Date().getTime() + (24 * 60 * 60 * 1000); // 24 ساعة
+          let clientName = currentUser.name;
+          let clientPhone = currentUser.phone;
+          let clientAddress = currentUser.address;
 
-          let clientName = currentUser.name || 'عميل مباشر';
-          let clientPhone = currentUser.phone || 'غير مسجل';
-          let clientAddress = currentUser.address || currentUser.location || 'غير محدد';
+          // إذا لم يكن الزبون مسجلاً مسبقاً (زبون عادي يطلب هدية) نأخذ بياناته البسيطة
+          if (!clientPhone) {
+              clientName = prompt("الرجاء إدخال اسمك الكريم:");
+              if (!clientName) return;
+              
+              clientPhone = prompt("الرجاء إدخال رقم هاتفك (واتساب) للتواصل والتنسيق:");
+              if (!clientPhone) return;
+
+              clientAddress = prompt("الرجاء إدخال عنوان التوصيل (المدينة / المنطقة):");
+              if (!clientAddress) return;
+          }
+
+          const reservationTime = new Date().getTime() + (24 * 60 * 60 * 1000); // 24 ساعة
 
           try {
               // 1. تحديث حقل الحجز في وثيقة المنتج في قاعدة البيانات ليظهر مظللاً للجميع
@@ -791,13 +794,16 @@
                   clientName: clientName,
                   clientPhone: clientPhone,
                   clientAddress: clientAddress,
-                  sponsor: activeSponsor || 'الإدارة المركزية',
+                  sponsor: activeSponsor || 'الإدارة المركزية (زبون مباشر)',
                   status: 'pending',
                   timestamp: new Date().toISOString()
               });
 
               // تسجيل أن المستخدم قد قام بطلب منتج لمنعه من تكرار الطلبات
               currentUser.hasOrdered = true;
+              currentUser.name = clientName;
+              currentUser.phone = clientPhone;
+              currentUser.address = clientAddress;
               localStorage.setItem('eva_current_user', JSON.stringify(currentUser));
 
           } catch (err) {
@@ -815,13 +821,12 @@
               btn.innerText = 'محجوز مؤقتاً (قيد المعالجة)';
           }
 
-          // تعطيل بقية الأزرار في الصفحة لمنع أي محاولة طلب إضافية
           document.querySelectorAll('.whatsapp-btn').forEach(b => {
               b.className = 'whatsapp-btn disabled';
               b.innerText = 'محجوز مؤقتاً (قيد المعالجة)';
           });
 
-          // 4. توجيه العميل للواتساب مع تضمين العنوان بوضوح
+          // 4. توجيه العميل للواتساب مع تضمين البيانات بوضوح
           let msg = `مرحباً إدارة معرض إيفا 🌸 أرغب بطلب المنتج التالي:\n\n` +
                     `- المنتج: ${name}\n` +
                     `- رمز المنتج: ${code}\n` +
@@ -834,7 +839,7 @@
           let whatsappLink = `https://wa.me/972559334655?text=${encodeURIComponent(msg)}`;
           window.open(whatsappLink, '_blank');
 
-          alert('✅ تم إرسال طلبك بنجاح وحجز المنتج! يرجى إتمام إرسال الرسالة عبر واتساب للإدارة لتأكيد طلبك وتفعيل حسابك.');
+          alert('✅ تم إرسال طلبك بنجاح وحجز المنتج! يرجى إتمام إرسال الرسالة عبر واتساب للإدارة لتأكيد طلبك وتوصيله.');
       }
 
       window.backToHome = function() {
