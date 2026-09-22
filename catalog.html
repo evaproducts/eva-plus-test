@@ -704,7 +704,10 @@
                           }
 
                           let currentUser = JSON.parse(localStorage.getItem('eva_current_user')) || {};
-                          if (currentUser.hasOrdered) {
+                          let isJoinFlow = currentUser.phone && currentUser.status === 'pending';
+
+                          // تعطيل المنتجات للكل إذا كان المنتج محجوزاً، أو إذا كان شريكاً قادماً من الانضمام وطلب مسبقاً
+                          if (currentUser.hasOrdered && isJoinFlow) {
                               isReserved = true;
                           }
 
@@ -752,65 +755,84 @@
           window.scrollTo({ top: 0, behavior: 'smooth' });
       }
 
-      // دالة معالجة الطلب لتناسب الشركاء والزبائن العاديين مع منع التكرار
+      // دالة معالجة الطلب المميزة (تفرق بين الكتالوج الأساسي وكتالوج شريك الانضمام)
       window.handleProductOrder = async function(code, name, price, event) {
           event.preventDefault();
 
           let currentUser = JSON.parse(localStorage.getItem('eva_current_user')) || {};
-          if (currentUser.hasOrdered) {
-              alert('⚠️ عذراً، لقد قمت مسبقاً بطلب منتج وتجميده. لا يمكنك طلب منتج آخر حتى تقوم الإدارة بتأكيد طلبك الحالي وتفعيل حسابك.');
+          let isJoinFlow = currentUser.phone && currentUser.status === 'pending';
+
+          if (isJoinFlow && currentUser.hasOrdered) {
+              alert('⚠️ عذراً، لقد قمت مسبقاً بطلب منتج وتجميده للانضمام. يجدر الانتظار ريثما تقوم الإدارة بمراجعة وتأكيد طلبك.');
               return;
           }
 
-          let clientName = currentUser.name;
-          let clientPhone = currentUser.phone;
-          let clientAddress = currentUser.address;
+          const reservationTime = new Date().getTime() + (24 * 60 * 60 * 1000); // 24 ساعة حجز
 
-          // إذا لم يكن الزبون مسجلاً مسبقاً (زبون عادي يطلب هدية) نأخذ بياناته البسيطة
-          if (!clientPhone) {
-              clientName = prompt("الرجاء إدخال اسمك الكريم:");
-              if (!clientName) return;
-              
-              clientPhone = prompt("الرجاء إدخال رقم هاتفك (واتساب) للتواصل والتنسيق:");
-              if (!clientPhone) return;
+          let msg = "";
+          let orderData = {};
 
-              clientAddress = prompt("الرجاء إدخال عنوان التوصيل (المدينة / المنطقة):");
-              if (!clientAddress) return;
+          if (isJoinFlow) {
+              // 1. مسار شريك الانضمام (قادم من join.html)
+              orderData = {
+                  productCode: code,
+                  productName: name,
+                  price: price,
+                  clientName: currentUser.name,
+                  clientPhone: currentUser.phone,
+                  clientAddress: currentUser.address,
+                  partnerId: currentUser.partnerId,
+                  sponsor: currentUser.sponsor || activeSponsor || 'EVA-ROOT',
+                  status: 'pending',
+                  timestamp: new Date().toISOString()
+              };
+
+              msg = `مرحباً إدارة معرض إيفا 🌸 هذا طلب انضمام جديد لنظام EVA PLUS:\n\n` +
+                    `- اسم العميل: ${currentUser.name}\n` +
+                    `- رقم الهاتف: ${currentUser.phone}\n` +
+                    `- العنوان: ${currentUser.address}\n` +
+                    `- رقم الشريك المؤقت: ${currentUser.partnerId}\n` +
+                    `- الداعي / المرجع: ${currentUser.sponsor || 'الإدارة المركزية'}\n` +
+                    `- المنتج المطلوب للانضمام: ${name} (رمز: ${code}) - السعر: ${price} ₪`;
+
+              currentUser.hasOrdered = true;
+              localStorage.setItem('eva_current_user', JSON.stringify(currentUser));
+
+          } else {
+              // 2. مسار الكتالوج الأساسي (زبون عادي يطلب مباشرة دون انضمام مسبق)
+              orderData = {
+                  productCode: code,
+                  productName: name,
+                  price: price,
+                  clientName: 'زبون مباشر (عبر الكتالوج العام)',
+                  clientPhone: 'غير مسجل مسبقاً',
+                  clientAddress: 'يُحدد عبر واتساب',
+                  sponsor: activeSponsor || 'الإدارة المركزية',
+                  status: 'direct',
+                  timestamp: new Date().toISOString()
+              };
+
+              msg = `مرحباً إدارة معرض إيفا 🌸 أرغب بطلب المنتج التالي:\n\n` +
+                    `- المنتج: ${name}\n` +
+                    `- رمز المنتج: ${code}\n` +
+                    `- السعر: ${price} ₪\n` +
+                    `- المرجع: ${activeSponsor || 'زيارة مباشرة للكتالوج'}`;
           }
 
-          const reservationTime = new Date().getTime() + (24 * 60 * 60 * 1000); // 24 ساعة
-
           try {
-              // 1. تحديث حقل الحجز في وثيقة المنتج في قاعدة البيانات ليظهر مظللاً للجميع
+              // تحديث حجز المنتج في قاعدة البيانات (تظليل لمدة 24 ساعة)
               await setDoc(doc(db, "products", code), {
                   reservedUntil: reservationTime
               }, { merge: true });
 
-              // 2. إرسال الطلب مع العنوان لقاعدة بيانات الطلبات المعلقة للإدارة
-              await addDoc(collection(db, "orders"), {
-                  productCode: code,
-                  productName: name,
-                  price: price,
-                  clientName: clientName,
-                  clientPhone: clientPhone,
-                  clientAddress: clientAddress,
-                  sponsor: activeSponsor || 'الإدارة المركزية (زبون مباشر)',
-                  status: 'pending',
-                  timestamp: new Date().toISOString()
-              });
-
-              // تسجيل أن المستخدم قد قام بطلب منتج لمنعه من تكرار الطلبات
-              currentUser.hasOrdered = true;
-              currentUser.name = clientName;
-              currentUser.phone = clientPhone;
-              currentUser.address = clientAddress;
-              localStorage.setItem('eva_current_user', JSON.stringify(currentUser));
+              // إضافة الطلب إلى قاعدة البيانات (معلق للانضمام أو مباشر)
+              await addDoc(collection(db, "orders"), orderData);
 
           } catch (err) {
-              console.error("Error updating reservation in Firestore:", err);
+              console.error("Error saving order to Firestore:", err);
           }
 
-          // 3. تحديث واجهة الكتالوج الحالية فوراً وتعديل كافة أزرار الطلب للتعطيل
+          // تحديث واجهة الكتالوج الحالية وتظليل المنتج
           const card = document.getElementById(`prod-card-${code}`);
           const badge = document.getElementById(`badge-${code}`);
           const btn = document.getElementById(`btn-${code}`);
@@ -821,25 +843,18 @@
               btn.innerText = 'محجوز مؤقتاً (قيد المعالجة)';
           }
 
-          document.querySelectorAll('.whatsapp-btn').forEach(b => {
-              b.className = 'whatsapp-btn disabled';
-              b.innerText = 'محجوز مؤقتاً (قيد المعالجة)';
-          });
+          if (isJoinFlow) {
+              document.querySelectorAll('.whatsapp-btn').forEach(b => {
+                  b.className = 'whatsapp-btn disabled';
+                  b.innerText = 'محجوز مؤقتاً (قيد المعالجة)';
+              });
+          }
 
-          // 4. توجيه العميل للواتساب مع تضمين البيانات بوضوح
-          let msg = `مرحباً إدارة معرض إيفا 🌸 أرغب بطلب المنتج التالي:\n\n` +
-                    `- المنتج: ${name}\n` +
-                    `- رمز المنتج: ${code}\n` +
-                    `- السعر: ${price} ₪\n` +
-                    `- اسم العميل: ${clientName}\n` +
-                    `- رقم الهاتف: ${clientPhone}\n` +
-                    `- العنوان: ${clientAddress}\n` +
-                    `- الشريك المرجع: ${activeSponsor || 'مباشر'}`;
-
+          // توجيه العميل للواتساب مباشرة
           let whatsappLink = `https://wa.me/972559334655?text=${encodeURIComponent(msg)}`;
           window.open(whatsappLink, '_blank');
 
-          alert('✅ تم إرسال طلبك بنجاح وحجز المنتج! يرجى إتمام إرسال الرسالة عبر واتساب للإدارة لتأكيد طلبك وتوصيله.');
+          alert('✅ تم حجز المنتج وإرسال طلبك بنجاح! يرجى إتمام الرسالة عبر واتساب للإدارة لتأكيد التنسيق.');
       }
 
       window.backToHome = function() {
