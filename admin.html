@@ -30,7 +30,7 @@
 
 <div class="box">
     <h2>📦 إدارة الطلبات المعلقة (EVA PLUS)</h2>
-    <p style="font-size: 13px; color: #666;">الطلبات الواردة لتأكيد التوصيل أو تفعيل حسابات الشركاء وتوزيع سعر الوسيط على الشجرة.</p>
+    <p style="font-size: 13px; color: #666;">الطلبات الواردة لتأكيد التوصيل أو تفعيل حسابات الشركاء وتوزيع ربح الشركاء على الشجرة.</p>
     <table class="orders-table">
         <thead>
             <tr>
@@ -82,8 +82,8 @@
     <input type="file" id="pImages" accept="image/*" multiple>
     <input type="text" id="pName" placeholder="اسم المنتج">
     <input type="text" id="pCode" readonly placeholder="كود المنتج التلقائي">
-    <input type="number" id="pPrice" placeholder="سعر المعرض">
-    <input type="number" id="pAgentPrice" placeholder="سعر الوسيط">
+    <input type="number" id="pPrice" placeholder="سعر المنتج (للكتالوج)">
+    <input type="number" id="pAgentPrice" placeholder="ربح الشركاء (للشجرة)">
     <button onclick="saveProduct()">حفظ المنتج</button>
 </div>
 
@@ -97,8 +97,8 @@
 <div class="box">
     <h2>🏷️ تحديث أسعار منتج (للعروض برمز المنتج)</h2>
     <input type="text" id="updatePriceCode" placeholder="أدخل كود المنتج (مثلاً A1)">
-    <input type="number" id="newPrice" placeholder="سعر المعرض الجديد">
-    <input type="number" id="newAgentPrice" placeholder="سعر الوسيط الجديد">
+    <input type="number" id="newPrice" placeholder="سعر المنتج الجديد">
+    <input type="number" id="newAgentPrice" placeholder="ربح الشركاء الجديد">
     <button onclick="updateProductPricesByCode()" class="purple-btn">تحديث الأسعار</button>
 </div>
 
@@ -245,15 +245,15 @@
         }
     }
 
-    // دالة تأكيد وتفعيل الطلب وقراءة سعر الوسيط وتقسيمه على الشجرة تلقائياً
+    // دالة تأكيد وتفعيل الطلب وقراءة "ربح الشركاء" (agentPrice / partnerProfit) وتقسيمه على الشجرة تلقائياً
     window.confirmAndNotifyOrder = async function(order) {
         let generatedPartnerId = "EVA-" + Math.floor(100 + Math.random() * 900);
         let generatedPassword = Math.floor(1000 + Math.random() * 9000).toString();
 
         try {
-            // 1. إنشاء حساب الشريك الجديد
             let sellerId = order.sponsor && order.sponsor !== "الإدارة المركزية" && order.sponsor !== "EVA-ROOT" ? order.sponsor : "EVA-001";
             
+            // 1. إنشاء حساب الشريك الجديد
             await setDoc(doc(db, "partners", generatedPartnerId), {
                 partnerId: generatedPartnerId,
                 name: order.clientName,
@@ -266,21 +266,19 @@
                 createdAt: new Date().toISOString()
             });
 
-            // 2. قراءة سعر الوسيط (agentPrice) للمنتج المطلوب وتوزيعه على السلسلة
+            // 2. قراءة "ربح الشركاء" للمنتج وتوزيعه على أفراد السلسلة بالتساوي
             if (order.productCode) {
                 let prodRef = doc(db, "products", order.productCode);
                 let prodSnap = await getDoc(prodRef);
                 
                 if (prodSnap.exists()) {
                     let prodData = prodSnap.data();
-                    let agentPrice = parseFloat(prodData.agentPrice || 0);
+                    let partnerProfit = parseFloat(prodData.agentPrice || prodData.partnerProfit || 0);
 
-                    if (agentPrice > 0) {
-                        // جلب كافة الشركاء لتتبع السلسلة الصعودية
+                    if (partnerProfit > 0) {
                         let partnersSnap = await getDocs(collection(db, "partners"));
                         let partnersMap = {};
                         partnersSnap.forEach(d => partnersMap[d.id] = d.data());
-                        // التأكد من تضمين الشريك الجديد
                         partnersMap[generatedPartnerId] = { uplineId: sellerId };
 
                         let chainArray = [];
@@ -303,10 +301,9 @@
                         }
 
                         let chainLength = chainArray.length;
-                        let shareAmount = parseFloat((agentPrice / chainLength).toFixed(2));
+                        let shareAmount = parseFloat((partnerProfit / chainLength).toFixed(2));
                         let dateNow = new Date().toLocaleString('ar-EG');
 
-                        // تحديث أرصدة أفراد السلسلة وسجل الحركات بالحقول الأربعة المحددة
                         for(let partnerId of chainArray) {
                             let pDocRef = doc(db, "partners", partnerId);
                             let pDocSnap = await getDoc(pDocRef);
@@ -318,7 +315,7 @@
                                 let newTx = {
                                     date: dateNow,
                                     chainLength: chainLength,
-                                    totalProfit: agentPrice,
+                                    totalProfit: partnerProfit,
                                     shareAmount: shareAmount
                                 };
 
@@ -362,7 +359,7 @@
 
         await deleteDoc(doc(db, "orders", order.id));
 
-        alert('✅ تم تأكيد الطلب، توزيع سعر الوسيط على السلسلة، وتوليد حساب الشريك (' + generatedPartnerId + ') بنجاح!');
+        alert('✅ تم تأكيد الطلب، توزيع ربح الشركاء على الشجرة، وتوليد حساب الشريك (' + generatedPartnerId + ') بنجاح!');
         loadOrders();
     }
 
@@ -470,7 +467,7 @@
                         name: name,
                         code: code,
                         price: document.getElementById('pPrice').value.trim(),
-                        agentPrice: document.getElementById('pAgentPrice').value.trim(),
+                        agentPrice: document.getElementById('pAgentPrice').value.trim(), // تخزين ربح الشركاء
                         images: imagesArray,
                         reservedUntil: null
                     });
