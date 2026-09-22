@@ -272,13 +272,13 @@
             text-decoration: none;
             font-weight: bold;
         }
-        <footer>
+        footer {
             text-align: center;
             color: #888;
             font-size: 13px;
             margin-bottom: 30px;
             margin-top: 30px;
-        </footer>
+        }
     </style>
 </head>
 <body>
@@ -385,10 +385,26 @@
     </div>
 
     <footer>
-       جميع الحقوق محفوظة © معرض إيفا براند - نظام EVA PLUS 2026
+        جميع الحقوق محفوظة © معرض إيفا براند - نظام EVA PLUS 2026
     </footer>
 
-    <script>
+    <!-- ربط مكتبات Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAqPpKqqHBEIJZTCGCROFzqZyHOYlnDgP4",
+            authDomain: "eva-plus-66b96.firebaseapp.com",
+            projectId: "eva-plus-66b96",
+            storageBucket: "eva-plus-66b96.firebasestorage.app",
+            messagingSenderId: "686798536842",
+            appId: "1:686798536842:web:8c09932cd5869292eb6d73"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
         // قراءة رابط الإحالة تلقائياً
         const urlParams = new URLSearchParams(window.location.search);
         const refId = urlParams.get('ref') || 'EVA-ROOT (الإدارة المركزية)';
@@ -402,7 +418,7 @@
             alertBox.innerHTML = `🌟 أنت تسجل الآن عبر الحملة الإعلانية الرسمية لـ <b>EVA PLUS</b> (تحت إشراف الإدارة المركزية مباشرة).`;
         }
 
-        function submitAndGoToCatalog() {
+        window.submitAndGoToCatalog = async function() {
             const name = document.getElementById('fullName').value.trim();
             const address = document.getElementById('address').value.trim();
             const phone = document.getElementById('phone').value.trim();
@@ -412,11 +428,27 @@
                 return;
             }
 
+            // التحقق من عدم تكرار رقم الهاتف في قاعدة البيانات (partners أو orders)
+            try {
+                const partnersQuery = query(collection(db, "partners"), where("phone", "==", phone));
+                const partnersSnap = await getDocs(partnersQuery);
+                
+                const ordersQuery = query(collection(db, "orders"), where("clientPhone", "==", phone));
+                const ordersSnap = await getDocs(ordersQuery);
+
+                if (!partnersSnap.empty || !ordersSnap.empty) {
+                    alert('⚠️ عذراً يا رفيق، رقم الهاتف المدخل مسجل مسبقاً ولديك حساب مفعل أو طلب معلق في النظام. لا يمكنك التسجيل مرتين بنفس الرقم.');
+                    return; // إيقاف التنفيذ وعدم الانتقال للكتالوج نهائياً
+                }
+            } catch (err) {
+                console.error("Error checking duplication in Firebase:", err);
+            }
+
             // توليد رقم تسلسلي مؤقت لطلب العضو الجديد
             const randomIdNum = Math.floor(1000 + Math.random() * 9000);
             const newPartnerId = `EVA-${randomIdNum}`;
 
-            // تخزين بيانات العضو والداعي في localStorage ليقرأها الكتالوج تلقائياً
+            // تخزين بيانات العضو والداعي
             const pendingPartnerData = {
                 partnerId: newPartnerId,
                 name: name,
@@ -427,15 +459,10 @@
                 date: new Date().toISOString()
             };
 
-            // حفظ في قائمة الانتظار للمشترين الجدد
-            let pendingPartners = JSON.parse(localStorage.getItem('eva_pending_partners')) || [];
-            pendingPartners.push(pendingPartnerData);
-            localStorage.setItem('eva_pending_partners', JSON.stringify(pendingPartners));
-
-            // حفظ بيانات المستخدم الحالي في ذاكرة مؤقتة لكي يستخدمها زر الكتالوج والاتصال بالواتساب فوراً
+            // حفظ بيانات المستخدم الحالي في ذاكرة مؤقتة لكي يستخدمها الكتالوج
             localStorage.setItem('eva_current_user', JSON.stringify(pendingPartnerData));
 
-            // الانتقال الفوري لصفحة الكتالوج مع تمرير معلومات الداعي في الرابط للتأكيد
+            // الانتقال الفوري لصفحة الكتالوج مع تمرير معلومات الداعي
             window.location.href = `catalog.html?ref=${refId}&user=${newPartnerId}`;
         }
     </script>
