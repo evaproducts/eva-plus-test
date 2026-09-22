@@ -241,17 +241,44 @@
         <p style="text-align: center; color: #888; font-size: 13px; margin-top: 30px;">جميع الحقوق محفوظة © معرض إيفا براند - نظام EVA PLUS 2026</p>
     </footer>
 
-    <script>
-        // التحقق مما إذا كان الشريك مسجل الدخول مسبقاً في الجلسة الحالية
-        window.onload = function() {
-            let activePartner = JSON.parse(localStorage.getItem('eva_logged_partner'));
-            if(activePartner) {
-                loadPartnerDashboard(activePartner);
+    <!-- ربط مكتبات Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // مفاتيح الربط الجديدة الخاصة بمشروع EVA PLUS
+        const firebaseConfig = {
+            apiKey: "AIzaSyAqPpKqqHBEIJZTCGCROFzqZyHOYlnDgP4",
+            authDomain: "eva-plus-66b96.firebaseapp.com",
+            projectId: "eva-plus-66b96",
+            storageBucket: "eva-plus-66b96.firebasestorage.app",
+            messagingSenderId: "686798536842",
+            appId: "1:686798536842:web:8c09932cd5869292eb6d73"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // التحقق مما إذا كان الشريك مسجل الدخول مسبقاً
+        window.onload = async function() {
+            let activePartnerId = localStorage.getItem('eva_logged_partner_id');
+            if(activePartnerId) {
+                try {
+                    const docRef = doc(db, "partners", activePartnerId);
+                    const docSnap = await getDoc(docRef);
+                    if(docSnap.exists()) {
+                        loadPartnerDashboard(docSnap.data(), docSnap.id);
+                    } else {
+                        localStorage.removeItem('eva_logged_partner_id');
+                    }
+                } catch(e) {
+                    console.error("خطأ في جلب بيانات الشريك:", e);
+                }
             }
         };
 
-        function handlePartnerLogin() {
-            let uInput = document.getElementById('loginUsername').value.trim();
+        window.handlePartnerLogin = async function() {
+            let uInput = document.getElementById('loginUsername').value.trim().toUpperCase();
             let pInput = document.getElementById('loginPassword').value.trim();
 
             if(!uInput || !pInput) {
@@ -259,50 +286,64 @@
                 return;
             }
 
-            // البحث في قاعدة بيانات الشركاء المفعلين المخزنة محلياً (سيتم ربطها بـ Firebase لاحقاً)
-            let partnersDB = JSON.parse(localStorage.getItem('eva_active_partners_db')) || [
-                // حساب تجريبي افتراضي للاختبار
-                { id: "EVA-101", username: "EVA-101", password: "123", name: "ماجد سحبان", address: "رام الله", phone: "0590000000", balance: 250, team: ["EVA-105", "EVA-112"] }
-            ];
+            try {
+                // محاولة البحث عن الشريك باستخدام معرّف الوثيقة (ID)
+                const docRef = doc(db, "partners", uInput);
+                const docSnap = await getDoc(docRef);
 
-            let foundPartner = partnersDB.find(p => (p.id === uInput || p.username === uInput) && p.password === pInput);
-
-            if(foundPartner) {
-                localStorage.setItem('eva_logged_partner', JSON.stringify(foundPartner));
-                loadPartnerDashboard(foundPartner);
-            } else {
-                alert('بيانات الدخول غير صحيحة أو أن الحساب غير مفعل من قِبل الإدارة بعد.');
+                if (docSnap.exists() && docSnap.data().password === pInput) {
+                    localStorage.setItem('eva_logged_partner_id', docSnap.id);
+                    loadPartnerDashboard(docSnap.data(), docSnap.id);
+                } else {
+                    // إذا لم يتم العثور عليه كمعرف وثيقة، يتم البحث كحقل (id)
+                    const q = query(collection(db, "partners"), where("id", "==", uInput), where("password", "==", pInput));
+                    const querySnapshot = await getDocs(q);
+                    
+                    if (!querySnapshot.empty) {
+                        const pDoc = querySnapshot.docs[0];
+                        localStorage.setItem('eva_logged_partner_id', pDoc.id);
+                        loadPartnerDashboard(pDoc.data(), pDoc.id);
+                    } else {
+                        alert('بيانات الدخول غير صحيحة أو أن الحساب غير مفعل من قِبل الإدارة بعد.');
+                    }
+                }
+            } catch (e) {
+                console.error("خطأ أثناء تسجيل الدخول:", e);
+                alert('حدث خطأ في الاتصال بقاعدة البيانات.');
             }
         }
 
-        function loadPartnerDashboard(partner) {
+        function loadPartnerDashboard(partner, docId) {
             document.getElementById('loginSection').style.display = 'none';
             document.getElementById('dashboardSection').style.display = 'block';
 
-            document.getElementById('displayName').innerText = partner.name;
-            document.getElementById('displayPartnerId').innerText = `الرقم: ${partner.id}`;
+            // تخزين معرّف الوثيقة في الحقل المخفي للتعديل
+            document.getElementById('editName').dataset.docId = docId;
+
+            document.getElementById('displayName').innerText = partner.name || 'شريك';
+            document.getElementById('displayPartnerId').innerText = `الرقم: ${partner.id || docId}`;
             document.getElementById('displayBalance').innerText = (partner.balance || 0) + " ₪";
 
             // تعبئة حقول التعديل
-            document.getElementById('editName').value = partner.name;
-            document.getElementById('editAddress').value = partner.address;
-            document.getElementById('editPhone').value = partner.phone;
+            document.getElementById('editName').value = partner.name || '';
+            document.getElementById('editAddress').value = partner.address || '';
+            document.getElementById('editPhone').value = partner.phone || '';
 
             // توليد الروابط الذكية الخاصة به
             let baseUrl = window.location.origin + window.location.pathname.replace('partner.html', '');
-            document.getElementById('catalogLink').value = `${baseUrl}catalog.html?user=${partner.id}`;
-            document.getElementById('referralLink').value = `${baseUrl}index.html?ref=${partner.id}`;
+            document.getElementById('catalogLink').value = `${baseUrl}catalog.html?user=${partner.id || docId}`;
+            document.getElementById('referralLink').value = `${baseUrl}join.html?ref=${partner.id || docId}`;
 
             // عرض الشجرة (بالأرقام فقط)
             let treeContainer = document.getElementById('treeNodesContainer');
             if(partner.team && partner.team.length > 0) {
                 treeContainer.innerHTML = partner.team.map(nodeId => `<div class="tree-node-badge">👤 ${nodeId}</div>`).join('');
             } else {
-                treeContainer.innerHTML = `<span style="color: #888; font-size: 13px;">لا توجد تسلسلات في الشجرة حتى الآن.</span>`;
+                treeContainer.innerHTML = `<span style="color: #888; font-size: 13px;">لا توجد تسلسلات في الشجرة حتى الآن. شارك رابط الاستقطاب لبناء فريقك!</span>`;
             }
         }
 
-        function shareLink(type) {
+        window.shareLink = function(type) {
             let linkId = type === 'catalog' ? 'catalogLink' : 'referralLink';
             let linkText = document.getElementById(linkId).value;
             
@@ -318,25 +359,37 @@
             }
         }
 
-        function savePartnerUpdates() {
-            let activePartner = JSON.parse(localStorage.getItem('eva_logged_partner'));
-            
-            activePartner.name = document.getElementById('editName').value.trim();
-            activePartner.address = document.getElementById('editAddress').value.trim();
-            activePartner.phone = document.getElementById('editPhone').value.trim();
-            
+        window.savePartnerUpdates = async function() {
+            let docId = document.getElementById('editName').dataset.docId;
+            let name = document.getElementById('editName').value.trim();
+            let address = document.getElementById('editAddress').value.trim();
+            let phone = document.getElementById('editPhone').value.trim();
             let newPass = document.getElementById('editPassword').value.trim();
+
+            if(!docId) return;
+
+            let updateData = { name, address, phone };
             if(newPass) {
-                activePartner.password = newPass;
+                updateData.password = newPass;
             }
 
-            localStorage.setItem('eva_logged_partner', JSON.stringify(activePartner));
-            alert('تم تحديث بياناتك بنجاح!');
-            loadPartnerDashboard(activePartner);
+            try {
+                const partnerRef = doc(db, "partners", docId);
+                await updateDoc(partnerRef, updateData);
+                
+                alert('تم تحديث بياناتك بنجاح!');
+                document.getElementById('editPassword').value = '';
+                
+                // تحديث واجهة المستخدم بالاسم الجديد
+                document.getElementById('displayName').innerText = name;
+            } catch(e) {
+                console.error("خطأ في تحديث البيانات:", e);
+                alert('حدث خطأ أثناء تحديث البيانات.');
+            }
         }
 
-        function partnerLogout() {
-            localStorage.removeItem('eva_logged_partner');
+        window.partnerLogout = function() {
+            localStorage.removeItem('eva_logged_partner_id');
             location.reload();
         }
     </script>
