@@ -371,7 +371,7 @@
 
                           let priceHtml = `<span class="price-ex">السعر: ${p.price} ₪</span>`;
 
-                          // التحقق من حجز المنتج بناءً على وقت الحجز في قاعدة البيانات فقط
+                          // الاعتماد حصرياً على بيانات Firebase الدقيقة لحالة حجز المنتج
                           let isReserved = false;
                           if (p.reservedUntil && now < p.reservedUntil) {
                               isReserved = true;
@@ -427,6 +427,21 @@
           let currentUser = JSON.parse(localStorage.getItem('eva_current_user')) || {};
           let isJoinFlow = currentUser.phone ? true : false;
 
+          // فحص دقيق من فايربيس (Orders) لمنع الشريك القادم من الانضمام من حجز أكثر من منتج بنفس رقم الهاتف
+          if (isJoinFlow && currentUser.phone) {
+              try {
+                  const ordersRef = collection(db, "orders");
+                  const qOrders = query(ordersRef, where("clientPhone", "==", currentUser.phone));
+                  const ordersSnap = await getDocs(qOrders);
+                  if (!ordersSnap.empty) {
+                      alert('⚠️ عذراً، لقد قمت مسبقاً بحجز منتج من رابط الانضمام هذا. لا يمكنك حجز منتج آخر حالياً ريثما تتم مراجعة طلبك.');
+                      return;
+                  }
+              } catch (err) {
+                  console.error("Error checking existing orders from firebase:", err);
+              }
+          }
+
           const reservationTime = new Date().getTime() + (24 * 60 * 60 * 1000); // 24 ساعة حجز
 
           let msg = "";
@@ -453,9 +468,6 @@
                     `- رقم الشريك المؤقت: ${orderData.partnerId}\n` +
                     `- الداعي / المرجع: ${orderData.sponsor}\n` +
                     `- المنتج المطلوب للانضمام: ${name} (رمز: ${code}) - السعر: ${price} ₪`;
-
-              currentUser.hasOrdered = true;
-              localStorage.setItem('eva_current_user', JSON.stringify(currentUser));
           } else {
               orderData = {
                   productCode: code,
@@ -477,10 +489,12 @@
           }
 
           try {
+              // تحديث حجز المنتج في قاعدة بيانات Firebase بشكل دقيق
               await setDoc(doc(db, "products", code), {
                   reservedUntil: reservationTime
               }, { merge: true });
 
+              // حفظ الطلب في Firebase
               await addDoc(collection(db, "orders"), orderData);
           } catch (err) {
               console.error("Error saving order to Firestore:", err);
