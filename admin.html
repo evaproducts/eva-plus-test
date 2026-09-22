@@ -30,12 +30,12 @@
 
 <div class="box">
     <h2>📦 إدارة الطلبات المعلقة (EVA PLUS)</h2>
-    <p style="font-size: 13px; color: #666;">الطلبات الواردة من الكتالوج تتطلب تأكيد التسليم لتوليد حسابات الشركاء وتوزيع العمولات تلقائياً.</p>
+    <p style="font-size: 13px; color: #666;">الطلبات الواردة لتأكيد التوصيل أو تفعيل حسابات الشركاء الجدد وتوليد بياناتهم.</p>
     <table class="orders-table">
         <thead>
             <tr>
                 <th>تفاصيل الزبون والطلب والعنوان</th>
-                <th>المرجع (الشريك)</th>
+                <th>المرجع / الشريك الداعي</th>
                 <th>الإجراء</th>
             </tr>
         </thead>
@@ -230,7 +230,7 @@
         }
     }
 
-    // دالة التأكيد والتفعيل وتوليد حساب الشريك وحفظه في قاعدة البيانات ليتمكن من الدخول فوراً
+    // دالة التأكيد والتفعيل وتوليد حساب الشريك والتوجيه لواتساب برسالة جاهزة
     window.confirmAndNotifyOrder = async function(order) {
         let generatedPartnerId = "EVA-" + Math.floor(100 + Math.random() * 900);
         let generatedPassword = Math.floor(1000 + Math.random() * 9000).toString();
@@ -250,15 +250,15 @@
         }
 
         let baseUrl = window.location.origin + window.location.pathname.replace('admin.html', '');
-        let partnerLink = `${baseUrl}partner.html`;
+        let partnerLink = `${baseUrl}partner.html?user=${generatedPartnerId}`;
 
         let welcomeMsg = `🌸 أهلاً بك يا ${order.clientName} في نظام EVA PLUS - معرض إيفا براند!\n\n` +
-                         `مبارك انضمامك رسمياً لفريقك وتفعيل حسابك بنجاح بعد تأكيد طلبك (${order.productName}).\n\n` +
+                         `مبارك انضمامك رسمياً وتفعيل حسابك بنجاح بعد تأكيد طلب انضمامك (${order.productName}).\n\n` +
                          `🔗 رابط لوحة التحكم الخاصة بك:\n${partnerLink}\n\n` +
                          `🔐 بيانات الدخول الخاصة بك:\n` +
                          `- اسم المستخدم / رقم الشجرة: ${generatedPartnerId}\n` +
                          `- كلمة المرور: ${generatedPassword}\n\n` +
-                         `يمكنك الآن الدخول لحسابك بكل أمان، متابعة أرباحك، ومشاركة روابطك الذكية الخاصة بالكتالوج والاستقطاب. بالتوفيق دائماً! ✨`;
+                         `يمكنك الآن الدخول لحسابك بكل أمان، متابعة أرباحك، ومشاركة رابط الكتالوج الخاص بك. بالتوفيق دائماً! ✨`;
 
         let rawPhone = (order.clientPhone || '').toString().trim();
         if (rawPhone.startsWith('00')) {
@@ -269,26 +269,15 @@
         let whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(welcomeMsg)}`;
         window.open(whatsappUrl, '_blank');
 
+        // حذف الطلب من قائمة المعلقات
         await deleteDoc(doc(db, "orders", order.id));
 
-        if (order.productCode) {
-            let deleteProductChoice = confirm(`هل تريد حذف المنتج (رمز: ${order.productCode} - ${order.productName}) من الكتالوج؟\n\n(اضغط "موافق" إذا كان آخر قطعة وانتهى المخزون، أو "إلغاء" إذا كان متوفراً بقطع أخرى).`);
-            if (deleteProductChoice) {
-                try {
-                    await deleteDoc(doc(db, "products", order.productCode));
-                    alert(`تم حذف المنتج (${order.productCode}) من الكتالوج بنجاح!`);
-                } catch(err) {
-                    console.error("Error deleting product:", err);
-                }
-            }
-        }
-
-        alert('تم تأكيد الطلب وتوليد وتفعيل حساب الشريك (' + generatedPartnerId + ') بنجاح!');
+        alert('✅ تم تأكيد الطلب وتوليد حساب الشريك (' + generatedPartnerId + ') بنجاح!');
         loadOrders();
     }
 
     window.deleteOrder = async function(orderId) {
-        if(confirm('هل أنت متأكد من إلغاء هذا الطلب؟ (سيتم إزالته دون تأثير)')) {
+        if(confirm('هل أنت متأكد من إلغاء هذا الطلب؟ (سيتم إزالته وإتاحة المنتج من جديد)')) {
             await deleteDoc(doc(db, "orders", orderId));
             loadOrders();
         }
