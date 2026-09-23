@@ -34,7 +34,7 @@
         .store-payment-badges { display: flex; justify-content: center; gap: 8px; margin: 10px 0; }
         .payment-pill { background: #fff; color: #880e4f; border: 1px solid #f8bbd0; padding: 4px 12px; border-radius: 15px; font-size: 12px; font-weight: bold; }
 
-        /* شبكة الأقسام الرئيسية (التصميم الأساسي المطلوب) */
+        /* شبكة الأقسام الرئيسية (بشكل مرتب بجانب بعضها) */
         .categories-grid-home { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; margin-top: 15px; margin-bottom: 25px; }
         .category-card { background: #fff; border: 1px solid #f8bbd0; border-radius: 12px; padding: 15px 10px; text-align: center; cursor: pointer; box-shadow: 0 3px 10px rgba(0,0,0,0.03); transition: transform 0.2s, box-shadow 0.2s; }
         .category-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(216, 27, 96, 0.15); border-color: #ad1457; }
@@ -42,22 +42,20 @@
         .category-card h3 { font-size: 14px; color: #880e4f; margin: 5px 0 2px 0; }
         .category-code-tag { font-size: 12px; color: #b8860b; font-weight: bold; }
 
-        /* شريط الأقسام الأفقي عند تصفح المنتجات */
-        .categories-nav { display: none; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 20px; }
-        .cat-btn { background: #fff; border: 1px solid #f8bbd0; color: #880e4f; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; white-space: nowrap; font-size: 13px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .cat-btn.active { background: #880e4f; color: #fff; border-color: #880e4f; }
-        
-        .back-home-btn { background: #880e4f; color: white; border: none; padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-        
-        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 15px; }
+        /* زر العودة لأقسام المعرض */
+        .back-home-btn { background: #ad1457; color: white; border: none; padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        .back-home-btn:hover { background: #880e4f; }
+
+        /* شبكة عرض المنتجات المتجاورة (Grid متناسق تماماً) */
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 15px; margin-top: 10px; }
         .product-card { background: #fff; border-radius: 12px; padding: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #f8bbd0; display: flex; flex-direction: column; justify-content: space-between; }
         .product-img-container { width: 100%; height: 220px; border-radius: 8px; overflow: hidden; background: #f9f9f9; position: relative; margin-bottom: 10px; cursor: pointer; }
         .product-img-container img { width: 100%; height: 100%; object-fit: cover; }
         .product-title { font-size: 15px; font-weight: bold; color: #333; margin-bottom: 5px; }
         .product-code { font-size: 12px; color: #b8860b; margin-bottom: 8px; font-weight: bold; }
         .product-price { font-size: 16px; font-weight: bold; color: #880e4f; margin-bottom: 12px; }
-        .order-btn { background: #880e4f; color: #fff; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; font-size: 14px; box-shadow: 0 2px 6px rgba(136,14,79,0.2); }
-        .order-btn:hover { background: #ad1457; }
+        .order-btn { background: #27ae60; color: #fff; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; font-size: 14px; box-shadow: 0 2px 6px rgba(39,174,96,0.3); }
+        .order-btn:hover { background: #219150; }
         .reserved-badge { background: #e74c3c; color: #fff; text-align: center; padding: 8px; border-radius: 8px; font-weight: bold; font-size: 13px; margin-top: 10px; }
         
         /* Modal للتصوير والطلب */
@@ -124,17 +122,13 @@
         <div id="categoriesGridHome" class="categories-grid-home">جاري تحميل الأقسام...</div>
     </div>
 
-    <!-- شريط الأقسام الأفقي (يظهر عند الدخول لقسم معين) -->
-    <div class="categories-nav" id="categoriesNav">
-        <button class="cat-btn active" onclick="filterCategory('ALL')">الكل</button>
-    </div>
-
-    <!-- زر العودة للأقسام -->
+    <!-- زر العودة لأقسام المعرض (يظهر عند الدخول للقسم) -->
     <div id="backHomeContainer" style="display: none;">
         <button class="back-home-btn" onclick="showCategoriesHome()">⬅ العودة لأقسام المعرض</button>
+        <h2 id="activeCategoryTitle" style="font-size: 18px; color: #880e4f; margin-bottom: 15px; border-bottom: 2px solid #f8bbd0; padding-bottom: 8px;"></h2>
     </div>
 
-    <!-- شبكة المنتجات -->
+    <!-- شبكة المنتجات (تظهر متجاورة ومنظمة بشكل شبكي) -->
     <div class="products-grid" id="productsGrid"></div>
 
     <div class="footer-link">
@@ -194,13 +188,13 @@
 
         let allProducts = [];
         let loadedCategoriesData = [];
+        let globalLogoUrl = "";
         let selectedProductForOrder = null;
         let urlParams = new URLSearchParams(window.location.search);
-        let partnerUser = urlParams.get('user'); // معرف الشريك إن وجد
+        let partnerUser = urlParams.get('user');
         let refParam = urlParams.get('ref');
 
         window.addEventListener('DOMContentLoaded', async () => {
-            // إخفاء زر "انضم لإيفا بلس" إذا دخل المستخدم عبر رابط شريك أو إحالة
             if (partnerUser || refParam) {
                 let joinBtn = document.getElementById('joinEvaPlusBtn');
                 if (joinBtn) joinBtn.style.display = 'none';
@@ -223,7 +217,8 @@
                 const settingsSnap = await getDocs(collection(db, "settings"));
                 settingsSnap.forEach(d => {
                     if(d.id === 'logo' && d.data().img) {
-                        document.getElementById('logoContainer').innerHTML = `<img src="${d.data().img}" alt="Logo">`;
+                        globalLogoUrl = d.data().img;
+                        document.getElementById('logoContainer').innerHTML = `<img src="${globalLogoUrl}" alt="Logo">`;
                     }
                     if(d.id === 'notice' && d.data().text) {
                         let bar = document.getElementById('adminNoticeBar');
@@ -232,30 +227,28 @@
                     }
                 });
 
-                // تحميل الأقسام وعرضها كبطاقات رئيسية
+                // تحميل الأقسام وعرضها كبطاقات رئيسية باستخدام لوغو إيفا براند العام كصورة للقسم
                 const catSnap = await getDocs(collection(db, "categories"));
                 loadedCategoriesData = [];
                 let gridHomeHtml = '';
-                let navHtml = `<button class="cat-btn active" onclick="filterCategory('ALL')">الكل</button>`;
 
                 catSnap.forEach(d => {
                     let catData = { id: d.id, ...d.data() };
                     loadedCategoriesData.push(catData);
                     
-                    let catImg = catData.image || 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=300&auto=format&fit=crop&q=80';
+                    // استخدام لوغو إيفا براند العام كصورة افتراضية لأقسام المعرض
+                    let catImg = globalLogoUrl || 'https://via.placeholder.com/70';
                     
                     gridHomeHtml += `
-                        <div class="category-card" onclick="selectCategory('${catData.id}')">
+                        <div class="category-card" onclick="selectCategory('${catData.id}', '${catData.name}')">
                             <img src="${catImg}" class="category-img" alt="${catData.name}">
                             <h3>${catData.name}</h3>
                             <span class="category-code-tag">(${catData.id})</span>
                         </div>
                     `;
-                    navHtml += `<button class="cat-btn" onclick="filterCategory('${catData.id}')">${catData.name}</button>`;
                 });
 
                 document.getElementById('categoriesGridHome').innerHTML = gridHomeHtml || '<p style="text-align:center; color:#888;">لا توجد أقسام مضافة حالياً.</p>';
-                document.getElementById('categoriesNav').innerHTML = navHtml;
 
                 const prodSnap = await getDocs(collection(db, "products"));
                 allProducts = [];
@@ -267,43 +260,22 @@
             }
         });
 
-        // عند النقر على قسم في الصفحة الرئيسية
-        window.selectCategory = function(catId) {
+        // عند النقر على القسم، يتم إخفاء الأقسام وعرض منتجات القسم بشكل شبكي متجاور
+        window.selectCategory = function(catId, catName) {
             document.getElementById('categoriesHomeView').style.display = 'none';
-            document.getElementById('categoriesNav').style.display = 'flex';
             document.getElementById('backHomeContainer').style.display = 'block';
-
-            // تفعيل الزر المناسب في الشريط الأفقي
-            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
-            // العثور على الزر المطابق للقسم
-            const buttons = document.querySelectorAll('.cat-btn');
-            buttons.forEach(btn => {
-                if(btn.getAttribute('onclick')?.includes(`'${catId}'`)) {
-                    btn.classList.add('active');
-                }
-            });
+            document.getElementById('activeCategoryTitle').innerText = `${catName} (${catId})`;
 
             renderProducts(allProducts.filter(p => p.category === catId));
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
-        // العودة للرئيسية (عرض الأقسام)
+        // زر العودة للصفحة الرئيسية للأقسام
         window.showCategoriesHome = function() {
-            document.getElementById('categoriesNav').style.display = 'none';
             document.getElementById('backHomeContainer').style.display = 'none';
             document.getElementById('productsGrid').innerHTML = '';
             document.getElementById('categoriesHomeView').style.display = 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
-
-        window.filterCategory = function(catId) {
-            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            if (catId === 'ALL') {
-                renderProducts(allProducts);
-            } else {
-                renderProducts(allProducts.filter(p => p.category === catId));
-            }
         };
 
         function renderProducts(products) {
