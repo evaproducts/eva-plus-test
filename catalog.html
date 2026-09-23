@@ -3,59 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>معرض إيفا | الكتالوج الرقمي</title>
+    <title>معرض إيفا | الكتالوج الرقمي - EVA PLUS</title>
+
+    <!-- إعدادات تطبيق الويب (PWA Manifest) -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#880e4f">
+
+    <!-- وسوم المعاينة الاحترافية -->
+    <meta property="og:title" content="معرض إيفا براند | الكتالوج الرقمي">
+    <meta property="og:description" content="أرقى العطور، الحقائب، والساعات الفاخرة. التوصيل متوفر لكافة مناطق الضفة، القدس، والداخل.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&auto=format&fit=crop&q=80">
+    <meta property="og:type" content="website">
+
     <style>
-        body { font-family: Arial, sans-serif; background: #fdf2f4; color: #333; margin: 0; padding: 15px; direction: rtl; }
-        .header { text-align: center; padding: 20px; background: #fff; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .header img { max-height: 70px; margin-bottom: 10px; }
+        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #fdfbfb 0%, #fce4ec 100%); color: #333; margin: 0; padding: 15px; direction: rtl; min-height: 100vh; }
+        
+        /* شريط التثبيت الذكي */
+        #installAppBanner { display: none; background: linear-gradient(135deg, #880e4f 0%, #ad1457 100%); color: white; padding: 10px 15px; text-align: center; position: sticky; top: 0; z-index: 9999; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(136, 14, 79, 0.3); }
+        .install-banner-content { max-width: 800px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        #installAppBtn { background: #fff; color: #880e4f; border: none; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 12px; cursor: pointer; }
+        #dismissInstallBtn { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.6); padding: 5px 10px; border-radius: 20px; font-size: 11px; cursor: pointer; }
+
+        .header { text-align: center; padding: 20px; background: #fff; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-bottom: 3px solid #d4af37; }
+        .header img { max-height: 80px; width: 80px; height: 80px; object-fit: cover; border-radius: 50%; border: 3px solid #d4af37; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .notice-bar { background: #880e4f; color: #fff; padding: 10px 15px; border-radius: 8px; text-align: center; font-size: 14px; margin-bottom: 20px; font-weight: bold; }
+        
+        /* أزرار التواصل والدفع */
+        .social-promo-box { display: flex; justify-content: center; align-items: center; gap: 8px; margin: 12px 0; flex-wrap: wrap; }
+        .social-promo-btn { display: inline-block; background: linear-gradient(135deg, #880e4f 0%, #ad1457 100%); color: #fff; text-decoration: none; padding: 7px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid #d4af37; }
+        .store-payment-badges { display: flex; justify-content: center; gap: 8px; margin: 10px 0; }
+        .payment-pill { background: #fff; color: #880e4f; border: 1px solid #f8bbd0; padding: 4px 12px; border-radius: 15px; font-size: 12px; font-weight: bold; }
+
+        /* الأقسام بشريط متحرك أفقياً */
         .categories-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 20px; }
-        .cat-btn { background: #fff; border: 1px solid #f8bbd0; color: #880e4f; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; white-space: nowrap; font-size: 13px; }
-        .cat-btn.active { background: #880e4f; color: #fff; }
+        .cat-btn { background: #fff; border: 1px solid #f8bbd0; color: #880e4f; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; white-space: nowrap; font-size: 13px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .cat-btn.active { background: #880e4f; color: #fff; border-color: #880e4f; }
+        
         .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 15px; }
         .product-card { background: #fff; border-radius: 12px; padding: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #f8bbd0; display: flex; flex-direction: column; justify-content: space-between; }
         .product-img-container { width: 100%; height: 220px; border-radius: 8px; overflow: hidden; background: #f9f9f9; position: relative; margin-bottom: 10px; cursor: pointer; }
         .product-img-container img { width: 100%; height: 100%; object-fit: cover; }
         .product-title { font-size: 15px; font-weight: bold; color: #333; margin-bottom: 5px; }
-        .product-code { font-size: 12px; color: #888; margin-bottom: 8px; }
+        .product-code { font-size: 12px; color: #b8860b; margin-bottom: 8px; font-weight: bold; }
         .product-price { font-size: 16px; font-weight: bold; color: #880e4f; margin-bottom: 12px; }
-        .order-btn { background: #880e4f; color: #fff; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; font-size: 14px; }
+        .order-btn { background: #880e4f; color: #fff; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; font-size: 14px; box-shadow: 0 2px 6px rgba(136,14,79,0.2); }
         .order-btn:hover { background: #ad1457; }
         .reserved-badge { background: #e74c3c; color: #fff; text-align: center; padding: 8px; border-radius: 8px; font-weight: bold; font-size: 13px; margin-top: 10px; }
         
         /* Modal للتصوير والطلب */
         .modal { display: none; position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; }
-        .modal-content { background: #fff; width: 100%; max-width: 450px; border-radius: 12px; padding: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
+        .modal-content { background: #fff; width: 100%; max-width: 450px; border-radius: 12px; padding: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); position: relative; }
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px; color: #555; }
         .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
         .close-modal { float: left; font-size: 20px; font-weight: bold; color: #880e4f; cursor: pointer; }
         
         /* معرض الصور المصغر */
-        .image-modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; flex-direction: column; padding: 20px; box-sizing: border-box; }
+        .image-modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; flex-direction: column; padding: 20px; box-sizing: border-box; }
         .image-modal img { max-width: 90%; max-height: 75vh; border-radius: 8px; object-fit: contain; }
         .close-img-modal { position: absolute; top: 20px; left: 25px; color: #fff; font-size: 30px; cursor: pointer; font-weight: bold; }
+        
+        .footer-link { text-align: center; margin-top: 30px; font-size: 14px; }
+        .footer-link a { color: #880e4f; text-decoration: none; font-weight: bold; }
+        footer { text-align: center; color: #888; font-size: 12px; margin-top: 20px; }
     </style>
 </head>
 <body>
 
+    <!-- شريط التثبيت التلقائي (PWA) -->
+    <div id="installAppBanner">
+        <div class="install-banner-content">
+            <span style="font-size: 13px; font-weight: bold;">📱 ثبت تطبيق معرض إيفا لسهولة التصفح!</span>
+            <div>
+                <button id="installAppBtn">تثبيت التطبيق</button>
+                <button id="dismissInstallBtn" onclick="document.getElementById('installAppBanner').style.display='none'">لاحقاً</button>
+            </div>
+        </div>
+    </div>
+
     <div class="header">
         <div id="logoContainer"><h1 style="color: #880e4f; margin:0;">معرض إيفا براند</h1></div>
-        <p style="color: #666; font-size: 13px; margin: 5px 0 0 0;">أرقى العطور، الحقائب، والساعات الفاخرة</p>
+        <p style="color: #ad1457; font-size: 13px; margin: 5px 0;">أرقى العطور، الحقائب، والساعات الفاخرة</p>
+        
+        <!-- الأزرار الثلاثة -->
+        <div class="social-promo-box">
+            <a href="https://linky.ps/eva" target="_blank" class="social-promo-btn">✨ تابعونا</a>
+            <a href="https://www.google.com/maps?q=32.1273809,35.1433041&z=17&hl=en" target="_blank" class="social-promo-btn">📍 موقعنا</a>
+            <a href="join.html" class="social-promo-btn">💼 فريق المسوقين</a>
+        </div>
+
+        <!-- طرق الدفع -->
+        <div class="store-payment-badges">
+            <div class="payment-pill">Cash</div>
+            <div class="payment-pill">Visa</div>
+            <div class="payment-pill">iBuraq</div>
+        </div>
+
+        <div style="font-size: 12px; font-weight: bold; color: #ad1457; margin-top: 8px;">
+            🚚 التوصيل متوفر لكافة مناطق الضفة، القدس، والداخل 📍
+        </div>
+
         <div id="partnerBanner" style="display:none; margin-top: 10px; background: #fff0f5; padding: 8px; border-radius: 6px; font-size: 13px; color: #880e4f; font-weight: bold;"></div>
     </div>
 
     <div id="adminNoticeBar" class="notice-bar" style="display: none;"></div>
 
+    <!-- شريط الأقسام الأفقي -->
     <div class="categories-nav" id="categoriesNav">
         <button class="cat-btn active" onclick="filterCategory('ALL')">الكل</button>
     </div>
 
+    <!-- شبكة المنتجات -->
     <div class="products-grid" id="productsGrid">
         <p style="text-align:center; grid-column: 1/-1; color:#888;">جاري تحميل المنتجات...</p>
     </div>
 
-    <!-- نافذة الطلب -->
+    <div class="footer-link">
+        تصفح روابطنا الأخرى: <a href="https://linky.ps/eva" target="_blank">linky.ps/eva</a>
+    </div>
+
+    <footer>
+        جميع الحقوق محفوظة © معرض إيفا براند - نظام EVA PLUS 2026
+    </footer>
+
+    <!-- نافذة الطلب (حجز 24 ساعة ونظام ايفا بلس) -->
     <div id="orderModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeOrderModal()">&times;</span>
@@ -79,7 +150,7 @@
         </div>
     </div>
 
-    <!-- نافذة تكبير الصورة -->
+    <!-- نافذة تكبير وتصفح الصور -->
     <div id="imageModal" class="image-modal">
         <span class="close-img-modal" onclick="closeImageModal()">&times;</span>
         <img id="modalFullImg" src="">
@@ -117,13 +188,12 @@
                         banner.style.display = 'block';
                         banner.innerHTML = `🌸 متجر برعاية الشريك المعتمد: ${pDoc.data().name} (${partnerUser})`;
                     } else {
-                        partnerUser = null; // إذا لم يكن موجوداً يُعامل كزائر عادي
+                        partnerUser = null;
                     }
                 } catch(e) { partnerUser = null; }
             }
 
             try {
-                // تحميل اللوغو والإدارة
                 const settingsSnap = await getDocs(collection(db, "settings"));
                 settingsSnap.forEach(d => {
                     if(d.id === 'logo' && d.data().img) {
@@ -136,7 +206,6 @@
                     }
                 });
 
-                // تحميل الأقسام
                 const catSnap = await getDocs(collection(db, "categories"));
                 let navHtml = `<button class="cat-btn active" onclick="filterCategory('ALL')">الكل</button>`;
                 catSnap.forEach(d => {
@@ -145,7 +214,6 @@
                 });
                 document.getElementById('categoriesNav').innerHTML = navHtml;
 
-                // تحميل المنتجات
                 const prodSnap = await getDocs(collection(db, "products"));
                 allProducts = [];
                 prodSnap.forEach(d => allProducts.push({ id: d.id, ...d.data() }));
@@ -213,7 +281,6 @@
             document.getElementById('orderModal').style.display = 'none';
         };
 
-        // إرسال الطلب (الفصل التام بين الزبون العادي وزبون أيفا بلس)
         window.submitOrder = async function() {
             let name = document.getElementById('clientName').value.trim();
             let phone = document.getElementById('clientPhone').value.trim();
@@ -227,13 +294,11 @@
                 let orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
                 let reserveDate = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
-                // حجز المنتج مؤقتاً
                 await setDoc(doc(db, "products", selectedProductForOrder.code), {
                     reservedUntil: reserveDate
                 }, { merge: true });
 
                 if (partnerUser) {
-                    // 🌳 الحالة الثانية: طلب أيفا بلس (عبر رابط شريك)
                     await setDoc(doc(db, "orders", orderId), {
                         orderType: 'partner',
                         productCode: selectedProductForOrder.code,
@@ -241,7 +306,7 @@
                         clientName: name,
                         clientPhone: phone,
                         clientAddress: address,
-                        sponsor: partnerUser, // الشريك صاحب الرابط
+                        sponsor: partnerUser,
                         createdAt: new Date().toISOString()
                     });
 
@@ -250,7 +315,6 @@
                     location.reload();
 
                 } else {
-                    // 🛍️ الحالة الأولى: طلب عادي (زائر مباشر بدون رابط شريك)
                     await setDoc(doc(db, "orders", orderId), {
                         orderType: 'normal',
                         productCode: selectedProductForOrder.code,
@@ -261,10 +325,9 @@
                         createdAt: new Date().toISOString()
                     });
 
-                    // توجيه تلقائي وفوري للواتساب التجاري
                     let whatsappMsg = `مرحباً إيفا براند، أريد طلب المنتج رقم [${selectedProductForOrder.code}] - ${selectedProductForOrder.name}.\nالاسم: ${name}\nالهاتف: ${phone}\nالعنوان: ${address}`;
-                    let storeWhatsApp = "0597180456"; // رقم المعرض الأساسي
-                    let waUrl = `https://wa.me/970${storeWhatsApp.replace(/^0/, '')}?text=${encodeURIComponent(whatsappMsg)}`;
+                    let storeWhatsApp = "970597180456";
+                    let waUrl = `https://wa.me/${storeWhatsApp}?text=${encodeURIComponent(whatsappMsg)}`;
 
                     closeOrderModal();
                     window.open(waUrl, '_blank');
