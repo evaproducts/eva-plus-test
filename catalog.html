@@ -5,11 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>معرض إيفا | الكتالوج الرقمي - EVA PLUS</title>
 
-    <!-- إعدادات تطبيق الويب (PWA Manifest) -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#880e4f">
 
-    <!-- وسوم المعاينة الاحترافية -->
     <meta property="og:title" content="معرض إيفا براند | الكتالوج الرقمي">
     <meta property="og:description" content="أرقى العطور، الحقائب، والساعات الفاخرة. التوصيل متوفر لكافة مناطق الضفة، القدس، والداخل.">
     <meta property="og:image" content="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&auto=format&fit=crop&q=80">
@@ -18,7 +16,6 @@
     <style>
         body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #fdfbfb 0%, #fce4ec 100%); color: #333; margin: 0; padding: 15px; direction: rtl; min-height: 100vh; }
         
-        /* شريط التثبيت الذكي */
         #installAppBanner { display: none; background: linear-gradient(135deg, #880e4f 0%, #ad1457 100%); color: white; padding: 10px 15px; text-align: center; position: sticky; top: 0; z-index: 9999; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(136, 14, 79, 0.3); }
         .install-banner-content { max-width: 800px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         #installAppBtn { background: #fff; color: #880e4f; border: none; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 12px; cursor: pointer; }
@@ -28,13 +25,11 @@
         .header img { max-height: 80px; width: 80px; height: 80px; object-fit: cover; border-radius: 50%; border: 3px solid #d4af37; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .notice-bar { background: #880e4f; color: #fff; padding: 10px 15px; border-radius: 8px; text-align: center; font-size: 14px; margin-bottom: 20px; font-weight: bold; }
         
-        /* أزرار التواصل والدفع */
         .social-promo-box { display: flex; justify-content: center; align-items: center; gap: 8px; margin: 12px 0; flex-wrap: wrap; }
         .social-promo-btn { display: inline-block; background: linear-gradient(135deg, #880e4f 0%, #ad1457 100%); color: #fff; text-decoration: none; padding: 7px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid #d4af37; }
         .store-payment-badges { display: flex; justify-content: center; gap: 8px; margin: 10px 0; }
         .payment-pill { background: #fff; color: #880e4f; border: 1px solid #f8bbd0; padding: 4px 12px; border-radius: 15px; font-size: 12px; font-weight: bold; }
 
-        /* شبكة الأقسام الرئيسية */
         .categories-grid-home { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; margin-top: 15px; margin-bottom: 25px; }
         .category-card { background: #fff; border: 1px solid #f8bbd0; border-radius: 12px; padding: 15px 10px; text-align: center; cursor: pointer; box-shadow: 0 3px 10px rgba(0,0,0,0.03); transition: transform 0.2s, box-shadow 0.2s; }
         .category-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(216, 27, 96, 0.15); border-color: #ad1457; }
@@ -42,7 +37,6 @@
         .category-card h3 { font-size: 14px; color: #880e4f; margin: 5px 0 2px 0; }
         .category-code-tag { font-size: 12px; color: #b8860b; font-weight: bold; }
 
-        /* زر العودة العائم (Sticky) لأقسام المعرض */
         #backHomeContainer {
             position: sticky;
             top: 10px;
@@ -57,7 +51,6 @@
         .back-home-btn { background: #ad1457; color: white; border: none; padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
         .back-home-btn:hover { background: #880e4f; }
 
-        /* شبكة المنتجات (متجاورة بشكل صحيح Grid) */
         .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; margin-top: 10px; }
         .product-card { background: #fff; border-radius: 12px; padding: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #f8bbd0; display: flex; flex-direction: column; justify-content: space-between; }
         .product-img-container { width: 100%; height: 180px; border-radius: 8px; overflow: hidden; background: #f9f9f9; position: relative; margin-bottom: 10px; cursor: pointer; }
@@ -69,15 +62,14 @@
         .order-btn:hover { background: #219150; }
         .reserved-badge { background: #e74c3c; color: #fff; text-align: center; padding: 8px; border-radius: 8px; font-weight: bold; font-size: 13px; margin-top: 10px; }
         
-        /* Modal للطلب */
         .modal { display: none; position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; }
         .modal-content { background: #fff; width: 100%; max-width: 450px; border-radius: 12px; padding: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); position: relative; }
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px; color: #555; }
-        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 13px; }
+        .phone-group { display: flex; gap: 8px; }
         .close-modal { float: left; font-size: 20px; font-weight: bold; color: #880e4f; cursor: pointer; }
         
-        /* معرض الصور المصغر */
         .image-modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; flex-direction: column; padding: 20px; box-sizing: border-box; }
         .image-modal img { max-width: 90%; max-height: 75vh; border-radius: 8px; object-fit: contain; }
         .close-img-modal { position: absolute; top: 20px; left: 25px; color: #fff; font-size: 30px; cursor: pointer; font-weight: bold; }
@@ -89,7 +81,6 @@
 </head>
 <body>
 
-    <!-- شريط التثبيت التلقائي (PWA) -->
     <div id="installAppBanner">
         <div class="install-banner-content">
             <span style="font-size: 13px; font-weight: bold;">📱 ثبت تطبيق معرض إيفا لسهولة التصفح!</span>
@@ -104,14 +95,12 @@
         <div id="logoContainer"><h1 style="color: #880e4f; margin:0;">معرض إيفا براند</h1></div>
         <p style="color: #ad1457; font-size: 13px; margin: 5px 0;">أرقى العطور، الحقائب، والساعات الفاخرة</p>
         
-        <!-- الأزرار الثلاثة -->
         <div class="social-promo-box">
             <a href="https://linky.ps/eva" target="_blank" class="social-promo-btn">✨ تابعونا</a>
             <a href="https://www.google.com/maps?q=32.1273809,35.1433041&z=17&hl=en" target="_blank" class="social-promo-btn">📍 موقعنا</a>
             <a href="join.html" id="joinEvaPlusBtn" class="social-promo-btn">💼 انضم لإيفا بلس</a>
         </div>
 
-        <!-- طرق الدفع -->
         <div class="store-payment-badges">
             <div class="payment-pill">Cash</div>
             <div class="payment-pill">Visa</div>
@@ -127,19 +116,16 @@
 
     <div id="adminNoticeBar" class="notice-bar" style="display: none;"></div>
 
-    <!-- زر العودة العائم لأقسام المعرض وعنوان القسم -->
     <div id="backHomeContainer" style="display: none;">
         <button class="back-home-btn" onclick="showCategoriesHome()">⬅ العودة لأقسام المعرض</button>
         <h2 id="activeCategoryTitle" style="font-size: 16px; color: #880e4f; margin: 8px 0 0 0;"></h2>
     </div>
 
-    <!-- واجهة الأقسام الرئيسية (العرض الافتراضي) -->
     <div id="categoriesHomeView">
         <h2 style="font-size: 18px; color: #880e4f; margin-bottom: 15px; border-bottom: 2px solid #f8bbd0; padding-bottom: 8px;">✨ أقسام المعرض</h2>
         <div id="categoriesGridHome" class="categories-grid-home">جاري تحميل الأقسام...</div>
     </div>
 
-    <!-- شبكة المنتجات -->
     <div class="products-grid" id="productsGrid"></div>
 
     <div class="footer-link">
@@ -150,7 +136,7 @@
         جميع الحقوق محفوظة © معرض إيفا براند - نظام EVA PLUS 2026
     </footer>
 
-    <!-- نافذة الطلب -->
+    <!-- نافذة الطلب مع اختيار رمز الدولة لرقم الواتساب -->
     <div id="orderModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeOrderModal()">&times;</span>
@@ -162,8 +148,16 @@
                 <input type="text" id="clientName" placeholder="أدخل اسمك الكريم">
             </div>
             <div class="form-group">
-                <label>رقم الهاتف (للتواصل أو الواتساب):</label>
-                <input type="text" id="clientPhone" placeholder="0590000000">
+                <label>رقم الهاتف / الواتساب:</label>
+                <div class="phone-group">
+                    <select id="phonePrefix" style="width: 110px;">
+                        <option value="00970">00970 (فلسطين)</option>
+                        <option value="00972">00972 (داخل/إسرائيل)</option>
+                        <option value="00962">00962 (الأردن)</option>
+                        <option value="00971">00971 (الإمارات)</option>
+                    </select>
+                    <input type="text" id="clientPhone" placeholder="590000000" style="flex: 1;">
+                </div>
             </div>
             <div class="form-group">
                 <label>العنوان (المدينة / الحي):</label>
@@ -174,7 +168,6 @@
         </div>
     </div>
 
-    <!-- نافذة تكبير وتصفح الصور -->
     <div id="imageModal" class="image-modal">
         <span class="close-img-modal" onclick="closeImageModal()">&times;</span>
         <img id="modalFullImg" src="">
@@ -342,12 +335,15 @@
 
         window.submitOrder = async function() {
             let name = document.getElementById('clientName').value.trim();
-            let phone = document.getElementById('clientPhone').value.trim();
+            let prefix = document.getElementById('phonePrefix').value;
+            let rawPhone = document.getElementById('clientPhone').value.trim().replace(/^0+/, '');
             let address = document.getElementById('clientAddress').value.trim();
 
-            if (!name || !phone || !address) {
+            if (!name || !rawPhone || !address) {
                 return alert('الرجاء إدخال كافة البيانات المطلوبة (الاسم، الهاتف، العنوان).');
             }
+
+            let fullPhone = prefix + rawPhone;
 
             try {
                 let orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
@@ -357,14 +353,13 @@
                     reservedUntil: reserveDate
                 }, { merge: true });
 
-                // الفصل التام بين طلبات الشركاء (EVA PLUS) وطلبات الزبائن العاديين
                 if (partnerUser) {
                     await setDoc(doc(db, "orders", orderId), {
                         orderType: 'partner',
                         productCode: selectedProductForOrder.code,
                         productName: selectedProductForOrder.name,
                         clientName: name,
-                        clientPhone: phone,
+                        clientPhone: fullPhone,
                         clientAddress: address,
                         sponsor: partnerUser,
                         createdAt: new Date().toISOString()
@@ -380,12 +375,12 @@
                         productCode: selectedProductForOrder.code,
                         productName: selectedProductForOrder.name,
                         clientName: name,
-                        clientPhone: phone,
+                        clientPhone: fullPhone,
                         clientAddress: address,
                         createdAt: new Date().toISOString()
                     });
 
-                    let whatsappMsg = `مرحباً إيفا براند، أريد طلب المنتج رقم [${selectedProductForOrder.code}] - ${selectedProductForOrder.name}.\nالاسم: ${name}\nالهاتف: ${phone}\nالعنوان: ${address}`;
+                    let whatsappMsg = `مرحباً إيفا براند، أريد طلب المنتج رقم [${selectedProductForOrder.code}] - ${selectedProductForOrder.name}.\nالاسم: ${name}\nالهاتف: ${fullPhone}\nالعنوان: ${address}`;
                     let storeWhatsApp = "970597180456";
                     let waUrl = `https://wa.me/${storeWhatsApp}?text=${encodeURIComponent(whatsappMsg)}`;
 
