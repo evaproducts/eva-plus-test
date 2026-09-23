@@ -9,20 +9,17 @@
         .header-panel { background: #fff; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-bottom: 3px solid #d4af37; }
         .header-panel h1 { color: #880e4f; margin: 0 0 5px 0; font-size: 22px; }
         
-        /* شبكة البطاقات الرئيسية (تشبه الكتالوج) */
         .admin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; max-width: 1000px; margin: 0 auto; }
         .box { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); border: 1px solid #f8bbd0; display: flex; flex-direction: column; justify-content: space-between; }
         .box-full { grid-column: 1 / -1; }
         h2 { font-size: 16px; color: #880e4f; border-right: 4px solid #d4af37; padding-right: 10px; margin-top: 0; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
         
-        /* شارة الإشعار (Badge) للأقسام المعلقة */
         .badge-notification { background: #e74c3c; color: #fff; font-size: 12px; padding: 2px 8px; border-radius: 12px; font-weight: bold; animation: pulseBadge 1.5s infinite; }
         @keyframes pulseBadge { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
         label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #555; }
         input, select, textarea { width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: Arial, sans-serif; font-size: 13px; }
         
-        /* حقول القراءة مع أيقونة القلم للتعديل */
         .editable-field-wrapper { position: relative; margin-bottom: 12px; }
         .editable-field-wrapper input { margin-bottom: 0; background-color: #fcfcfc; padding-left: 35px; }
         .edit-pen-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 15px; color: #ad1457; user-select: none; }
@@ -54,7 +51,7 @@
 
 <div class="admin-grid">
 
-    <!-- قسم طلبات الزبائن -->
+    <!-- طلبات الزبائن -->
     <div class="box box-full">
         <h2>
             <span>🛍️ طلبات الزبائن (متجر الكتالوج المباشر)</span>
@@ -76,7 +73,7 @@
         </div>
     </div>
 
-    <!-- قسم طلبات أيفا بلس -->
+    <!-- طلبات أيفا بلس -->
     <div class="box box-full">
         <h2>
             <span>🌳 طلبات أيفا بلس (عبر روابط الشركاء والوسطاء)</span>
@@ -99,7 +96,7 @@
         </div>
     </div>
 
-    <!-- إدارة رسالة الإدارة البارزة -->
+    <!-- رسالة الإدارة البارزة -->
     <div class="box">
         <h2>📢 رسالة الإدارة البارزة</h2>
         <textarea id="adminNoticeInput" rows="3" placeholder="اكتب رسالة الإدارة لتظهر في أعلى الكتالوج..."></textarea>
@@ -141,13 +138,13 @@
         <button onclick="saveProduct()">حفظ المنتج الجديد</button>
     </div>
 
-    <!-- شاشة موحدة لتعديل المنتج (الاسم، السعر، الصورة) مع جلب تلقائي وأيقونة قلم -->
+    <!-- تعديل وتحديث منتج موجود -->
     <div class="box">
         <h2>✏️ تعديل وتحديث منتج موجود</h2>
         <label>أدخل كود المنتج:</label>
         <div style="display: flex; gap: 8px;">
             <input type="text" id="lookupProdCode" placeholder="مثال: A1" style="margin-bottom: 12px;">
-            <button onclick="fetchProductDataForEdit()" class="blue-btn" style="width: 110px; height: 42px;">بحث ورلبط</button>
+            <button onclick="fetchProductDataForEdit()" class="blue-btn" style="width: 110px; height: 42px;">بحث ورابط</button>
         </div>
 
         <label>اسم المنتج:</label>
@@ -306,7 +303,6 @@
                 }
             });
 
-            // تحديث شارات الإشعارات (Badges)
             if (normalOrders.length > 0) {
                 normalBadge.style.display = 'inline-block';
                 normalBadge.innerText = normalOrders.length;
@@ -321,7 +317,6 @@
                 partnerBadge.style.display = 'none';
             }
 
-            // جدول طلبات الزبائن
             if(normalOrders.length === 0) {
                 normalTable.innerHTML = `<tr><td colspan="2" style="color: #888;">لا توجد طلبات زبائن معلقة</td></tr>`;
             } else {
@@ -334,13 +329,12 @@
                         </td>
                         <td>
                             <button onclick="shareWhatsApp('${o.clientPhone}', '${o.productName}')" class="whatsapp-btn" style="padding: 6px; font-size: 11px; margin-bottom:4px;">تواصل واتساب</button>
-                            <button onclick="deleteOrder('${o.id}', '${o.productCode || ''}')" class="delete-btn" style="padding: 6px; font-size: 11px;">حذف / إتاحة</button>
+                            <button onclick="handleOrderAction('${o.id}', '${o.productCode || ''}', 'normal_delete')" class="delete-btn" style="padding: 6px; font-size: 11px;">حذف الطلب</button>
                         </td>
                     </tr>
                 `).join('');
             }
 
-            // جدول طلبات أيفا بلس
             if(partnerOrders.length === 0) {
                 partnerTable.innerHTML = `<tr><td colspan="3" style="color: #888;">لا توجد طلبات أيفا بلس معلقة</td></tr>`;
             } else {
@@ -353,8 +347,8 @@
                         </td>
                         <td><span style="color:#d4af37; font-weight:bold;">${o.sponsor || 'EVA-001'}</span></td>
                         <td>
-                            <button onclick='confirmPartnerOrder(${JSON.stringify(o)})' style="padding: 6px; font-size: 11px; margin-bottom: 4px;">تأكيد وتوزيع 🌸</button>
-                            <button onclick="deleteOrder('${o.id}', '${o.productCode || ''}')" class="delete-btn" style="padding: 6px; font-size: 11px;">إلغاء الطلب</button>
+                            <button onclick='confirmPartnerOrder(${JSON.stringify(o)})' style="padding: 6px; font-size: 11px; margin-bottom: 4px; background:#27ae60;">تأكيد وتوزيع 🌸</button>
+                            <button onclick="handleOrderAction('${o.id}', '${o.productCode || ''}', 'partner_reject')" class="delete-btn" style="padding: 6px; font-size: 11px;">رفض وإلغاء</button>
                         </td>
                     </tr>
                 `).join('');
@@ -365,9 +359,38 @@
         }
     }
 
+    // دالة عامة للتعامل مع تأكيد أو رفض الطلبات (مع إبقاء الحجز لمدة 10 دقائق)
+    window.handleOrderAction = async function(orderId, productCode, actionType) {
+        if(confirm(actionType === 'partner_reject' ? 'هل أنت متأكد من رفض الطلب؟' : 'هل أنت متأكد من حذف الطلب؟')) {
+            try {
+                if (productCode) {
+                    // إبقاء حجز المنتج لمدة 10 دقائق ليتأكد المعرض قبل إتاحته
+                    let tenMinutesLater = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+                    await setDoc(doc(db, "products", productCode), { reservedUntil: tenMinutesLater }, { merge: true });
+                }
+                await deleteDoc(doc(db, "orders", orderId));
+                alert('✅ تم تنفيذ الإجراء بنجاح. (يبقى المنتج محجوزاً لمدة 10 دقائق للتأكد من توفره بالمعرض).');
+                loadOrders();
+            } catch(err) { console.error(err); }
+        }
+    }
+
+    // تأكيد طلب أيفا بلس (توزيع أرباح، توليد حساب شريك، وفتح واتساب برقم الشريك الجديد)
     window.confirmPartnerOrder = async function(order) {
         try {
             let sellerId = order.sponsor && order.sponsor !== "الإدارة المركزية" && order.sponsor !== "EVA-ROOT" ? order.sponsor : "EVA-001";
+            let newPartnerId = "EVA-" + Math.floor(100 + Math.random() * 900);
+            let rawPass = Math.floor(1000 + Math.random() * 9000).toString();
+
+            // إنشاء حساب للشريك الجديد تلقائياً في قاعدة البيانات
+            await setDoc(doc(db, "partners", newPartnerId), {
+                name: order.clientName,
+                phone: order.clientPhone,
+                password: rawPass,
+                balance: 0,
+                uplineId: sellerId,
+                createdAt: new Date().toISOString()
+            });
 
             if (order.productCode) {
                 let prodRef = doc(db, "products", order.productCode);
@@ -429,27 +452,25 @@
                     }
                 }
 
-                await setDoc(doc(db, "products", order.productCode), { reservedUntil: null }, { merge: true });
+                // إبقاء المنتج محجوزاً لمدة 10 دقائق بعد التأكيد للتأكد النهائي
+                let tenMinutesLater = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+                await setDoc(doc(db, "products", order.productCode), { reservedUntil: tenMinutesLater }, { merge: true });
             }
+
+            await deleteDoc(doc(db, "orders", order.id));
+
+            // فتح واتساب مباشرة لرقم الشريك الجديد مع رسالة التهنئة والبيانات
+            let cleanPhone = (order.clientPhone || '').toString().trim().replace(/^00/, '').replace(/[^0-9]/g, '');
+            let welcomeMsg = `مرحباً بك ${order.clientName} 🌸\nمبروك انضمامك رسمياً لعائلة نظام "إيفا بلس"!\n\nبيانات حسابك الشريك:\n🆔 رقم الشريك: ${newPartnerId}\n🔑 كلمة المرور: ${rawPass}\n\nيمكنك البدء بمشاركة رابط متجرك وتحقيق الأرباح.`;
+            let waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(welcomeMsg)}`;
+            window.open(waUrl, '_blank');
+
+            alert('✅ تم تأكيد الطلب بنجاح، توزيع الأرباح، إنشاء حساب الشريك (' + newPartnerId + ')، وفتح الواتساب لمراسلة الشريك!');
+            loadOrders();
+
         } catch (err) {
             console.error("Error confirming partner order:", err);
-        }
-
-        await deleteDoc(doc(db, "orders", order.id));
-        alert('✅ تم تأكيد الطلب بنجاح وتوزيع "ربح الشركاء" على الشجرة!');
-        loadOrders();
-    }
-
-    window.deleteOrder = async function(orderId, productCode) {
-        if(confirm('هل أنت متأكد من حذف الطلب وإتاحة المنتج؟')) {
-            try {
-                if (productCode) {
-                    await setDoc(doc(db, "products", productCode), { reservedUntil: null }, { merge: true });
-                }
-                await deleteDoc(doc(db, "orders", orderId));
-                alert('✅ تم الحذف وإتاحة المنتج.');
-                loadOrders();
-            } catch(err) { console.error(err); }
+            alert('حدث خطأ أثناء معالجة الطلب.');
         }
     }
 
