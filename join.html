@@ -53,7 +53,6 @@
             position: relative;
             border: 1px solid #f8bbd0;
         }
-        /* صندوق تنبيه الداعي أو الحملة الإعلانية */
         .sponsor-alert-box {
             background: #e3f2fd;
             border: 1px solid #90caf9;
@@ -66,11 +65,10 @@
             text-align: center;
             display: none;
         }
-        /* صندوق الفيديو التوضيحي (يوتيوب) */
         .video-container {
             position: relative;
             width: 100%;
-            padding-bottom: 56.25%; /* نسبة أبعاد 16:9 */
+            padding-bottom: 56.25%;
             height: 0;
             background: #000;
             border-radius: 12px;
@@ -87,7 +85,6 @@
             height: 100%;
             border: none;
         }
-        /* الهوك المخصص لوسيطات شي ان والفرق الجذري */
         .shein-hook-box {
             background: linear-gradient(135deg, #fff3e0 100%, #ffe0b2 0%);
             border: 2px solid #ffb74d;
@@ -109,7 +106,6 @@
             color: #4e342e;
             font-weight: bold;
         }
-        /* صندوق الفكرة الجوهرية */
         .core-idea-box {
             background: linear-gradient(135deg, #f8bbd0 0%, #f48fb1 100%);
             color: #fff;
@@ -123,7 +119,6 @@
             margin-top: 0;
             font-size: 20px;
             color: #fff;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
         .core-idea-box p {
             font-size: 15px;
@@ -158,7 +153,6 @@
             margin-bottom: 12px;
             color: #444;
         }
-        /* صندوق تفاصيل العمولات والدفع (أرباحك ونقاط السحب) */
         .payout-box {
             background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
             border: 2px solid #81c784;
@@ -179,7 +173,6 @@
             margin-bottom: 0;
             font-weight: bold;
         }
-        /* صندوق تحفيزي يشرح فكرة نظام EVA PLUS والمثال العملي */
         .evaplus-power-box {
             background: linear-gradient(135deg, #fff9c4 0%, #fffde7 100%);
             border: 2px dashed #d4af37;
@@ -225,6 +218,20 @@
             border-radius: 8px;
             box-sizing: border-box;
             font-size: 14px;
+            background: #fff;
+        }
+        .phone-input-group {
+            display: flex;
+            gap: 8px;
+        }
+        .phone-input-group select {
+            flex: 0 0 130px;
+            background: #f9f9f9;
+            font-weight: bold;
+            color: #880e4f;
+        }
+        .phone-input-group input {
+            flex: 1;
         }
         .register-btn {
             background: #ad1457;
@@ -246,7 +253,6 @@
         .register-btn:hover {
             background: #880e4f;
         }
-        /* صندوق المساعدة والدعم المباشر */
         .support-box {
             background: #fce4ec;
             border: 1px solid #f8bbd0;
@@ -291,15 +297,12 @@
 
     <div class="container">
         
-        <!-- صندوق تنبيه الداعي أو الحملة الإعلانية -->
         <div id="sponsorAlert" class="sponsor-alert-box"></div>
 
-        <!-- فيديو الشرح التوضيحي (يوتيوب) -->
         <div class="video-container">
             <iframe src="https://www.youtube.com/embed/XlYoHwowL74" title="دليل الانضمام والعمل في نظام EVA PLUS" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
 
-        <!-- الهوك المخصص لوسيطات شي ان والفرق الجذري -->
         <div class="shein-hook-box">
             <h3>🛍️ هل تعبتِ من دوامة الطلبات، وجع رأس التوصيل، وتنافس أكواد الخصم؟</h3>
             <p>
@@ -308,7 +311,6 @@
             </p>
         </div>
 
-        <!-- الصندوق الجوهري: أنت لا تبيع منتجاً بل تبيع فكرة -->
         <div class="core-idea-box">
             <h3>💡 أنت لا تبيع منتجاً.. أنت تبيع فكرة!</h3>
             <p>
@@ -316,7 +318,6 @@
             </p>
         </div>
 
-        <!-- صندوق تفاصيل العمولات وطريقة الدفع -->
         <div class="payout-box">
             <h3>💵 كيف ومتى تحصل على أرباحك وعمولاتك؟</h3>
             <p>
@@ -329,7 +330,6 @@
             إذا كنت تبحث عن استقلال مالي حقيقي وأنت تدير عملك بكل راحة من منزلك وبدون أي رأس مال، فإن نظام <b>EVA PLUS</b> صُمم خصيصاً ليغير حياتك. نحن لا نمنحك فرصة بيع تقليدية، بل نبني معك إمبراطورية أرباح تراكمية لا تتوقف ليل نهار!
         </div>
 
-        <!-- صندوق تحفيزي يشرح فكرة نظام EVA PLUS والمثال العملي -->
         <div class="evaplus-power-box">
             <h3>💎 كيف تقلب موازين دخلك مع نظام EVA PLUS؟</h3>
             <p>
@@ -360,11 +360,18 @@
             </div>
             <div class="form-group">
                 <label>عنوان التوصيل المعتمد (المدينة / المنطقة في الضفة أو القدس أو الداخل):</label>
-                <input type="text" id="address" placeholder="مثال: رام الله - المنارة ">
+                <input type="text" id="address" placeholder="مثال: رام الله - المنارة">
             </div>
+            
             <div class="form-group">
                 <label>رقم الهاتف المعتمد (واتساب):</label>
-                <input type="tel" id="phone" placeholder="مثال: 00970590000000">
+                <div class="phone-input-group">
+                    <select id="phonePrefix">
+                        <option value="00970">00970 (فلسطين)</option>
+                        <option value="00972">00972 (إسرائيل/الداخل)</option>
+                    </select>
+                    <input type="tel" id="phoneNumber" placeholder="590000000">
+                </div>
             </div>
 
             <button type="button" onclick="submitAndGoToCatalog()" class="register-btn">
@@ -372,7 +379,6 @@
             </button>
         </div>
 
-        <!-- صندوق المساعدة والدعم -->
         <div class="support-box">
             ❓ <b>هل تحتاج إلى مساعدة أو استفسار؟</b><br>
             تواصل معنا مباشرة عبر الواتساب: <a href="https://wa.me/00970594101632" target="_blank">00970594101632</a> | 
@@ -388,10 +394,9 @@
         جميع الحقوق محفوظة © معرض إيفا براند - نظام EVA PLUS 2026
     </footer>
 
-    <!-- ربط مكتبات Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAqPpKqqHBEIJZTCGCROFzqZyHOYlnDgP4",
@@ -405,7 +410,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // قراءة رابط الإحالة تلقائياً
         const urlParams = new URLSearchParams(window.location.search);
         const refId = urlParams.get('ref') || 'EVA-ROOT (الإدارة المركزية)';
         const alertBox = document.getElementById('sponsorAlert');
@@ -421,48 +425,63 @@
         window.submitAndGoToCatalog = async function() {
             const name = document.getElementById('fullName').value.trim();
             const address = document.getElementById('address').value.trim();
-            const phone = document.getElementById('phone').value.trim();
+            const prefix = document.getElementById('phonePrefix').value;
+            const rawNumber = document.getElementById('phoneNumber').value.trim().replace(/^0/, ''); // إزالة الصفر البادئ إن وجد للمقارنة الموحدة
 
-            if(!name || !address || !phone) {
+            if(!name || !address || !rawNumber) {
                 alert('الرجاء تعبئة كافة الحقول (الاسم، العنوان، ورقم الهاتف) للانتقال للكتالوج.');
                 return;
             }
 
-            // التحقق من عدم تكرار رقم الهاتف في قاعدة البيانات (partners أو orders)
-            try {
-                const partnersQuery = query(collection(db, "partners"), where("phone", "==", phone));
-                const partnersSnap = await getDocs(partnersQuery);
-                
-                const ordersQuery = query(collection(db, "orders"), where("clientPhone", "==", phone));
-                const ordersSnap = await getDocs(ordersQuery);
+            // الرقم الكامل المخزن في النظام
+            const fullPhone = prefix + rawNumber;
 
-                if (!partnersSnap.empty || !ordersSnap.empty) {
+            try {
+                // جلب كافة الشركاء والطلبات لفحص الرقم الفعلي (بدون المقدمة) منعاً للتلاعب
+                const partnersSnap = await getDocs(collection(db, "partners"));
+                const ordersSnap = await getDocs(collection(db, "orders"));
+
+                let isDuplicate = false;
+
+                partnersSnap.forEach(docItem => {
+                    let pPhone = (docItem.data().phone || "").toString();
+                    // اقتطاع أي مقدمة للمقارنة بالرقم الفعلي فقط
+                    let cleanStoredPhone = pPhone.replace(/^00970/, '').replace(/^00972/, '').replace(/^0/, '');
+                    if (cleanStoredPhone === rawNumber) {
+                        isDuplicate = true;
+                    }
+                });
+
+                ordersSnap.forEach(docItem => {
+                    let oPhone = (docItem.data().clientPhone || "").toString();
+                    let cleanStoredPhone = oPhone.replace(/^00970/, '').replace(/^00972/, '').replace(/^0/, '');
+                    if (cleanStoredPhone === rawNumber) {
+                        isDuplicate = true;
+                    }
+                });
+
+                if (isDuplicate) {
                     alert('⚠️ عذراً يا رفيق، رقم الهاتف المدخل مسجل مسبقاً ولديك حساب مفعل أو طلب معلق في النظام. لا يمكنك التسجيل مرتين بنفس الرقم.');
-                    return; // إيقاف التنفيذ وعدم الانتقال للكتالوج نهائياً
+                    return;
                 }
             } catch (err) {
                 console.error("Error checking duplication in Firebase:", err);
             }
 
-            // توليد رقم تسلسلي مؤقت لطلب العضو الجديد
             const randomIdNum = Math.floor(1000 + Math.random() * 9000);
             const newPartnerId = `EVA-${randomIdNum}`;
 
-            // تخزين بيانات العضو والداعي
             const pendingPartnerData = {
                 partnerId: newPartnerId,
                 name: name,
                 address: address,
-                phone: phone,
+                phone: fullPhone,
                 sponsor: refId,
                 status: 'pending',
                 date: new Date().toISOString()
             };
 
-            // حفظ بيانات المستخدم الحالي في ذاكرة مؤقتة لكي يستخدمها الكتالوج
             localStorage.setItem('eva_current_user', JSON.stringify(pendingPartnerData));
-
-            // الانتقال الفوري لصفحة الكتالوج مع تمرير معلومات الداعي
             window.location.href = `catalog.html?ref=${refId}&user=${newPartnerId}`;
         }
     </script>
