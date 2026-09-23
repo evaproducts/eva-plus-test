@@ -12,6 +12,8 @@
         .btn:hover { background: #880e4f; }
         .blue-btn { background: #1976d2; }
         .blue-btn:hover { background: #115293; }
+        .whatsapp-btn { background: #25d366; }
+        .whatsapp-btn:hover { background: #20ba5a; }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; font-size: 13px; }
         .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; background: #f9f9f9; font-size: 13px; }
@@ -20,6 +22,7 @@
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { border: 1px solid #f8bbd0; padding: 10px; text-align: center; font-size: 13px; }
         th { background: #fff0f5; color: #880e4f; }
+        .link-text { display: block; text-align: center; margin-top: 15px; color: #880e4f; text-decoration: none; font-weight: bold; font-size: 14px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -71,23 +74,43 @@
         </div>
 
         <button class="btn blue-btn" onclick="copyInfo()">📋 نسخ روابطك ومعلوماتك</button>
-        <a href="catalog.html" style="display: block; text-align: center; margin-top: 15px; color: #880e4f; text-decoration: none; font-weight: bold;">⬅️ تصفح الكتالوج الرقمي</a>
+        <a href="catalog.html" class="link-text">⬅️ تصفح الكتالوج الرقمي</a>
     </div>
 
-    <!-- شاشة تسجيل الدخول إذا لم يكن الرابط يتضمن معرف الشريك -->
+    <!-- شاشة تسجيل الدخول -->
     <div class="container" id="loginContainer" style="max-width: 400px; text-align: center; display: none;">
         <h2 style="color: #880e4f;">🔐 تسجيل دخول الشريك</h2>
         <p style="font-size: 13px; color: #666; margin-bottom: 20px;">الرجاء إدخال رقم الشريك (اليوزر) وكلمة المرور الخاصة بك.</p>
-        <div class="form-group" style="text-align: right;">
-            <label>رقم الشريك (اليوزر):</label>
-            <input type="text" id="loginId" placeholder="مثلاً: EVA-102" style="background:#fff;">
+        
+        <div id="loginFormSection">
+            <div class="form-group" style="text-align: right;">
+                <label>رقم الشريك (اليوزر):</label>
+                <input type="text" id="loginId" placeholder="مثلاً: EVA-102" style="background:#fff;">
+            </div>
+            <div class="form-group" style="text-align: right;">
+                <label>كلمة المرور:</label>
+                <input type="password" id="loginPass" placeholder="كلمة المرور" style="background:#fff;">
+            </div>
+            <button class="btn" onclick="partnerLogin()">دخول للوحة التحكم</button>
+            <span class="link-text" onclick="showForgotPassword()">نسيت كلمة المرور؟</span>
         </div>
-        <div class="form-group" style="text-align: right;">
-            <label>كلمة المرور:</label>
-            <input type="password" id="loginPass" placeholder="كلمة المرور" style="background:#fff;">
+
+        <!-- قسم استعادة كلمة المرور عبر واتساب الدعم -->
+        <div id="forgotSection" style="display: none; text-align: right; margin-top: 15px; border-top: 1px dashed #f8bbd0; padding-top: 15px;">
+            <h4 style="color: #880e4f; margin-bottom: 10px; font-size: 14px;">🔑 استعادة كلمة المرور</h4>
+            <div class="form-group">
+                <label>الاسم الكامل للحساب:</label>
+                <input type="text" id="forgotName" placeholder="ادخل اسمك المسجل" style="background:#fff;">
+            </div>
+            <div class="form-group">
+                <label>رقم الهاتف المعتمد:</label>
+                <input type="text" id="forgotPhone" placeholder="0590000000" style="background:#fff;">
+            </div>
+            <button class="btn whatsapp-btn" onclick="sendForgotPasswordWhatsApp()">💬 إرسال طلب الاستعادة عبر واتساب</button>
+            <span class="link-text" onclick="backToLogin()" style="font-size: 13px; margin-top: 10px;">⬅️ العودة لتسجيل الدخول</span>
         </div>
-        <button class="btn" onclick="partnerLogin()">دخول للوحة التحكم</button>
-        <a href="catalog.html" style="display: block; text-align: center; margin-top: 15px; color: #880e4f; text-decoration: none; font-weight: bold;">⬅️ العودة للكتالوج</a>
+
+        <a href="catalog.html" class="link-text" style="margin-top: 25px;">⬅️ العودة للكتالوج</a>
     </div>
 
     <script type="module">
@@ -113,7 +136,6 @@
             if (partnerUser) {
                 loadPartnerData(partnerUser);
             } else {
-                // التحقق من وجود جلسة مخزنة محلياً
                 let savedUser = localStorage.getItem('eva_partner_user');
                 if (savedUser) {
                     loadPartnerData(savedUser);
@@ -144,7 +166,6 @@
                     document.getElementById('catalogLink').value = `${baseUrl}catalog.html?user=${p.partnerId}`;
                     document.getElementById('referralLink').value = `${baseUrl}join.html?ref=${p.partnerId}`;
 
-                    // تعبئة سجل الحركات والأرباح بالحقول الأربعة المطلوبة بدقة
                     let txBody = document.getElementById('transactionsBody');
                     let txs = p.transactions || [];
                     if (txs.length > 0) {
@@ -194,6 +215,31 @@
             } catch(e) {
                 alert('حدث خطأ في تسجيل الدخول.');
             }
+        };
+
+        window.showForgotPassword = function() {
+            document.getElementById('loginFormSection').style.display = 'none';
+            document.getElementById('forgotSection').style.display = 'block';
+        };
+
+        window.backToLogin = function() {
+            document.getElementById('forgotSection').style.display = 'none';
+            document.getElementById('loginFormSection').style.display = 'block';
+        };
+
+        window.sendForgotPasswordWhatsApp = function() {
+            let name = document.getElementById('forgotName').value.trim();
+            let phone = document.getElementById('forgotPhone').value.trim();
+
+            if (!name || !phone) {
+                return alert('الرجاء إدخال الاسم ورقم الهاتف.');
+            }
+
+            let supportPhone = "970594101632";
+            let msg = `مرحباً فريق الدعم في إيفا براند، نسيت كلمة المرور الخاص بحساب الشريك الخاص بي.\n\n- الاسم: ${name}\n- رقم الهاتف: ${phone}\n\nالرجاء تزويدي ببيانات الحساب.`;
+            let waUrl = `https://wa.me/${supportPhone}?text=${encodeURIComponent(msg)}`;
+
+            window.open(waUrl, '_blank');
         };
 
         window.copyInfo = function() {
