@@ -183,7 +183,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, getDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAqPpKqqHBEIJZTCGCROFzqZyHOYlnDgP4",
@@ -197,8 +197,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        let allProducts = [];
-        let loadedCategoriesData = [];
         let globalLogoUrl = "";
         let selectedProductForOrder = null;
         let urlParams = new URLSearchParams(window.location.search);
@@ -239,12 +237,10 @@
                 });
 
                 const catSnap = await getDocs(collection(db, "categories"));
-                loadedCategoriesData = [];
                 let gridHomeHtml = '';
 
                 catSnap.forEach(d => {
                     let catData = { id: d.id, ...d.data() };
-                    loadedCategoriesData.push(catData);
                     let catImg = globalLogoUrl || 'https://via.placeholder.com/70';
                     
                     gridHomeHtml += `
@@ -258,22 +254,35 @@
 
                 document.getElementById('categoriesGridHome').innerHTML = gridHomeHtml || '<p style="text-align:center; color:#888;">لا توجد أقسام مضافة حالياً.</p>';
 
-                const prodSnap = await getDocs(collection(db, "products"));
-                allProducts = [];
-                prodSnap.forEach(d => allProducts.push({ id: d.id, ...d.data() }));
-
             } catch (err) {
-                console.error("Error loading catalog:", err);
+                console.error("Error loading catalog categories:", err);
                 document.getElementById('categoriesGridHome').innerHTML = `<p style="text-align:center; color:red;">خطأ في تحميل الأقسام.</p>`;
             }
         });
 
-        window.selectCategory = function(catId, catName) {
+        // جلب المنتجات فوراً عند النقر على القسم (طريقة الكتالوج الأصلي السريعة)
+        window.selectCategory = async function(catId, catName) {
             document.getElementById('categoriesHomeView').style.display = 'none';
             document.getElementById('backHomeContainer').style.display = 'block';
             document.getElementById('activeCategoryTitle').innerText = `${catName} (${catId})`;
+            
+            let grid = document.getElementById('productsGrid');
+            grid.innerHTML = `<p style="text-align:center; color:#880e4f; grid-column:1/-1; padding:20px;">جاري تحميل منتجات القسم...</p>`;
 
-            renderProducts(allProducts.filter(p => p.category === catId));
+            try {
+                const prodRef = collection(db, "products");
+                const q = query(prodRef, where("category", "in", [catId, catName]));
+                const prodSnap = await getDocs(q);
+                
+                let catProducts = [];
+                prodSnap.forEach(d => catProducts.push({ id: d.id, ...d.data() }));
+
+                renderProducts(catProducts);
+            } catch (e) {
+                console.error("Error loading products for category:", e);
+                grid.innerHTML = `<p style="text-align:center; color:red; grid-column:1/-1; padding:20px;">حدث خطأ في تحميل المنتجات.</p>`;
+            }
+
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
