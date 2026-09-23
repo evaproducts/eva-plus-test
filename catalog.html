@@ -104,7 +104,7 @@
         <div id="logoContainer"><h1 style="color: #880e4f; margin:0;">معرض إيفا براند</h1></div>
         <p style="color: #ad1457; font-size: 13px; margin: 5px 0;">أرقى العطور، الحقائب، والساعات الفاخرة</p>
         
-        <!-- الأزرار الثلاثة (زر انضم لإيفا بلس يختفي تلقائياً للزوار القادمين عبر رابط شريك) -->
+        <!-- الأزرار الثلاثة -->
         <div class="social-promo-box">
             <a href="https://linky.ps/eva" target="_blank" class="social-promo-btn">✨ تابعونا</a>
             <a href="https://www.google.com/maps?q=32.1273809,35.1433041&z=17&hl=en" target="_blank" class="social-promo-btn">📍 موقعنا</a>
@@ -150,7 +150,7 @@
         جميع الحقوق محفوظة © معرض إيفا براند - نظام EVA PLUS 2026
     </footer>
 
-    <!-- نافذة الطلب (حجز 24 ساعة ونظام ايفا بلس) -->
+    <!-- نافذة الطلب -->
     <div id="orderModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeOrderModal()">&times;</span>
@@ -162,7 +162,7 @@
                 <input type="text" id="clientName" placeholder="أدخل اسمك الكريم">
             </div>
             <div class="form-group">
-                <label>رقم الهاتف (واتساب):</label>
+                <label>رقم الهاتف (للتواصل أو الواتساب):</label>
                 <input type="text" id="clientPhone" placeholder="0590000000">
             </div>
             <div class="form-group">
@@ -260,7 +260,6 @@
             }
         });
 
-        // جلب المنتجات فوراً عند النقر على القسم (طريقة الكتالوج الأصلي السريعة)
         window.selectCategory = async function(catId, catName) {
             document.getElementById('categoriesHomeView').style.display = 'none';
             document.getElementById('backHomeContainer').style.display = 'block';
@@ -358,6 +357,7 @@
                     reservedUntil: reserveDate
                 }, { merge: true });
 
+                // الفصل التام بين طلبات الشركاء (EVA PLUS) وطلبات الزبائن العاديين
                 if (partnerUser) {
                     await setDoc(doc(db, "orders", orderId), {
                         orderType: 'partner',
@@ -370,8 +370,8 @@
                         createdAt: new Date().toISOString()
                     });
 
-                    alert('✅ تم إرسال طلبك بنجاح! سيتم التنسيق معك لتوصيل طلبك قريباً.');
                     closeOrderModal();
+                    alert('✅ تم إرسال طلبك بنجاح! سيتم تنسيق التوصيل معك قريباً.');
                     location.reload();
 
                 } else {
