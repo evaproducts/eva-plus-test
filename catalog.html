@@ -42,11 +42,22 @@
         .category-card h3 { font-size: 14px; color: #880e4f; margin: 5px 0 2px 0; }
         .category-code-tag { font-size: 12px; color: #b8860b; font-weight: bold; }
 
-        /* زر العودة لأقسام المعرض */
-        .back-home-btn { background: #ad1457; color: white; border: none; padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        /* زر العودة العائم (Sticky) لأقسام المعرض */
+        #backHomeContainer {
+            position: sticky;
+            top: 10px;
+            z-index: 998;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            backdrop-filter: blur(5px);
+            margin-bottom: 15px;
+        }
+        .back-home-btn { background: #ad1457; color: white; border: none; padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
         .back-home-btn:hover { background: #880e4f; }
 
-        /* شبكة المنتجات المتجاورة */
+        /* شبكة المنتجات (متجاورة بشكل صحيح Grid) */
         .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; margin-top: 10px; }
         .product-card { background: #fff; border-radius: 12px; padding: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #f8bbd0; display: flex; flex-direction: column; justify-content: space-between; }
         .product-img-container { width: 100%; height: 180px; border-radius: 8px; overflow: hidden; background: #f9f9f9; position: relative; margin-bottom: 10px; cursor: pointer; }
@@ -116,16 +127,16 @@
 
     <div id="adminNoticeBar" class="notice-bar" style="display: none;"></div>
 
+    <!-- زر العودة العائم لأقسام المعرض وعنوان القسم -->
+    <div id="backHomeContainer" style="display: none;">
+        <button class="back-home-btn" onclick="showCategoriesHome()">⬅ العودة لأقسام المعرض</button>
+        <h2 id="activeCategoryTitle" style="font-size: 16px; color: #880e4f; margin: 8px 0 0 0;"></h2>
+    </div>
+
     <!-- واجهة الأقسام الرئيسية (العرض الافتراضي) -->
     <div id="categoriesHomeView">
         <h2 style="font-size: 18px; color: #880e4f; margin-bottom: 15px; border-bottom: 2px solid #f8bbd0; padding-bottom: 8px;">✨ أقسام المعرض</h2>
         <div id="categoriesGridHome" class="categories-grid-home">جاري تحميل الأقسام...</div>
-    </div>
-
-    <!-- زر العودة لأقسام المعرض وعنوان القسم -->
-    <div id="backHomeContainer" style="display: none;">
-        <button class="back-home-btn" onclick="showCategoriesHome()">⬅ العودة لأقسام المعرض</button>
-        <h2 id="activeCategoryTitle" style="font-size: 18px; color: #880e4f; margin-bottom: 15px; border-bottom: 2px solid #f8bbd0; padding-bottom: 8px;"></h2>
     </div>
 
     <!-- شبكة المنتجات -->
@@ -284,7 +295,6 @@
                 let firstImg = (p.images && p.images.length > 0) ? p.images[0] : '';
                 let isReserved = p.reservedUntil && new Date(p.reservedUntil) > new Date();
                 
-                // ترميز آمن لأسماء المنتجات لمنع أي خطأ بسبب الرموز أو الفواصل العليا مثل E1 (Homer's Legend)
                 let safeName = (p.name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
                 let jsonImages = JSON.stringify(p.images || []).replace(/"/g, '&quot;');
 
