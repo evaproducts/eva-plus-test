@@ -5,128 +5,188 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة التحكم الشاملة | إيفا بلس</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f0f2f5; padding: 15px; direction: rtl; margin: 0; }
-        .box { background: #fff; padding: 20px; border-radius: 12px; max-width: 650px; margin: 15px auto; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        h2 { font-size: 17px; color: #1c1e21; border-right: 4px solid #d4af37; padding-right: 10px; margin-bottom: 15px; }
-        label { display: block; font-size: 14px; font-weight: bold; margin-bottom: 5px; color: #555; }
-        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: Arial, sans-serif; font-size: 14px; }
-        input[readonly] { background-color: #f9f9f9; color: #880e4f; font-weight: bold; cursor: not-allowed; }
-        button { background: #27ae60; color: white; padding: 12px; border: none; border-radius: 8px; width: 100%; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #fdfbfb 0%, #fce4ec 100%); padding: 15px; direction: rtl; margin: 0; min-height: 100vh; }
+        .header-panel { background: #fff; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-bottom: 3px solid #d4af37; }
+        .header-panel h1 { color: #880e4f; margin: 0 0 5px 0; font-size: 22px; }
+        
+        /* شبكة البطاقات الرئيسية (تشبه الكتالوج) */
+        .admin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; max-width: 1000px; margin: 0 auto; }
+        .box { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); border: 1px solid #f8bbd0; display: flex; flex-direction: column; justify-content: space-between; }
+        .box-full { grid-column: 1 / -1; }
+        h2 { font-size: 16px; color: #880e4f; border-right: 4px solid #d4af37; padding-right: 10px; margin-top: 0; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* شارة الإشعار (Badge) للأقسام المعلقة */
+        .badge-notification { background: #e74c3c; color: #fff; font-size: 12px; padding: 2px 8px; border-radius: 12px; font-weight: bold; animation: pulseBadge 1.5s infinite; }
+        @keyframes pulseBadge { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+        label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #555; }
+        input, select, textarea { width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: Arial, sans-serif; font-size: 13px; }
+        
+        /* حقول القراءة مع أيقونة القلم للتعديل */
+        .editable-field-wrapper { position: relative; margin-bottom: 12px; }
+        .editable-field-wrapper input { margin-bottom: 0; background-color: #fcfcfc; padding-left: 35px; }
+        .edit-pen-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 15px; color: #ad1457; user-select: none; }
+        
+        button { background: #27ae60; color: white; padding: 10px; border: none; border-radius: 8px; width: 100%; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         button:hover { background: #219150; }
         .delete-btn { background: #e74c3c; margin-top: 5px; }
+        .delete-btn:hover { background: #c0392b; }
         .blue-btn { background: #2980b9; }
+        .blue-btn:hover { background: #2471a3; }
         .orange-btn { background: #e67e22; }
-        .purple-btn { background: #8e44ad; }
+        .orange-btn:hover { background: #d35400; }
         .whatsapp-btn { background: #25d366; margin-top: 5px; }
         .whatsapp-btn:hover { background: #20ba5a; }
-        .link-home { display: block; text-align: center; margin-top: 20px; color: #ad1457; text-decoration: none; font-weight: bold; font-size: 15px; }
-        hr { border: 0; border-top: 1px solid #eee; margin: 20px 0; }
-        .orders-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+        .link-home { display: inline-block; text-align: center; margin: 20px auto; background: #880e4f; color: #fff; padding: 10px 25px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 14px; box-shadow: 0 3px 10px rgba(136,14,79,0.2); }
+        hr { border: 0; border-top: 1px solid #eee; margin: 15px 0; }
+        .orders-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
         .orders-table th, .orders-table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
         .orders-table th { background-color: #f9f9f9; color: #333; }
     </style>
 </head>
 <body>
 
-<!-- قسم طلبات العاديين -->
-<div class="box">
-    <h2>🛍️ طلبات العاديين (متجر الكتالوج المباشر)</h2>
-    <p style="font-size: 13px; color: #666;">الطلبات الواردة من الزبائن الذين تصفحوا الكتالوج وطلبوا مباشرة بدون روابط شركاء.</p>
-    <table class="orders-table">
-        <thead>
-            <tr>
-                <th>تفاصيل الزبون والطلب</th>
-                <th>الإجراء</th>
-            </tr>
-        </thead>
-        <tbody id="normalOrdersTableBody">
-            <tr><td colspan="2">جاري التحميل...</td></tr>
-        </tbody>
-    </table>
+<div class="header-panel">
+    <h1>👑 لوحة التحكم الشاملة - إيفا بلس</h1>
+    <p style="color: #ad1457; font-size: 13px; margin: 5px 0 0 0;">إدارة المنتجات، الطلبات، والأقسام بكل احترافية</p>
+    <a href="catalog.html" class="link-home">⬅️ معاينة الكتالوج الرقمي</a>
 </div>
 
-<!-- قسم طلبات أيفا بلس -->
-<div class="box">
-    <h2>🌳 طلبات أيفا بلس (عبر روابط الشركاء والوسطاء)</h2>
-    <p style="font-size: 13px; color: #666;">الطلبات الواردة عبر روابط الشركاء لتوزيع "ربح الشركاء" على الشجرة فور التأكيد والتفعيل.</p>
-    <table class="orders-table">
-        <thead>
-            <tr>
-                <th>تفاصيل الزبون والطلب والعنوان</th>
-                <th>الشريك صاحب الرابط</th>
-                <th>الإجراء</th>
-            </tr>
-        </thead>
-        <tbody id="partnerOrdersTableBody">
-            <tr><td colspan="3">جاري التحميل...</td></tr>
-        </tbody>
-    </table>
+<div class="admin-grid">
+
+    <!-- قسم طلبات الزبائن -->
+    <div class="box box-full">
+        <h2>
+            <span>🛍️ طلبات الزبائن (متجر الكتالوج المباشر)</span>
+            <span id="normalOrdersBadge" style="display: none;" class="badge-notification">0</span>
+        </h2>
+        <p style="font-size: 12px; color: #666; margin-top:0;">الطلبات الواردة من الزبائن الذين تصفحوا الكتالوج وطلبوا مباشرة بدون روابط شركاء.</p>
+        <div style="overflow-x: auto;">
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>تفاصيل الزبون والطلب</th>
+                        <th>الإجراء</th>
+                    </tr>
+                </thead>
+                <tbody id="normalOrdersTableBody">
+                    <tr><td colspan="2">جاري التحميل...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- قسم طلبات أيفا بلس -->
+    <div class="box box-full">
+        <h2>
+            <span>🌳 طلبات أيفا بلس (عبر روابط الشركاء والوسطاء)</span>
+            <span id="partnerOrdersBadge" style="display: none;" class="badge-notification">0</span>
+        </h2>
+        <p style="font-size: 12px; color: #666; margin-top:0;">الطلبات الواردة عبر روابط الشركاء لتوزيع "ربح الشركاء" على الشجرة فور التأكيد والتفعيل.</p>
+        <div style="overflow-x: auto;">
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>تفاصيل الزبون والطلب والعنوان</th>
+                        <th>الشريك صاحب الرابط</th>
+                        <th>الإجراء</th>
+                    </tr>
+                </thead>
+                <tbody id="partnerOrdersTableBody">
+                    <tr><td colspan="3">جاري التحميل...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- إدارة رسالة الإدارة البارزة -->
+    <div class="box">
+        <h2>📢 رسالة الإدارة البارزة</h2>
+        <textarea id="adminNoticeInput" rows="3" placeholder="اكتب رسالة الإدارة لتظهر في أعلى الكتالوج..."></textarea>
+        <button onclick="saveAdminNotice()" class="blue-btn">حفظ رسالة الإدارة</button>
+    </div>
+
+    <!-- إدارة الأقسام -->
+    <div class="box">
+        <h2>📂 إدارة الأقسام</h2>
+        <label>إضافة قسم جديد:</label>
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+            <input type="text" id="autoCatId" readonly style="width: 70px; text-align: center; margin-bottom: 0;">
+            <input type="text" id="newCatName" placeholder="اسم القسم الجديد" style="margin-bottom: 0;">
+        </div>
+        <button onclick="addCategory()" class="blue-btn" style="margin-bottom: 15px;">إضافة القسم</button>
+        <hr>
+        <label>تعديل اسم قسم:</label>
+        <select id="catSelect" onchange="fillCategoryEditName()" style="margin-bottom: 8px;"></select>
+        <input type="text" id="editCatName" placeholder="اسم القسم المعدل">
+        <button onclick="updateCategory()" class="blue-btn">حفظ التعديل</button>
+        <button onclick="deleteCategory()" class="delete-btn">حذف القسم</button>
+    </div>
+
+    <!-- إضافة منتج جديد -->
+    <div class="box">
+        <h2>➕ إضافة منتج جديد</h2>
+        <label>القسم:</label>
+        <select id="pCategory" onchange="updateProductCodePreview()"></select>
+        <label>صور المنتج:</label>
+        <input type="file" id="pImages" accept="image/*" multiple>
+        <label>اسم المنتج:</label>
+        <input type="text" id="pName" placeholder="اسم المنتج">
+        <label>كود المنتج التلقائي:</label>
+        <input type="text" id="pCode" readonly placeholder="يُولّد تلقائياً">
+        <label>السعر (للكتالوج) ₪:</label>
+        <input type="number" id="pPrice" placeholder="مثال: 150">
+        <label>ربح الشركاء (للشجرة) ₪:</label>
+        <input type="number" id="pAgentPrice" placeholder="مثال: 20">
+        <button onclick="saveProduct()">حفظ المنتج الجديد</button>
+    </div>
+
+    <!-- شاشة موحدة لتعديل المنتج (الاسم، السعر، الصورة) مع جلب تلقائي وأيقونة قلم -->
+    <div class="box">
+        <h2>✏️ تعديل وتحديث منتج موجود</h2>
+        <label>أدخل كود المنتج:</label>
+        <div style="display: flex; gap: 8px;">
+            <input type="text" id="lookupProdCode" placeholder="مثال: A1" style="margin-bottom: 12px;">
+            <button onclick="fetchProductDataForEdit()" class="blue-btn" style="width: 110px; height: 42px;">بحث ورلبط</button>
+        </div>
+
+        <label>اسم المنتج:</label>
+        <div class="editable-field-wrapper">
+            <input type="text" id="editProdName" readonly placeholder="ابحث عن الكود أولاً...">
+            <span class="edit-pen-icon" onclick="enableField('editProdName')" title="تعديل الاسم">✏️</span>
+        </div>
+
+        <label>السعر (للكتالوج):</label>
+        <div class="editable-field-wrapper">
+            <input type="number" id="editProdPrice" readonly placeholder="السعر الحالي...">
+            <span class="edit-pen-icon" onclick="enableField('editProdPrice')" title="تعديل السعر">✏️</span>
+        </div>
+
+        <label>ربح الشركاء (للشجرة):</label>
+        <div class="editable-field-wrapper">
+            <input type="number" id="editProdAgentPrice" readonly placeholder="ربح الشركاء الحالي...">
+            <span class="edit-pen-icon" onclick="enableField('editProdAgentPrice')" title="تعديل ربح الشركاء">✏️</span>
+        </div>
+
+        <label>تحديث الصور (اختياري):</label>
+        <input type="file" id="editProdImages" accept="image/*" multiple>
+
+        <button onclick="saveUpdatedProductData()" class="orange-btn" style="margin-top: 5px;">حفظ التعديلات على المنتج</button>
+    </div>
+
+    <!-- حذف منتج -->
+    <div class="box">
+        <h2>🗑️ حذف منتج من الكتالوج</h2>
+        <label>كود المنتج المراد حذفه:</label>
+        <input type="text" id="delCode" placeholder="مثال: A1">
+        <button class="delete-btn" onclick="deleteProduct()" style="margin-top: 10px;">حذف المنتج نهائياً</button>
+    </div>
+
 </div>
 
-<div class="box">
-    <h2>🔍 استعلام سريع عن رصيد شريك</h2>
-    <input type="text" id="queryPartnerId" placeholder="أدخل رقم الشريك (مثلاً EVA-101)">
-    <button onclick="queryPartnerBalance()" class="blue-btn">استعلام عن الرصيد</button>
-    <div id="queryResultBox" style="margin-top: 10px; font-weight: bold; color: #880e4f; text-align: center;"></div>
+<div style="text-align: center; margin: 30px 0;">
+    <a href="catalog.html" class="link-home">⬅️ معاينة الكتالوج الرقمي</a>
 </div>
-
-<div class="box">
-    <h2>🖼️ تحديث لوغو الماركة</h2>
-    <input type="file" id="logoInput" accept="image/*">
-    <button onclick="updateLogo()" class="blue-btn">حفظ اللوغو</button>
-</div>
-
-<div class="box">
-    <h2>📢 إدارة رسالة الإدارة البارزة</h2>
-    <textarea id="adminNoticeInput" rows="2" placeholder="اكتب رسالة الإدارة لتظهر في أعلى الكتالوج..."></textarea>
-    <button onclick="saveAdminNotice()" class="blue-btn">حفظ رسالة الإدارة</button>
-</div>
-
-<div class="box">
-    <h2>📂 إدارة الأقسام</h2>
-    <input type="text" id="autoCatId" readonly>
-    <input type="text" id="newCatName" placeholder="اسم القسم الجديد">
-    <button onclick="addCategory()" class="blue-btn">إضافة القسم</button>
-    <hr>
-    <select id="catSelect" onchange="fillCategoryEditName()"></select>
-    <input type="text" id="editCatName" placeholder="تعديل الاسم">
-    <button onclick="updateCategory()" class="blue-btn">تعديل</button>
-    <button onclick="deleteCategory()" class="delete-btn">حذف القسم</button>
-</div>
-
-<div class="box">
-    <h2>➕ إضافة منتج جديد</h2>
-    <select id="pCategory" onchange="updateProductCodePreview()"></select>
-    <input type="file" id="pImages" accept="image/*" multiple>
-    <input type="text" id="pName" placeholder="اسم المنتج">
-    <input type="text" id="pCode" readonly placeholder="كود المنتج التلقائي">
-    <input type="number" id="pPrice" placeholder="سعر المنتج (للكتالوج)">
-    <input type="number" id="pAgentPrice" placeholder="ربح الشركاء (للشجرة)">
-    <button onclick="saveProduct()">حفظ المنتج</button>
-</div>
-
-<div class="box">
-    <h2>✏️ تحديث صور منتج موجود</h2>
-    <input type="text" id="updateProdCode" placeholder="أدخل كود المنتج (مثلاً A1)">
-    <input type="file" id="updateProdImages" accept="image/*" multiple>
-    <button onclick="updateProductImageByCode()" class="orange-btn">تحديث صور المنتج</button>
-</div>
-
-<div class="box">
-    <h2>🏷️ تحديث أسعار منتج</h2>
-    <input type="text" id="updatePriceCode" placeholder="أدخل كود المنتج (مثلاً A1)">
-    <input type="number" id="newPrice" placeholder="سعر المنتج الجديد">
-    <input type="number" id="newAgentPrice" placeholder="ربح الشركاء الجديد">
-    <button onclick="updateProductPricesByCode()" class="purple-btn">تحديث الأسعار</button>
-</div>
-
-<div class="box">
-    <h2>🗑️ حذف منتج</h2>
-    <input type="text" id="delCode" placeholder="كود المنتج (مثلاً A1)">
-    <button class="delete-btn" onclick="deleteProduct()">حذف المنتج</button>
-</div>
-
-<a href="catalog.html" class="link-home">⬅️ معاينة الكتالوج</a>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -185,6 +245,13 @@
         if (found) editInput.value = found.name;
     }
 
+    window.enableField = function(fieldId) {
+        let field = document.getElementById(fieldId);
+        field.removeAttribute('readonly');
+        field.style.backgroundColor = '#fff';
+        field.focus();
+    }
+
     async function initAdmin() {
         const catSnapshot = await getDocs(collection(db, "categories"));
         loadedCategoriesData = [];
@@ -222,6 +289,9 @@
     async function loadOrders() {
         let normalTable = document.getElementById('normalOrdersTableBody');
         let partnerTable = document.getElementById('partnerOrdersTableBody');
+        let normalBadge = document.getElementById('normalOrdersBadge');
+        let partnerBadge = document.getElementById('partnerOrdersBadge');
+
         try {
             const snap = await getDocs(collection(db, "orders"));
             let normalOrders = [];
@@ -236,9 +306,24 @@
                 }
             });
 
-            // جدول طلبات العاديين
+            // تحديث شارات الإشعارات (Badges)
+            if (normalOrders.length > 0) {
+                normalBadge.style.display = 'inline-block';
+                normalBadge.innerText = normalOrders.length;
+            } else {
+                normalBadge.style.display = 'none';
+            }
+
+            if (partnerOrders.length > 0) {
+                partnerBadge.style.display = 'inline-block';
+                partnerBadge.innerText = partnerOrders.length;
+            } else {
+                partnerBadge.style.display = 'none';
+            }
+
+            // جدول طلبات الزبائن
             if(normalOrders.length === 0) {
-                normalTable.innerHTML = `<tr><td colspan="2" style="color: #888;">لا توجد طلبات عادية معلقة</td></tr>`;
+                normalTable.innerHTML = `<tr><td colspan="2" style="color: #888;">لا توجد طلبات زبائن معلقة</td></tr>`;
             } else {
                 normalTable.innerHTML = normalOrders.map(o => `
                     <tr>
@@ -248,8 +333,8 @@
                             <b>العنوان:</b> <span style="color:#880e4f; font-weight:bold;">${o.clientAddress || 'غير محدد'}</span>
                         </td>
                         <td>
-                            <button onclick="shareWhatsApp('${o.clientPhone}', '${o.productName}')" class="whatsapp-btn" style="padding: 6px; font-size: 12px; margin-bottom:4px;">تواصل واتساب</button>
-                            <button onclick="deleteOrder('${o.id}', '${o.productCode || ''}')" class="delete-btn" style="padding: 6px; font-size: 12px;">حذف / إتاحة المنتج</button>
+                            <button onclick="shareWhatsApp('${o.clientPhone}', '${o.productName}')" class="whatsapp-btn" style="padding: 6px; font-size: 11px; margin-bottom:4px;">تواصل واتساب</button>
+                            <button onclick="deleteOrder('${o.id}', '${o.productCode || ''}')" class="delete-btn" style="padding: 6px; font-size: 11px;">حذف / إتاحة</button>
                         </td>
                     </tr>
                 `).join('');
@@ -268,8 +353,8 @@
                         </td>
                         <td><span style="color:#d4af37; font-weight:bold;">${o.sponsor || 'EVA-001'}</span></td>
                         <td>
-                            <button onclick='confirmPartnerOrder(${JSON.stringify(o)})' style="padding: 6px; font-size: 12px; margin-bottom: 4px;">تأكيد وتوزيع الربح 🌸</button>
-                            <button onclick="deleteOrder('${o.id}', '${o.productCode || ''}')" class="delete-btn" style="padding: 6px; font-size: 12px; margin-bottom: 4px;">إلغاء الطلب</button>
+                            <button onclick='confirmPartnerOrder(${JSON.stringify(o)})' style="padding: 6px; font-size: 11px; margin-bottom: 4px;">تأكيد وتوزيع 🌸</button>
+                            <button onclick="deleteOrder('${o.id}', '${o.productCode || ''}')" class="delete-btn" style="padding: 6px; font-size: 11px;">إلغاء الطلب</button>
                         </td>
                     </tr>
                 `).join('');
@@ -280,7 +365,6 @@
         }
     }
 
-    // دالة تأكيد وتفعيل طلب أيفا بلس وتوزيع "ربح الشركاء" تصاعدياً من الشريك صاحب الرابط حتى EVA-001
     window.confirmPartnerOrder = async function(order) {
         try {
             let sellerId = order.sponsor && order.sponsor !== "الإدارة المركزية" && order.sponsor !== "EVA-ROOT" ? order.sponsor : "EVA-001";
@@ -352,7 +436,7 @@
         }
 
         await deleteDoc(doc(db, "orders", order.id));
-        alert('✅ تم تأكيد الطلب بنجاح وتوزيع "ربح الشركاء" على الشجرة بدءاً من الشائع صاحب الرابط (' + (order.sponsor || 'EVA-001') + ') وصولاً إلى رأس الهرم!');
+        alert('✅ تم تأكيد الطلب بنجاح وتوزيع "ربح الشركاء" على الشجرة!');
         loadOrders();
     }
 
@@ -375,58 +459,48 @@
         window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    window.queryPartnerBalance = function() {
-        let partnerId = document.getElementById('queryPartnerId').value.trim().toUpperCase();
-        let resultBox = document.getElementById('queryResultBox');
-        if(!partnerId) return alert('الرجاء إدخال رقم الشريك');
-        getDoc(doc(db, "partners", partnerId)).then(docSnap => {
-            if(docSnap.exists()) {
-                resultBox.innerHTML = `💰 رصيد الشريك (${partnerId}) الحالي: ${docSnap.data().balance || 0} ₪`;
-            } else {
-                resultBox.innerHTML = `❌ لم يتم العثور على شريك بهذا الرقم.`;
-            }
-        });
-    }
-
     window.addCategory = async function() {
         let id = document.getElementById('autoCatId').value.trim();
         let name = document.getElementById('newCatName').value.trim();
-        if(!name) return;
+        if(!name) return alert('الرجاء إدخال اسم القسم');
         await setDoc(doc(db, "categories", id), { name });
+        alert('✅ تم إضافة القسم بنجاح');
         location.reload();
     }
 
     window.updateCategory = async function() {
         let id = document.getElementById('catSelect').value;
         let name = document.getElementById('editCatName').value.trim();
-        if(!name) return;
+        if(!name) return alert('الرجاء إدخال اسم القسم');
         await setDoc(doc(db, "categories", id), { name }, { merge: true });
+        alert('✅ تم تحديث القسم بنجاح');
         location.reload();
     }
 
     window.deleteCategory = async function() {
-        await deleteDoc(doc(db, "categories", document.getElementById('catSelect').value));
-        location.reload();
+        if(confirm('هل أنت متأكد من حذف هذا القسم؟')) {
+            await deleteDoc(doc(db, "categories", document.getElementById('catSelect').value));
+            alert('✅ تم حذف القسم');
+            location.reload();
+        }
     }
 
     window.saveAdminNotice = async function() {
         let text = document.getElementById('adminNoticeInput').value.trim();
         await setDoc(doc(db, "settings", "notice"), { text });
-        alert('تم الحفظ!');
-    }
-
-    window.updateLogo = function() {
-        const file = document.getElementById('logoInput').files[0];
-        if(!file) return;
-        compressImage(file, async function(data) {
-            await setDoc(doc(db, "settings", "logo"), { img: data });
-            alert('تم التحديث!');
-        });
+        alert('✅ تم حفظ رسالة الإدارة!');
     }
 
     window.saveProduct = function() {
         const filesInput = document.getElementById('pImages');
-        if(filesInput.files.length === 0) return alert('اختر صوراً للمنتج');
+        let name = document.getElementById('pName').value.trim();
+        let price = document.getElementById('pPrice').value.trim();
+        let agentPrice = document.getElementById('pAgentPrice').value.trim();
+
+        if(!name || !price || !agentPrice || filesInput.files.length === 0) {
+            return alert('الرجاء تعبئة كافة بيانات المنتج وإرفاق الصور المطلوبة.');
+        }
+
         let imagesArray = [], processed = 0;
         for (let i = 0; i < filesInput.files.length; i++) {
             compressImage(filesInput.files[i], async function(compressed) {
@@ -436,47 +510,73 @@
                     let code = document.getElementById('pCode').value.trim();
                     await setDoc(doc(db, "products", code), {
                         category: document.getElementById('pCategory').value,
-                        name: document.getElementById('pName').value.trim(),
+                        name: name,
                         code: code,
-                        price: document.getElementById('pPrice').value.trim(),
-                        agentPrice: document.getElementById('pAgentPrice').value.trim(),
+                        price: price,
+                        agentPrice: agentPrice,
                         images: imagesArray,
                         reservedUntil: null
                     });
-                    alert('تم حفظ المنتج!');
+                    alert('✅ تم حفظ المنتج بنجاح!');
                     location.reload();
                 }
             });
         }
     }
 
-    window.updateProductImageByCode = async function() {
-        let code = document.getElementById('updateProdCode').value.trim().toUpperCase();
-        const filesInput = document.getElementById('updateProdImages');
-        if(!code || filesInput.files.length === 0) return alert('أدخل الكود والصور');
-        compressImage(filesInput.files[0], async function(compressed) {
-            await setDoc(doc(db, "products", code), { images: [compressed] }, { merge: true });
-            alert('تم التحديث!');
-            location.reload();
-        });
+    window.fetchProductDataForEdit = async function() {
+        let code = document.getElementById('lookupProdCode').value.trim().toUpperCase();
+        if(!code) return alert('الرجاء إدخال كود المنتج أولاً');
+        
+        let docRef = doc(db, "products", code);
+        let docSnap = await getDoc(docRef);
+
+        if(docSnap.exists()) {
+            let data = docSnap.data();
+            document.getElementById('editProdName').value = data.name || '';
+            document.getElementById('editProdPrice').value = data.price || '';
+            document.getElementById('editProdAgentPrice').value = data.agentPrice || '';
+            alert('✅ تم العثور على المنتج وجلب بياناته بنجاح! انقر على أيقونة القلم بجانب الحقل الذي تريد تعديله.');
+        } else {
+            alert('❌ لم يتم العثور على منتج بهذا الكود.');
+        }
     }
 
-    window.updateProductPricesByCode = async function() {
-        let code = document.getElementById('updatePriceCode').value.trim().toUpperCase();
-        let newPrice = document.getElementById('newPrice').value.trim();
-        let newAgentPrice = document.getElementById('newAgentPrice').value.trim();
-        if(!code || !newPrice || !newAgentPrice) return alert('أدخل الحقول كاملة');
-        await setDoc(doc(db, "products", code), { price: newPrice, agentPrice: newAgentPrice }, { merge: true });
-        alert('تم التحديث!');
-        location.reload();
+    window.saveUpdatedProductData = async function() {
+        let code = document.getElementById('lookupProdCode').value.trim().toUpperCase();
+        let name = document.getElementById('editProdName').value.trim();
+        let price = document.getElementById('editProdPrice').value.trim();
+        let agentPrice = document.getElementById('editProdAgentPrice').value.trim();
+        const filesInput = document.getElementById('editProdImages');
+
+        if(!code || !name || !price || !agentPrice) {
+            return alert('الرجاء التأكد من جلب بيانات المنتج وتعبئة الحقول الأساسية.');
+        }
+
+        let updateData = { name: name, price: price, agentPrice: agentPrice };
+
+        if(filesInput.files.length > 0) {
+            compressImage(filesInput.files[0], async function(compressed) {
+                updateData.images = [compressed];
+                await setDoc(doc(db, "products", code), updateData, { merge: true });
+                alert('✅ تم تحديث بيانات وصور المنتج بنجاح!');
+                location.reload();
+            });
+        } else {
+            await setDoc(doc(db, "products", code), updateData, { merge: true });
+            alert('✅ تم تحديث بيانات المنتج بنجاح!');
+            location.reload();
+        }
     }
 
     window.deleteProduct = async function() {
         let code = document.getElementById('delCode').value.trim().toUpperCase();
-        if(!code) return alert('أدخل الكود');
-        await deleteDoc(doc(db, "products", code));
-        alert('تم الحذف!');
-        location.reload();
+        if(!code) return alert('الرجاء إدخال كود المنتج');
+        if(confirm(`هل أنت متأكد من حذف المنتج (${code}) نهائياً؟`)) {
+            await deleteDoc(doc(db, "products", code));
+            alert('✅ تم الحذف بنجاح!');
+            location.reload();
+        }
     }
 
     initAdmin();
