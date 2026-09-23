@@ -34,10 +34,20 @@
         .store-payment-badges { display: flex; justify-content: center; gap: 8px; margin: 10px 0; }
         .payment-pill { background: #fff; color: #880e4f; border: 1px solid #f8bbd0; padding: 4px 12px; border-radius: 15px; font-size: 12px; font-weight: bold; }
 
-        /* الأقسام بشريط متحرك أفقياً */
-        .categories-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 20px; }
+        /* شبكة الأقسام الرئيسية (التصميم الأساسي المطلوب) */
+        .categories-grid-home { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; margin-top: 15px; margin-bottom: 25px; }
+        .category-card { background: #fff; border: 1px solid #f8bbd0; border-radius: 12px; padding: 15px 10px; text-align: center; cursor: pointer; box-shadow: 0 3px 10px rgba(0,0,0,0.03); transition: transform 0.2s, box-shadow 0.2s; }
+        .category-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(216, 27, 96, 0.15); border-color: #ad1457; }
+        .category-img { width: 70px; height: 70px; object-fit: cover; border-radius: 50%; border: 2px solid #d4af37; margin-bottom: 8px; background-color: #fafafa; }
+        .category-card h3 { font-size: 14px; color: #880e4f; margin: 5px 0 2px 0; }
+        .category-code-tag { font-size: 12px; color: #b8860b; font-weight: bold; }
+
+        /* شريط الأقسام الأفقي عند تصفح المنتجات */
+        .categories-nav { display: none; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 20px; }
         .cat-btn { background: #fff; border: 1px solid #f8bbd0; color: #880e4f; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; white-space: nowrap; font-size: 13px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
         .cat-btn.active { background: #880e4f; color: #fff; border-color: #880e4f; }
+        
+        .back-home-btn { background: #880e4f; color: white; border: none; padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
         
         .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 15px; }
         .product-card { background: #fff; border-radius: 12px; padding: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #f8bbd0; display: flex; flex-direction: column; justify-content: space-between; }
@@ -85,11 +95,11 @@
         <div id="logoContainer"><h1 style="color: #880e4f; margin:0;">معرض إيفا براند</h1></div>
         <p style="color: #ad1457; font-size: 13px; margin: 5px 0;">أرقى العطور، الحقائب، والساعات الفاخرة</p>
         
-        <!-- الأزرار الثلاثة -->
+        <!-- الأزرار الثلاثة (زر انضم لإيفا بلس يختفي تلقائياً للزوار القادمين عبر رابط شريك) -->
         <div class="social-promo-box">
             <a href="https://linky.ps/eva" target="_blank" class="social-promo-btn">✨ تابعونا</a>
             <a href="https://www.google.com/maps?q=32.1273809,35.1433041&z=17&hl=en" target="_blank" class="social-promo-btn">📍 موقعنا</a>
-            <a href="join.html" class="social-promo-btn">💼 فريق المسوقين</a>
+            <a href="join.html" id="joinEvaPlusBtn" class="social-promo-btn">💼 انضم لإيفا بلس</a>
         </div>
 
         <!-- طرق الدفع -->
@@ -108,15 +118,24 @@
 
     <div id="adminNoticeBar" class="notice-bar" style="display: none;"></div>
 
-    <!-- شريط الأقسام الأفقي -->
+    <!-- واجهة الأقسام الرئيسية (العرض الافتراضي) -->
+    <div id="categoriesHomeView">
+        <h2 style="font-size: 18px; color: #880e4f; margin-bottom: 15px; border-bottom: 2px solid #f8bbd0; padding-bottom: 8px;">✨ أقسام المعرض</h2>
+        <div id="categoriesGridHome" class="categories-grid-home">جاري تحميل الأقسام...</div>
+    </div>
+
+    <!-- شريط الأقسام الأفقي (يظهر عند الدخول لقسم معين) -->
     <div class="categories-nav" id="categoriesNav">
         <button class="cat-btn active" onclick="filterCategory('ALL')">الكل</button>
     </div>
 
-    <!-- شبكة المنتجات -->
-    <div class="products-grid" id="productsGrid">
-        <p style="text-align:center; grid-column: 1/-1; color:#888;">جاري تحميل المنتجات...</p>
+    <!-- زر العودة للأقسام -->
+    <div id="backHomeContainer" style="display: none;">
+        <button class="back-home-btn" onclick="showCategoriesHome()">⬅ العودة لأقسام المعرض</button>
     </div>
+
+    <!-- شبكة المنتجات -->
+    <div class="products-grid" id="productsGrid"></div>
 
     <div class="footer-link">
         تصفح روابطنا الأخرى: <a href="https://linky.ps/eva" target="_blank">linky.ps/eva</a>
@@ -174,12 +193,19 @@
         const db = getFirestore(app);
 
         let allProducts = [];
-        let categoriesData = {};
+        let loadedCategoriesData = [];
         let selectedProductForOrder = null;
         let urlParams = new URLSearchParams(window.location.search);
         let partnerUser = urlParams.get('user'); // معرف الشريك إن وجد
+        let refParam = urlParams.get('ref');
 
         window.addEventListener('DOMContentLoaded', async () => {
+            // إخفاء زر "انضم لإيفا بلس" إذا دخل المستخدم عبر رابط شريك أو إحالة
+            if (partnerUser || refParam) {
+                let joinBtn = document.getElementById('joinEvaPlusBtn');
+                if (joinBtn) joinBtn.style.display = 'none';
+            }
+
             if (partnerUser) {
                 try {
                     let pDoc = await getDoc(doc(db, "partners", partnerUser));
@@ -206,25 +232,69 @@
                     }
                 });
 
+                // تحميل الأقسام وعرضها كبطاقات رئيسية
                 const catSnap = await getDocs(collection(db, "categories"));
+                loadedCategoriesData = [];
+                let gridHomeHtml = '';
                 let navHtml = `<button class="cat-btn active" onclick="filterCategory('ALL')">الكل</button>`;
+
                 catSnap.forEach(d => {
-                    categoriesData[d.id] = d.data().name;
-                    navHtml += `<button class="cat-btn" onclick="filterCategory('${d.id}')">${d.data().name}</button>`;
+                    let catData = { id: d.id, ...d.data() };
+                    loadedCategoriesData.push(catData);
+                    
+                    let catImg = catData.image || 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=300&auto=format&fit=crop&q=80';
+                    
+                    gridHomeHtml += `
+                        <div class="category-card" onclick="selectCategory('${catData.id}')">
+                            <img src="${catImg}" class="category-img" alt="${catData.name}">
+                            <h3>${catData.name}</h3>
+                            <span class="category-code-tag">(${catData.id})</span>
+                        </div>
+                    `;
+                    navHtml += `<button class="cat-btn" onclick="filterCategory('${catData.id}')">${catData.name}</button>`;
                 });
+
+                document.getElementById('categoriesGridHome').innerHTML = gridHomeHtml || '<p style="text-align:center; color:#888;">لا توجد أقسام مضافة حالياً.</p>';
                 document.getElementById('categoriesNav').innerHTML = navHtml;
 
                 const prodSnap = await getDocs(collection(db, "products"));
                 allProducts = [];
                 prodSnap.forEach(d => allProducts.push({ id: d.id, ...d.data() }));
 
-                renderProducts(allProducts);
-
             } catch (err) {
                 console.error("Error loading catalog:", err);
-                document.getElementById('productsGrid').innerHTML = `<p style="text-align:center; color:red; grid-column:1/-1;">خطأ في تحميل المنتجات.</p>`;
+                document.getElementById('categoriesGridHome').innerHTML = `<p style="text-align:center; color:red;">خطأ في تحميل الأقسام.</p>`;
             }
         });
+
+        // عند النقر على قسم في الصفحة الرئيسية
+        window.selectCategory = function(catId) {
+            document.getElementById('categoriesHomeView').style.display = 'none';
+            document.getElementById('categoriesNav').style.display = 'flex';
+            document.getElementById('backHomeContainer').style.display = 'block';
+
+            // تفعيل الزر المناسب في الشريط الأفقي
+            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+            // العثور على الزر المطابق للقسم
+            const buttons = document.querySelectorAll('.cat-btn');
+            buttons.forEach(btn => {
+                if(btn.getAttribute('onclick')?.includes(`'${catId}'`)) {
+                    btn.classList.add('active');
+                }
+            });
+
+            renderProducts(allProducts.filter(p => p.category === catId));
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        // العودة للرئيسية (عرض الأقسام)
+        window.showCategoriesHome = function() {
+            document.getElementById('categoriesNav').style.display = 'none';
+            document.getElementById('backHomeContainer').style.display = 'none';
+            document.getElementById('productsGrid').innerHTML = '';
+            document.getElementById('categoriesHomeView').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
 
         window.filterCategory = function(catId) {
             document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
@@ -239,7 +309,7 @@
         function renderProducts(products) {
             let grid = document.getElementById('productsGrid');
             if (products.length === 0) {
-                grid.innerHTML = `<p style="text-align:center; color:#888; grid-column:1/-1;">لا توجد منتجات متوفرة حالياً في هذا القسم.</p>`;
+                grid.innerHTML = `<p style="text-align:center; color:#888; grid-column: 1/-1; padding: 20px;">لا توجد منتجات متوفرة حالياً في هذا القسم.</p>`;
                 return;
             }
 
