@@ -9,6 +9,26 @@
     <meta name="theme-color" content="#880e4f">
     <style>
         body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #fdfbfb 0%, #fce4ec 100%); padding: 15px; direction: rtl; margin: 0; min-height: 100vh; padding-bottom: 70px; }
+        
+        /* تنسيقات شاشة تسجيل الدخول للإدارة */
+        #adminLoginSection {
+            max-width: 400px;
+            margin: 60px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(136,14,79,0.1);
+            border: 1px solid #f8bbd0;
+            text-align: center;
+        }
+        #adminLoginSection h2 {
+            color: #880e4f;
+            font-size: 20px;
+            border-right: none;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
         .header-panel { background: #fff; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-bottom: 3px solid #d4af37; }
         .header-panel h1 { color: #880e4f; margin: 0 0 5px 0; font-size: 22px; }
         
@@ -20,7 +40,7 @@
         .badge-notification { background: #e74c3c; color: #fff; font-size: 12px; padding: 2px 8px; border-radius: 12px; font-weight: bold; animation: pulseBadge 1.5s infinite; }
         @keyframes pulseBadge { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
-        label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #555; }
+        label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #555; text-align: right; }
         input, select, textarea { width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: Arial, sans-serif; font-size: 13px; }
         
         .editable-field-wrapper { position: relative; margin-bottom: 12px; }
@@ -88,147 +108,167 @@
         <button class="pwa-btn" id="installAppBtn">تثبيت الآن</button>
     </div>
 
-<div class="header-panel">
-    <h1>👑 لوحة التحكم الشاملة - إيفا بلس</h1>
-    <p style="color: #ad1457; font-size: 13px; margin: 5px 0 0 0;">إدارة المنتجات، الطلبات، والأقسام بكل احترافية</p>
-    <a href="catalog.html" class="link-home">⬅️ معاينة الكتالوج الرقمي</a>
-</div>
-
-<div class="admin-grid">
-
-    <!-- طلبات الزبائن -->
-    <div class="box box-full">
-        <h2>
-            <span>🛍️ طلبات الزبائن (متجر الكتالوج المباشر)</span>
-            <span id="normalOrdersBadge" style="display: none;" class="badge-notification">0</span>
-        </h2>
-        <p style="font-size: 12px; color: #666; margin-top:0;">الطلبات الواردة من الزبائن الذين تصفحوا الكتالوج وطلبوا مباشرة بدون روابط شركاء.</p>
-        <div style="overflow-x: auto;">
-            <table class="orders-table">
-                <thead>
-                    <tr>
-                        <th>تفاصيل الزبون والطلب</th>
-                        <th>الإجراء</th>
-                    </tr>
-                </thead>
-                <tbody id="normalOrdersTableBody">
-                    <tr><td colspan="2">جاري التحميل...</td></tr>
-                </tbody>
-            </table>
+    <!-- شاشة تسجيل الدخول للإدارة -->
+    <div id="adminLoginSection">
+        <h2>🔐 تسجيل دخول الإدارة</h2>
+        <p style="font-size: 12px; color: #666; margin-bottom: 20px;">الرجاء إدخال بيانات الاعتماد الخاصة بلوحة التحكم.</p>
+        <label>اسم المستخدم (اليوزر):</label>
+        <input type="text" id="adminLoginUser" placeholder="مثال: EVA-001">
+        <label>كلمة المرور:</label>
+        <input type="password" id="adminLoginPass" placeholder="كلمة المرور">
+        <button onclick="verifyAdminLogin()" style="background: #880e4f; margin-top: 10px;">تسجيل الدخول</button>
+        <div style="margin-top: 20px;">
+            <a href="catalog.html" class="link-home" style="margin: 0; padding: 8px 20px; font-size: 12px;">⬅️ العودة للكتالوج الرقمي</a>
         </div>
     </div>
 
-    <!-- طلبات أيفا بلس -->
-    <div class="box box-full">
-        <h2>
-            <span>🌳 طلبات أيفا بلس (عبر روابط الشركاء والوسطاء)</span>
-            <span id="partnerOrdersBadge" style="display: none;" class="badge-notification">0</span>
-        </h2>
-        <p style="font-size: 12px; color: #666; margin-top:0;">الطلبات الواردة عبر روابط الشركاء لتوزيع "ربح الشركاء" على الشجرة فور التأكيد والتفعيل.</p>
-        <div style="overflow-x: auto;">
-            <table class="orders-table">
-                <thead>
-                    <tr>
-                        <th>تفاصيل الزبون والطلب والعنوان</th>
-                        <th>الشريك صاحب الرابط</th>
-                        <th>الإجراء</th>
-                    </tr>
-                </thead>
-                <tbody id="partnerOrdersTableBody">
-                    <tr><td colspan="3">جاري التحميل...</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- رسالة الإدارة البارزة -->
-    <div class="box">
-        <h2>📢 رسالة الإدارة البارزة</h2>
-        <textarea id="adminNoticeInput" rows="3" placeholder="اكتب رسالة الإدارة لتظهر في أعلى الكتالوج..."></textarea>
-        <button onclick="saveAdminNotice()" class="blue-btn">حفظ رسالة الإدارة</button>
-    </div>
-
-    <!-- إدارة الأقسام -->
-    <div class="box">
-        <h2>📂 إدارة الأقسام</h2>
-        <label>إضافة قسم جديد:</label>
-        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-            <input type="text" id="autoCatId" readonly style="width: 70px; text-align: center; margin-bottom: 0;">
-            <input type="text" id="newCatName" placeholder="اسم القسم الجديد" style="margin-bottom: 0;">
-        </div>
-        <button onclick="addCategory()" class="blue-btn" style="margin-bottom: 15px;">إضافة القسم</button>
-        <hr>
-        <label>تعديل اسم قسم:</label>
-        <select id="catSelect" onchange="fillCategoryEditName()" style="margin-bottom: 8px;"></select>
-        <input type="text" id="editCatName" placeholder="اسم القسم المعدل">
-        <button onclick="updateCategory()" class="blue-btn">حفظ التعديل</button>
-        <button onclick="deleteCategory()" class="delete-btn">حذف القسم</button>
-    </div>
-
-    <!-- إضافة منتج جديد -->
-    <div class="box">
-        <h2>➕ إضافة منتج جديد</h2>
-        <label>القسم:</label>
-        <select id="pCategory" onchange="updateProductCodePreview()"></select>
-        <label>صور المنتج:</label>
-        <input type="file" id="pImages" accept="image/*" multiple>
-        <label>اسم المنتج:</label>
-        <input type="text" id="pName" placeholder="اسم المنتج">
-        <label>كود المنتج التلقائي:</label>
-        <input type="text" id="pCode" readonly placeholder="يُولّد تلقائياً">
-        <label>السعر (للكتالوج) ₪:</label>
-        <input type="number" id="pPrice" placeholder="مثال: 150">
-        <label>ربح الشركاء (للشجرة) ₪:</label>
-        <input type="number" id="pAgentPrice" placeholder="مثال: 20">
-        <button onclick="saveProduct()">حفظ المنتج الجديد</button>
-    </div>
-
-    <!-- تعديل وتحديث منتج موجود -->
-    <div class="box">
-        <h2>✏️ تعديل وتحديث منتج موجود</h2>
-        <label>أدخل كود المنتج:</label>
-        <div style="display: flex; gap: 8px;">
-            <input type="text" id="lookupProdCode" placeholder="مثال: A1" style="margin-bottom: 12px;">
-            <button onclick="fetchProductDataForEdit()" class="blue-btn" style="width: 110px; height: 42px;">بحث ورابط</button>
+    <!-- المحتوى الرئيسي للوحة التحكم (مخفي لحين تسجيل الدخول) -->
+    <div id="adminMainContent" style="display: none;">
+        <div class="header-panel">
+            <h1>👑 لوحة التحكم الشاملة - إيفا بلس</h1>
+            <p style="color: #ad1457; font-size: 13px; margin: 5px 0 0 0;">إدارة المنتجات، الطلبات، والأقسام بكل احترافية</p>
+            <div style="display: flex; justify-content: center; gap: 10px; margin-top: 15px;">
+                <a href="catalog.html" class="link-home" style="margin:0;">⬅️ معاينة الكتالوج الرقمي</a>
+                <button onclick="adminLogout()" style="background: #e74c3c; width: auto; padding: 8px 20px; font-size: 13px; border-radius: 20px;">تسجيل خروج 🔒</button>
+            </div>
         </div>
 
-        <label>اسم المنتج:</label>
-        <div class="editable-field-wrapper">
-            <input type="text" id="editProdName" readonly placeholder="ابحث عن الكود أولاً...">
-            <span class="edit-pen-icon" onclick="enableField('editProdName')" title="تعديل الاسم">✏️</span>
+        <div class="admin-grid">
+
+            <!-- طلبات الزبائن -->
+            <div class="box box-full">
+                <h2>
+                    <span>🛍️ طلبات الزبائن (متجر الكتالوج المباشر)</span>
+                    <span id="normalOrdersBadge" style="display: none;" class="badge-notification">0</span>
+                </h2>
+                <p style="font-size: 12px; color: #666; margin-top:0;">الطلبات الواردة من الزبائن الذين تصفحوا الكتالوج وطلبوا مباشرة بدون روابط شركاء.</p>
+                <div style="overflow-x: auto;">
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>تفاصيل الزبون والطلب</th>
+                                <th>الإجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="normalOrdersTableBody">
+                            <tr><td colspan="2">جاري التحميل...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- طلبات أيفا بلس -->
+            <div class="box box-full">
+                <h2>
+                    <span>🌳 طلبات أيفا بلس (عبر روابط الشركاء والوسطاء)</span>
+                    <span id="partnerOrdersBadge" style="display: none;" class="badge-notification">0</span>
+                </h2>
+                <p style="font-size: 12px; color: #666; margin-top:0;">الطلبات الواردة عبر روابط الشركاء لتوزيع "ربح الشركاء" على الشجرة فور التأكيد والتفعيل.</p>
+                <div style="overflow-x: auto;">
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>تفاصيل الزبون والطلب والعنوان</th>
+                                <th>الشريك صاحب الرابط</th>
+                                <th>الإجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="partnerOrdersTableBody">
+                            <tr><td colspan="3">جاري التحميل...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- رسالة الإدارة البارزة -->
+            <div class="box">
+                <h2>📢 رسالة الإدارة البارزة</h2>
+                <textarea id="adminNoticeInput" rows="3" placeholder="اكتب رسالة الإدارة لتظهر في أعلى الكتالوج..."></textarea>
+                <button onclick="saveAdminNotice()" class="blue-btn">حفظ رسالة الإدارة</button>
+            </div>
+
+            <!-- إدارة الأقسام -->
+            <div class="box">
+                <h2>📂 إدارة الأقسام</h2>
+                <label>إضافة قسم جديد:</label>
+                <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                    <input type="text" id="autoCatId" readonly style="width: 70px; text-align: center; margin-bottom: 0;">
+                    <input type="text" id="newCatName" placeholder="اسم القسم الجديد" style="margin-bottom: 0;">
+                </div>
+                <button onclick="addCategory()" class="blue-btn" style="margin-bottom: 15px;">إضافة القسم</button>
+                <hr>
+                <label>تعديل اسم قسم:</label>
+                <select id="catSelect" onchange="fillCategoryEditName()" style="margin-bottom: 8px;"></select>
+                <input type="text" id="editCatName" placeholder="اسم القسم المعدل">
+                <button onclick="updateCategory()" class="blue-btn">حفظ التعديل</button>
+                <button onclick="deleteCategory()" class="delete-btn">حذف القسم</button>
+            </div>
+
+            <!-- إضافة منتج جديد -->
+            <div class="box">
+                <h2>➕ إضافة منتج جديد</h2>
+                <label>القسم:</label>
+                <select id="pCategory" onchange="updateProductCodePreview()"></select>
+                <label>صور المنتج:</label>
+                <input type="file" id="pImages" accept="image/*" multiple>
+                <label>اسم المنتج:</label>
+                <input type="text" id="pName" placeholder="اسم المنتج">
+                <label>كود المنتج التلقائي:</label>
+                <input type="text" id="pCode" readonly placeholder="يُولّد تلقائياً">
+                <label>السعر (للكتالوج) ₪:</label>
+                <input type="number" id="pPrice" placeholder="مثال: 150">
+                <label>ربح الشركاء (للشجرة) ₪:</label>
+                <input type="number" id="pAgentPrice" placeholder="مثال: 20">
+                <button onclick="saveProduct()">حفظ المنتج الجديد</button>
+            </div>
+
+            <!-- تعديل وتحديث منتج موجود -->
+            <div class="box">
+                <h2>✏️ تعديل وتحديث منتج موجود</h2>
+                <label>أدخل كود المنتج:</label>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="lookupProdCode" placeholder="مثال: A1" style="margin-bottom: 12px;">
+                    <button onclick="fetchProductDataForEdit()" class="blue-btn" style="width: 110px; height: 42px;">بحث ورابط</button>
+                </div>
+
+                <label>اسم المنتج:</label>
+                <div class="editable-field-wrapper">
+                    <input type="text" id="editProdName" readonly placeholder="ابحث عن الكود أولاً...">
+                    <span class="edit-pen-icon" onclick="enableField('editProdName')" title="تعديل الاسم">✏️</span>
+                </div>
+
+                <label>السعر (للكتالوج):</label>
+                <div class="editable-field-wrapper">
+                    <input type="number" id="editProdPrice" readonly placeholder="السعر الحالي...">
+                    <span class="edit-pen-icon" onclick="enableField('editProdPrice')" title="تعديل السعر">✏️</span>
+                </div>
+
+                <label>ربح الشركاء (للشجرة):</label>
+                <div class="editable-field-wrapper">
+                    <input type="number" id="editProdAgentPrice" readonly placeholder="ربح الشركاء الحالي...">
+                    <span class="edit-pen-icon" onclick="enableField('editProdAgentPrice')" title="تعديل ربح الشركاء">✏️</span>
+                </div>
+
+                <label>تحديث الصور (اختياري):</label>
+                <input type="file" id="editProdImages" accept="image/*" multiple>
+
+                <button onclick="saveUpdatedProductData()" class="orange-btn" style="margin-top: 5px;">حفظ التعديلات على المنتج</button>
+            </div>
+
+            <!-- حذف منتج -->
+            <div class="box">
+                <h2>🗑️ حذف منتج من الكتالوج</h2>
+                <label>كود المنتج المراد حذفه:</label>
+                <input type="text" id="delCode" placeholder="مثال: A1">
+                <button class="delete-btn" onclick="deleteProduct()" style="margin-top: 10px;">حذف المنتج نهائياً</button>
+            </div>
+
         </div>
 
-        <label>السعر (للكتالوج):</label>
-        <div class="editable-field-wrapper">
-            <input type="number" id="editProdPrice" readonly placeholder="السعر الحالي...">
-            <span class="edit-pen-icon" onclick="enableField('editProdPrice')" title="تعديل السعر">✏️</span>
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="catalog.html" class="link-home">⬅️ معاينة الكتالوج الرقمي</a>
         </div>
-
-        <label>ربح الشركاء (للشجرة):</label>
-        <div class="editable-field-wrapper">
-            <input type="number" id="editProdAgentPrice" readonly placeholder="ربح الشركاء الحالي...">
-            <span class="edit-pen-icon" onclick="enableField('editProdAgentPrice')" title="تعديل ربح الشركاء">✏️</span>
-        </div>
-
-        <label>تحديث الصور (اختياري):</label>
-        <input type="file" id="editProdImages" accept="image/*" multiple>
-
-        <button onclick="saveUpdatedProductData()" class="orange-btn" style="margin-top: 5px;">حفظ التعديلات على المنتج</button>
     </div>
-
-    <!-- حذف منتج -->
-    <div class="box">
-        <h2>🗑️ حذف منتج من الكتالوج</h2>
-        <label>كود المنتج المراد حذفه:</label>
-        <input type="text" id="delCode" placeholder="مثال: A1">
-        <button class="delete-btn" onclick="deleteProduct()" style="margin-top: 10px;">حذف المنتج نهائياً</button>
-    </div>
-
-</div>
-
-<div style="text-align: center; margin: 30px 0;">
-    <a href="catalog.html" class="link-home">⬅️ معاينة الكتالوج الرقمي</a>
-</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -248,6 +288,38 @@
 
     let allProducts = [];
     let loadedCategoriesData = [];
+
+    // التحقق من حالة تسجيل الدخول مسبقاً في الـ localStorage
+    window.addEventListener('DOMContentLoaded', () => {
+        let isLogged = localStorage.getItem('eva_admin_logged');
+        if (isLogged === 'true') {
+            document.getElementById('adminLoginSection').style.display = 'none';
+            document.getElementById('adminMainContent').style.display = 'block';
+            initAdmin();
+        }
+    });
+
+    window.verifyAdminLogin = function() {
+        let uInput = document.getElementById('adminLoginUser').value.trim();
+        let pInput = document.getElementById('adminLoginPass').value.trim();
+
+        if (uInput === 'EVA-001' && pInput === '0597180456') {
+            localStorage.setItem('eva_admin_logged', 'true');
+            document.getElementById('adminLoginSection').style.display = 'none';
+            document.getElementById('adminMainContent').style.display = 'block';
+            initAdmin();
+        } else {
+            alert('❌ اسم المستخدم أو كلمة المرور غير صحيحة.');
+        }
+    };
+
+    window.adminLogout = function() {
+        localStorage.removeItem('eva_admin_logged');
+        document.getElementById('adminMainContent').style.display = 'none';
+        document.getElementById('adminLoginSection').style.display = 'block';
+        document.getElementById('adminLoginUser').value = '';
+        document.getElementById('adminLoginPass').value = '';
+    };
 
     // كود تفاعل شريط تثبيت التطبيق (PWA) للوحة الإدارة
     let deferredPrompt;
@@ -712,8 +784,6 @@
             location.reload();
         }
     }
-
-    initAdmin();
 </script>
 </body>
 </html>
