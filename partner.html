@@ -147,15 +147,18 @@
 
         async function loadPartnerData(userId) {
             try {
-                let docRef = doc(db, "partners", userId.toUpperCase().trim());
+                let cleanId = userId.toUpperCase().trim();
+                let docRef = doc(db, "partners", cleanId);
                 let docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {
                     let p = docSnap.data();
+                    let activePartnerId = p.partnerId || cleanId; // معالجة منع ظهور undefined
+
                     document.getElementById('loginContainer').style.display = 'none';
                     document.getElementById('mainContainer').style.display = 'block';
 
-                    document.getElementById('partnerIdBadge').innerText = p.partnerId;
+                    document.getElementById('partnerIdBadge').innerText = activePartnerId;
                     document.getElementById('pName').innerText = p.name || 'بدون اسم';
                     document.getElementById('pPhone').innerText = p.phone || 'غير مسجل';
                     document.getElementById('pAddress').innerText = p.address || 'غير محدد';
@@ -163,8 +166,8 @@
                     document.getElementById('pBalance').innerText = (p.balance || 0) + " ₪";
 
                     let baseUrl = window.location.origin + window.location.pathname.replace('partner.html', '');
-                    document.getElementById('catalogLink').value = `${baseUrl}catalog.html?user=${p.partnerId}`;
-                    document.getElementById('referralLink').value = `${baseUrl}join.html?ref=${p.partnerId}`;
+                    document.getElementById('catalogLink').value = `${baseUrl}catalog.html?user=${activePartnerId}`;
+                    document.getElementById('referralLink').value = `${baseUrl}join.html?ref=${activePartnerId}`;
 
                     let txBody = document.getElementById('transactionsBody');
                     let txs = p.transactions || [];
@@ -181,7 +184,7 @@
                         txBody.innerHTML = `<tr><td colspan="4" style="color: #888; text-align: center;">لا توجد حركات أرباح مسجلة حتى الآن.</td></tr>`;
                     }
 
-                    localStorage.setItem('eva_partner_user', p.partnerId);
+                    localStorage.setItem('eva_partner_user', activePartnerId);
 
                 } else {
                     alert('رقم الشريك غير صحيح.');
