@@ -136,7 +136,7 @@
         جميع الحقوق محفوظة © معرض إيفا براند - نظام EVA PLUS 2026
     </footer>
 
-    <!-- نافذة الطلب مع اختيار رمز الدولة لرقم الواتساب -->
+    <!-- نافذة الطلب مع اختيار رمز الدولة (فلسطين وإسرائيل فقط) -->
     <div id="orderModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeOrderModal()">&times;</span>
@@ -150,11 +150,9 @@
             <div class="form-group">
                 <label>رقم الهاتف / الواتساب:</label>
                 <div class="phone-group">
-                    <select id="phonePrefix" style="width: 110px;">
+                    <select id="phonePrefix" style="width: 140px;">
                         <option value="00970">00970 (فلسطين)</option>
-                        <option value="00972">00972 (داخل/إسرائيل)</option>
-                        <option value="00962">00962 (الأردن)</option>
-                        <option value="00971">00971 (الإمارات)</option>
+                        <option value="00972">00972 (إسرائيل)</option>
                     </select>
                     <input type="text" id="clientPhone" placeholder="590000000" style="flex: 1;">
                 </div>
