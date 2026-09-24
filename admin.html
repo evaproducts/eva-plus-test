@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة التحكم الشاملة | إيفا بلس</title>
+    <!-- ربط ملف الـ Manifest المخصص لوحة التحكم (PWA) -->
+    <link rel="manifest" href="manifest-admin.json">
+    <meta name="theme-color" content="#880e4f">
     <style>
-        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #fdfbfb 0%, #fce4ec 100%); padding: 15px; direction: rtl; margin: 0; min-height: 100vh; }
+        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #fdfbfb 0%, #fce4ec 100%); padding: 15px; direction: rtl; margin: 0; min-height: 100vh; padding-bottom: 70px; }
         .header-panel { background: #fff; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-bottom: 3px solid #d4af37; }
         .header-panel h1 { color: #880e4f; margin: 0 0 5px 0; font-size: 22px; }
         
@@ -39,9 +42,51 @@
         .orders-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
         .orders-table th, .orders-table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
         .orders-table th { background-color: #f9f9f9; color: #333; }
+
+        /* شريط تثبيت لوحة التحكم السفلي (PWA Banner) */
+        #pwaInstallBanner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(135deg, #880e4f, #ad1457);
+            color: white;
+            padding: 12px 15px;
+            box-sizing: border-box;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 2px solid #d4af37;
+        }
+        .pwa-btn {
+            background: #d4af37;
+            color: #333;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            width: auto;
+        }
     </style>
 </head>
 <body>
+
+    <!-- شريط تثبيت لوحة التحكم السفلي (PWA Install Banner) -->
+    <div id="pwaInstallBanner">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 24px;">👑</span>
+            <div>
+                <div style="font-weight: bold; font-size: 13px;">لوحة التحكم - إيفا بلس</div>
+                <div style="font-size: 11px; opacity: 0.9;">ثبّت لوحة الإدارة على شاشتك الرئيسية للوصول السريع!</div>
+            </div>
+        </div>
+        <button class="pwa-btn" id="installAppBtn">تثبيت الآن</button>
+    </div>
 
 <div class="header-panel">
     <h1>👑 لوحة التحكم الشاملة - إيفا بلس</h1>
@@ -203,6 +248,37 @@
 
     let allProducts = [];
     let loadedCategoriesData = [];
+
+    // كود تفاعل شريط تثبيت التطبيق (PWA) للوحة الإدارة
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        if (!window.matchMedia('(display-mode: standalone)').matches) {
+            document.getElementById('pwaInstallBanner').style.display = 'flex';
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        let installBtn = document.getElementById('installAppBtn');
+        if (installBtn) {
+            installBtn.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    let { outcome } = await deferredPrompt.userChoice;
+                    deferredPrompt = null;
+                    document.getElementById('pwaInstallBanner').style.display = 'none';
+                }
+            });
+        }
+    });
+
+    // تسجيل خدمة الـ Service Worker لتفعيل PWA بالكامل
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed: ', err));
+        });
+    }
 
     function compressImage(file, callback) {
         const reader = new FileReader();
