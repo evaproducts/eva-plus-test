@@ -3,161 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة شجرة شركاء EVA PLUS</title>
+    <title>إدارة شجرة شركاء | EVA PLUS</title>
+    <meta name="theme-color" content="#880e4f">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f8f9fa;
-            color: #333;
-            margin: 0;
-            padding: 20px;
-            direction: rtl;
-        }
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
+        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #fdfbfb 0%, #fce4ec 100%); padding: 15px; direction: rtl; margin: 0; min-height: 100vh; padding-bottom: 70px; }
+        
+        /* تنسيقات شاشة تسجيل الدخول للشجرة المتوافقة مع الموبايل */
+        #treeLoginSection {
+            width: 100%;
+            max-width: 380px;
+            margin: 40px auto;
             background: #fff;
             padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-        h2, h3 {
-            color: #880e4f;
-            border-bottom: 2px solid #f8bbd0;
-            padding-bottom: 8px;
-        }
-        .btn {
-            background: #ad1457;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 13px;
-        }
-        .btn:hover { background: #880e4f; }
-        .blue-btn { background: #1976d2; }
-        .blue-btn:hover { background: #115293; }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(136,14,79,0.1);
+            border: 1px solid #f8bbd0;
+            text-align: center;
             box-sizing: border-box;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        th, td {
-            border: 1px solid #f8bbd0;
-            padding: 10px;
-            text-align: center;
-            font-size: 13px;
-        }
-        th {
-            background: #fff0f5;
+        #treeLoginSection h2 {
             color: #880e4f;
+            font-size: 20px;
+            border-right: none;
+            justify-content: center;
+            margin-bottom: 15px;
         }
-        .tree-path-box {
-            background: #e3f2fd;
-            border: 1px solid #90caf9;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-            margin-bottom: 20px;
-        }
-        #treePathResult {
-            margin-top: 12px;
-            font-weight: bold;
-            color: #0d47a1;
-            font-size: 14px;
-            background: #fff;
-            padding: 12px;
-            border-radius: 6px;
-            border: 1px solid #90caf9;
-            max-height: 100px;
-            overflow-y: auto;
-            display: none;
-            line-height: 1.6;
-        }
-        .modal {
-            display: none;
+
+        .header-panel { background: #fff; padding: 15px 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-bottom: 3px solid #d4af37; display: flex; justify-content: space-between; align-items: center; position: relative; }
+        .header-panel h1 { color: #880e4f; margin: 0; font-size: 18px; }
+        
+        /* زر القائمة الجانبية (ثلاث شحطات) */
+        .menu-toggle-btn { background: #880e4f; color: #fff; border: none; padding: 8px 12px; border-radius: 8px; font-size: 18px; cursor: pointer; }
+        
+        /* القائمة الجانبية المنبثقة */
+        #sideDrawer {
             position: fixed;
-            z-index: 1000;
+            top: 0;
+            right: -320px;
+            width: 300px;
+            height: 100%;
+            background: #fff;
+            box-shadow: -5px 0 20px rgba(0,0,0,0.15);
+            z-index: 4000;
+            transition: right 0.3s ease;
+            box-sizing: border-box;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        #sideDrawer.open { right: 0; }
+        .drawer-overlay {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-            padding: 15px;
-            box-sizing: border-box;
+            background: rgba(0,0,0,0.4);
+            z-index: 3500;
+            display: none;
         }
-        .modal-content {
-            background: #fff;
-            width: 100%;
-            max-width: 650px;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
-            border-top: 5px solid #880e4f;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-        }
-        .close-modal {
-            position: absolute;
-            top: 15px;
-            left: 20px;
-            font-size: 24px;
-            font-weight: bold;
-            color: #880e4f;
-            cursor: pointer;
-        }
-        .partner-preview-card {
-            background: #fff0f5;
-            border: 1px solid #f8bbd0;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 12px;
-        }
-        .status-dot {
-            height: 14px;
-            width: 14px;
-            border-radius: 50%;
-            display: inline-block;
-            box-shadow: 0 0 4px rgba(0,0,0,0.2);
-        }
+        .drawer-overlay.open { display: block; }
+
+        .container { max-width: 1100px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); box-sizing: border-box; }
+        h2, h3 { color: #880e4f; border-bottom: 2px solid #f8bbd0; padding-bottom: 8px; font-size: 16px; }
+        .btn { background: #ad1457; color: white; border: none; padding: 9px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 13px; width: 100%; transition: 0.3s; }
+        .btn:hover { background: #880e4f; }
+        .blue-btn { background: #1976d2; }
+        .blue-btn:hover { background: #115293; }
+        .green-btn { background: #27ae60; }
+        .green-btn:hover { background: #219150; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; font-size: 12px; text-align: right; }
+        .form-group input, .form-group select { width: 100%; padding: 9px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 13px; font-family: Arial, sans-serif; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #f8bbd0; padding: 9px; text-align: center; font-size: 12px; }
+        th { background: #fff0f5; color: #880e4f; }
+        
+        .tree-path-box { background: #e3f2fd; border: 1px solid #90caf9; padding: 15px; border-radius: 8px; margin-top: 20px; margin-bottom: 20px; }
+        #treePathResult { margin-top: 12px; font-weight: bold; color: #0d47a1; font-size: 13px; background: #fff; padding: 12px; border-radius: 6px; border: 1px solid #90caf9; max-height: 120px; overflow-y: auto; display: none; line-height: 1.6; }
+        
+        .modal { display: none; position: fixed; z-index: 5000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; }
+        .modal-content { background: #fff; width: 100%; max-width: 600px; border-radius: 12px; padding: 25px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); border-top: 5px solid #880e4f; max-height: 90vh; overflow-y: auto; position: relative; box-sizing: border-box; }
+        .close-modal { position: absolute; top: 15px; left: 20px; font-size: 22px; font-weight: bold; color: #880e4f; cursor: pointer; }
+        
+        .partner-preview-card { background: #fff0f5; border: 1px solid #f8bbd0; padding: 15px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; line-height: 1.6; }
+        .status-dot { height: 12px; width: 12px; border-radius: 50%; display: inline-block; box-shadow: 0 0 4px rgba(0,0,0,0.2); }
         .dot-red { background-color: #e74c3c; animation: pulseRed 1.5s infinite; }
         .dot-green { background-color: #27ae60; }
         @keyframes pulseRed { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
+
+        /* الأقسام المخفية للتبديل من القائمة الجانبية */
+        .content-section { display: none; }
+        .content-section.active { display: block; }
     </style>
 </head>
 <body>
 
-    <div id="adminPanel" class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h2>🌟 لوحة تحكم شجرة EVA PLUS</h2>
-            <span style="color: #666; font-size: 14px;">إدارة الشركاء والاطلاع على بيانات الحسابات</span>
+    <!-- شاشة تسجيل الدخول لشجرة الشركاء -->
+    <div id="treeLoginSection">
+        <h2>🔐 تسجيل دخول إدارة الشجرة</h2>
+        <p style="font-size: 12px; color: #666; margin-bottom: 20px;">الرجاء إدخال بيانات الاعتماد المعتمدة.</p>
+        <label style="text-align: right;">اسم المستخدم (اليوزر):</label>
+        <input type="text" id="treeLoginUser" placeholder="مثال: EVA-001">
+        <label style="text-align: right;">كلمة المرور:</label>
+        <input type="password" id="treeLoginPass" placeholder="كلمة المرور">
+        <button onclick="verifyTreeLogin()" style="background: #880e4f; margin-top: 10px; width: 100%; padding: 10px; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">تسجيل الدخول</button>
+    </div>
+
+    <!-- المحتوى الرئيسي للشجرة (مخفي لحين تسجيل الدخول) -->
+    <div id="treeMainContent" style="display: none;">
+        <div class="header-panel">
+            <button class="menu-toggle-btn" onclick="toggleDrawer()">☰</button>
+            <h1>🌟 إدارة شجرة شركاء EVA PLUS</h1>
+            <button onclick="treeLogout()" style="background: #e74c3c; width: auto; padding: 6px 14px; font-size: 12px; border-radius: 6px; color: #fff; border: none; cursor: pointer;">خروج 🔒</button>
         </div>
 
-        <!-- نموذج إضافة شريك جديد -->
-        <div style="background: #fff0f5; padding: 20px; border-radius: 8px; margin-top: 20px; border: 1px solid #f8bbd0;">
-            <h3>➕ إضافة شريك جديد للشجرة</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px;">
+        <!-- القائمة الجانبية المنبثقة (Drawer) -->
+        <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
+        <div id="sideDrawer">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #d4af37; padding-bottom: 10px;">
+                <h3 style="color: #880e4f; margin:0; font-size: 16px;">📂 أقسام شجرة الشركاء</h3>
+                <button onclick="toggleDrawer()" style="background: #e74c3c; width: 30px; height: 30px; padding: 0; border-radius: 50%; font-size: 14px; color: #fff; border: none; cursor: pointer;">✕</button>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button class="btn blue-btn" onclick="switchSection('sectionTable')">📋 قائمة الشركاء والأعضاء</button>
+                <button class="btn" onclick="switchSection('sectionAdd')">➕ إضافة شريك جديد</button>
+                <button class="btn blue-btn" onclick="switchSection('sectionSearchPath')">🔍 تتبع السلسلة الصعودية</button>
+                <button class="btn green-btn" onclick="switchSection('sectionFinance')">💰 إدارة الأرصدة والمدفوعات</button>
+                <button class="btn" style="background: #d4af37; color: #333;" onclick="switchSection('sectionCounter')">📈 صندوق حجم المعاملات</button>
+            </div>
+        </div>
+
+        <div class="container">
+
+            <!-- 1. قسم قائمة الشركاء (افتراضي) -->
+            <div id="sectionTable" class="content-section active">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+                    <h3 style="margin: 0; border: none;">📋 قائمة شركاء الفريق المسجلين</h3>
+                    <button class="btn blue-btn" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="exportPartnersCSV()">📥 تصدير التقارير (CSV)</button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الحالة</th>
+                                <th>الرمز (ID)</th>
+                                <th>اسم الشريك</th>
+                                <th>رقم الهاتف</th>
+                                <th>الرصيد الحالي</th>
+                                <th>كلمة المرور</th>
+                                <th>الداعي</th>
+                                <th>آخر دخول</th>
+                                <th>إجراءات الدعم</th>
+                            </tr>
+                        </thead>
+                        <tbody id="partnersTableBody">
+                            <tr><td colspan="9" style="text-align:center;">جاري تحميل الشجرة...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 2. قسم إضافة شريك جديد -->
+            <div id="sectionAdd" class="content-section">
+                <h3>➕ إضافة شريك جديد للشجرة</h3>
                 <div class="form-group">
                     <label>الاسم الكامل للشريك:</label>
                     <input type="text" id="partnerName" placeholder="مثال: مريم أبو عيشة">
@@ -176,42 +186,56 @@
                         <option value="EVA-001">EVA-001 (إيفا - رأس الهرم)</option>
                     </select>
                 </div>
+                <button class="btn" style="margin-top: 10px;" onclick="addNewPartner()">حفظ وإضافة الشريك للنظام</button>
             </div>
-            <button class="btn" style="margin-top: 10px;" onclick="addNewPartner()">حفظ وإضافة الشريك للنظام</button>
-        </div>
 
-        <!-- صندوق بحث وتتبع تسلسل الشجرة الصعودي -->
-        <div class="tree-path-box">
-            <h3 style="margin-top:0; color:#1565c0; border-color:#90caf9;">🔍 تتبع السلسلة الصعودية لشريك</h3>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-                <select id="searchPartnerSelect" style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #90caf9;">
-                    <option value="">-- اختر الشريك لمعرفة تسلسله في الشجرة --</option>
-                </select>
-                <button class="btn blue-btn" onclick="showPartnerTreePath()">عرض التسلسل</button>
+            <!-- 3. قسم تتبع السلسلة الصعودية (بالبحث برقم الشريك مباشرة) -->
+            <div id="sectionSearchPath" class="content-section">
+                <div class="tree-path-box" style="margin-top: 0;">
+                    <h3 style="margin-top:0; color:#1565c0; border-color:#90caf9;">🔍 تتبع السلسلة الصعودية لشريك</h3>
+                    <p style="font-size: 12px; color: #555;">اكتب رقم الشريك مباشرة (مثال: EVA-491) لتتبع تسلسله الصعودي في الشجرة.</p>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                        <input type="text" id="searchPartnerIdInput" placeholder="أدخل رقم الشريك (مثال: EVA-491)" style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #90caf9; background: #fff;">
+                        <button class="btn blue-btn" style="width: 130px;" onclick="showPartnerTreePath()">عرض التسلسل</button>
+                    </div>
+                    <div id="treePathResult"></div>
+                </div>
             </div>
-            <div id="treePathResult"></div>
-        </div>
 
-        <!-- جدول عرض الشجرة والشركاء -->
-        <h3 style="margin-top: 30px;">📋 قائمة شركاء الفريق المسجلين</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>الحالة</th>
-                    <th>الرمز (ID)</th>
-                    <th>اسم الشريك</th>
-                    <th>رقم الهاتف</th>
-                    <th>الرصيد الحالي</th>
-                    <th>كلمة المرور</th>
-                    <th>الداعي</th>
-                    <th>آخر تسجيل دخول</th>
-                    <th>إجراءات الدعم</th>
-                </tr>
-            </thead>
-            <tbody id="partnersTableBody">
-                <tr><td colspan="9" style="text-align:center;">جاري تحميل الشجرة...</td></tr>
-            </tbody>
-        </table>
+            <!-- 4. قسم إدارة الأرصدة والمدفوعات -->
+            <div id="sectionFinance" class="content-section">
+                <h3 style="color: #27ae60;">💰 إدارة الأرصدة وإصدار الدفعات</h3>
+                <div style="background: #e8f5e9; border: 1px solid #81c784; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <span style="font-size: 13px; color: #1b5e20; font-weight: bold;">💎 رصيد كافة العملاء والشركاء في النظام:</span>
+                    <h2 id="totalAllPartnersBalance" style="margin: 5px 0 0 0; color: #2e7d32; border: none; font-size: 24px;">جاري الحساب... ₪</h2>
+                </div>
+
+                <div style="background: #fff; border: 1px solid #f8bbd0; padding: 20px; border-radius: 8px;">
+                    <h4 style="margin-top: 0; color: #880e4f;">💸 خانة دفع وتصفية مستحقات شريك</h4>
+                    <div class="form-group">
+                        <label>رقم الشريك (اليوزر):</label>
+                        <input type="text" id="payPartnerId" placeholder="مثال: EVA-491">
+                    </div>
+                    <div class="form-group">
+                        <label>قيمة الدفعة المراد خصمها (₪):</label>
+                        <input type="number" id="payAmount" placeholder="مثال: 100">
+                    </div>
+                    <button class="btn green-btn" onclick="issuePartnerPayment()">إصدار الدفعة وتحديث الأرصدة فوراً 💳</button>
+                </div>
+            </div>
+
+            <!-- 5. قسم صندوق حجم المعاملات -->
+            <div id="sectionCounter" class="content-section">
+                <h3 style="color: #d4af37;">📈 صندوق حجم المعاملات والسيولة التراكمية</h3>
+                <div style="background: #fff8e1; border: 1px solid #ffe082; padding: 20px; border-radius: 8px; text-align: center;">
+                    <span style="font-size: 14px; color: #856404; font-weight: bold;">🏦 إجمالي حجم المعاملات والأرباح منذ انطلاق النظام:</span>
+                    <h2 id="totalTransactionsVolume" style="margin: 10px 0; color: #b78103; font-size: 32px; border: none;">0.00 ₪</h2>
+                    <p style="font-size: 12px; color: #666;">يمثل هذا العداد إجمالي السيولة والأرباح التراكمية التي دارت عبر شبكة إيفا بلس.</p>
+                    <button class="btn" style="background: #e74c3c; width: auto; padding: 8px 20px; font-size: 12px; margin-top: 10px;" onclick="resetTransactionsVolume()">🔄 تصفير العداد للبدء من جديد</button>
+                </div>
+            </div>
+
+        </div>
     </div>
 
     <!-- نافذة منبثقة (Modal) لعرض تفاصيل حساب الشريك مع شريط الحركات والأرباح -->
@@ -239,10 +263,10 @@
                 <table style="margin-top: 0;">
                     <thead>
                         <tr>
-                            <th>التاريخ والوقت (date)</th>
-                            <th>عدد الشركاء (chainLength)</th>
-                            <th>إجمالي الربح (totalProfit)</th>
-                            <th>حصة الشريك (shareAmount)</th>
+                            <th>التاريخ والوقت</th>
+                            <th>عدد الشركاء</th>
+                            <th>إجمالي الربح</th>
+                            <th>حصة الشريك</th>
                         </tr>
                     </thead>
                     <tbody id="mTransactionsBody">
@@ -252,13 +276,13 @@
             </div>
 
             <div class="form-group">
-                <label style="font-size: 13px;">رابط الكتالوج الخاص بالشريك:</label>
-                <input type="text" id="mCatalogLink" readonly style="background: #f9f9f9; font-size: 12px;">
+                <label style="font-size: 12px;">رابط الكتالوج الخاص بالشريك:</label>
+                <input type="text" id="mCatalogLink" readonly style="background: #f9f9f9; font-size: 11px;">
             </div>
 
             <div class="form-group">
-                <label style="font-size: 13px;">رابط الاستقطاب الخاص بالشريك:</label>
-                <input type="text" id="mReferralLink" readonly style="background: #f9f9f9; font-size: 12px;">
+                <label style="font-size: 12px;">رابط الاستقطاب الخاص بالشريك:</label>
+                <input type="text" id="mReferralLink" readonly style="background: #f9f9f9; font-size: 11px;">
             </div>
 
             <button class="btn blue-btn" style="width: 100%; margin-top: 10px;" onclick="copyPartnerInfoToClipboard()">📋 نسخ معلومات الحساب لإرسالها للعميل</button>
@@ -267,7 +291,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAqPpKqqHBEIJZTCGCROFzqZyHOYlnDgP4",
@@ -283,9 +307,50 @@
 
         let allPartnersMap = {};
 
+        // التحكم بالقائمة الجانبية (Drawer)
+        window.toggleDrawer = function() {
+            document.getElementById('sideDrawer').classList.toggle('open');
+            document.getElementById('drawerOverlay').classList.toggle('open');
+        }
+
+        // التبديل بين الأقسام من القائمة الجانبية
+        window.switchSection = function(sectionId) {
+            document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            toggleDrawer();
+        }
+
+        // التحقق من حالة تسجيل الدخول مسبقاً في الـ localStorage
         window.addEventListener('DOMContentLoaded', () => {
-            loadPartnersData();
+            let isLogged = localStorage.getItem('eva_tree_logged');
+            if (isLogged === 'true') {
+                document.getElementById('treeLoginSection').style.display = 'none';
+                document.getElementById('treeMainContent').style.display = 'block';
+                loadPartnersData();
+            }
         });
+
+        window.verifyTreeLogin = function() {
+            let uInput = document.getElementById('treeLoginUser').value.trim();
+            let pInput = document.getElementById('treeLoginPass').value.trim();
+
+            if (uInput === 'EVA-001' && pInput === '0597180456') {
+                localStorage.setItem('eva_tree_logged', 'true');
+                document.getElementById('treeLoginSection').style.display = 'none';
+                document.getElementById('treeMainContent').style.display = 'block';
+                loadPartnersData();
+            } else {
+                alert('❌ اسم المستخدم أو كلمة المرور غير صحيحة.');
+            }
+        };
+
+        window.treeLogout = function() {
+            localStorage.removeItem('eva_tree_logged');
+            document.getElementById('treeMainContent').style.display = 'none';
+            document.getElementById('treeLoginSection').style.display = 'block';
+            document.getElementById('treeLoginUser').value = '';
+            document.getElementById('treeLoginPass').value = '';
+        };
 
         async function loadPartnersData() {
             try {
@@ -311,14 +376,14 @@
                 const snap = await getDocs(collection(db, "partners"));
                 let rowsHtml = '';
                 let uplineOptions = '<option value="EVA-001">EVA-001 (إيفا - رأس الهرم)</option>';
-                let searchOptions = '<option value="">-- اختر الشريك لمعرفة تسلسله في الشجرة --</option>';
+                let totalBalancesSum = 0;
+                let totalVolumeSum = 0;
 
                 allPartnersMap = {};
                 snap.forEach(docItem => {
                     let p = docItem.data();
                     let pId = p.partnerId || docItem.id;
                     
-                    // استبعاد أي حساب وهمي أو غير صالح وعرض الشركاء الحقيقيين فقط
                     if (!pId || !pId.toUpperCase().startsWith("EVA-") || pId.includes("زبون") || pId.includes("عام")) {
                         return;
                     }
@@ -326,10 +391,13 @@
                     p.partnerId = pId;
                     allPartnersMap[pId] = p;
 
+                    totalBalancesSum += parseFloat(p.balance || 0);
+                    let txs = p.transactions || [];
+                    txs.forEach(t => { totalVolumeSum += parseFloat(t.totalProfit || 0); });
+
                     if(pId !== "EVA-001") {
                         uplineOptions += `<option value="${pId}">${pId} - ${p.name || 'بدون اسم'}</option>`;
                     }
-                    searchOptions += `<option value="${pId}">${pId} (${p.name || 'بدون اسم'})</option>`;
 
                     let hasLoggedIn = p.firstLogin === false;
                     let statusDot = hasLoggedIn 
@@ -348,9 +416,9 @@
                             <td><b style="color: #2e7d32;">${p.balance || 0} ₪</b></td>
                             <td><code style="background:#eee; padding:2px 6px; border-radius:4px; color:#c2185b;">${p.password || 'غير محدد'}</code></td>
                             <td>${uplineDisplay}</td>
-                            <td style="font-size: 12px; color: #555;">${lastLoginTime}</td>
+                            <td style="font-size: 11px; color: #555;">${lastLoginTime}</td>
                             <td>
-                                <button class="btn" onclick='openPartnerPreview("${pId}")'>👁️ عرض الحساب</button>
+                                <button class="btn" style="padding: 5px 10px; font-size: 11px;" onclick='openPartnerPreview("${pId}")'>👁️ عرض الحساب</button>
                             </td>
                         </tr>
                     `;
@@ -362,7 +430,12 @@
 
                 document.getElementById('partnersTableBody').innerHTML = rowsHtml;
                 document.getElementById('uplineSelect').innerHTML = uplineOptions;
-                document.getElementById('searchPartnerSelect').innerHTML = searchOptions;
+                document.getElementById('totalAllPartnersBalance').innerText = totalBalancesSum.toFixed(2) + " ₪";
+
+                // تحديث عداد حجم المعاملات من إعدادات النظام أو الحساب
+                let savedVolume = localStorage.getItem('eva_transactions_volume');
+                let finalVolume = savedVolume ? parseFloat(savedVolume) : totalVolumeSum;
+                document.getElementById('totalTransactionsVolume').innerText = finalVolume.toFixed(2) + " ₪";
 
             } catch (error) {
                 console.error("Error loading partners:", error);
@@ -424,13 +497,20 @@
             alert('✅ تم نسخ معلومات الحساب بالكامل! يمكنك لصقها مباشرة في رسالة واتساب للعميل.');
         };
 
+        // تتبع التسلسل الصعودي بكتابة رقم الشريك مباشرة
         window.showPartnerTreePath = function() {
-            let selectedId = document.getElementById('searchPartnerSelect').value;
+            let selectedId = document.getElementById('searchPartnerIdInput').value.trim().toUpperCase();
             let resultBox = document.getElementById('treePathResult');
 
             if(!selectedId) {
                 resultBox.style.display = 'none';
-                alert('الرجاء اختيار شريك أولاً.');
+                alert('الرجاء إدخال رقم الشريك أولاً (مثال: EVA-491).');
+                return;
+            }
+
+            if(!allPartnersMap[selectedId]) {
+                resultBox.style.display = 'block';
+                resultBox.innerHTML = `<span style="color:red;">❌ لم يتم العثور على شريك بهذا الرقم في النظام.</span>`;
                 return;
             }
 
@@ -446,7 +526,76 @@
             }
 
             resultBox.style.display = 'block';
-            resultBox.innerHTML = `📍 تسلسل الشجرة:<br>` + pathArray.join(' ⬅ ');
+            resultBox.innerHTML = `📍 تسلسل الشجرة للشريك (${selectedId}):<br>` + pathArray.join(' ⬅ ');
+        };
+
+        // إصدار دفعة لشريك معين وخصمها من رصيده
+        window.issuePartnerPayment = async function() {
+            let pId = document.getElementById('payPartnerId').value.trim().toUpperCase();
+            let amount = parseFloat(document.getElementById('payAmount').value);
+
+            if(!pId || isNaN(amount) || amount <= 0) {
+                return alert('الرجاء إدخال رقم شريك صحيح وقيمة دفعة سليمة.');
+            }
+
+            let pDocRef = doc(db, "partners", pId);
+            let pSnap = await getDoc(pDocRef);
+
+            if(!pSnap.exists()) {
+                return alert('❌ عذراً، رقم الشريك غير موجود في النظام.');
+            }
+
+            let pData = pSnap.data();
+            let currentBal = parseFloat(pData.balance || 0);
+
+            if(amount > currentBal) {
+                return alert(`⚠️ المبلغ المطلوب دفع (${amount} ₪) أكبر من رصيد الشريك الحالي (${currentBal} ₪).`);
+            }
+
+            let newBalance = parseFloat((currentBal - amount).toFixed(2));
+            let paymentTx = {
+                date: new Date().toLocaleString('ar-EG'),
+                chainLength: 0,
+                totalProfit: -amount,
+                shareAmount: -amount // تمثل سحب دفعة مالية
+            };
+
+            try {
+                await updateDoc(pDocRef, {
+                    balance: newBalance,
+                    transactions: arrayUnion(paymentTx)
+                });
+                alert(`✅ تم إصدار دفعة بقيمة ${amount} ₪ للشريك (${pId}) بنجاح! وتحديث رصيده.`);
+                document.getElementById('payPartnerId').value = '';
+                document.getElementById('payAmount').value = '';
+                loadPartnersData();
+            } catch(e) {
+                console.error(e);
+                alert('حدث خطأ أثناء معالجة الدفعة.');
+            }
+        };
+
+        // تصفير عداد حجم المعاملات
+        window.resetTransactionsVolume = function() {
+            if(confirm('هل أنت متأكد من تصفير عداد حجم المعاملات للبدء من جديد؟')) {
+                localStorage.setItem('eva_transactions_volume', '0');
+                document.getElementById('totalTransactionsVolume').innerText = "0.00 ₪";
+                alert('✅ تم تصفير العداد بنجاح.');
+            }
+        };
+
+        // تصدير التقارير بصيغة CSV
+        window.exportPartnersCSV = function() {
+            let csvContent = "\uFEFFرمز الشريك,اسم الشريك,رقم الهاتف,العنوان,الرصيد الحالي,كلمة المرور,الداعي\n";
+            for(let id in allPartnersMap) {
+                let p = allPartnersMap[id];
+                csvContent += `"${p.partnerId}","${p.name || ''}","${p.phone || ''}","${p.address || ''}","${p.balance || 0}","${p.password || ''}","${p.uplineId || p.sponsor || ''}"\n`;
+            }
+            let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            let link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "EVA_PLUS_Partners_Report.csv";
+            link.click();
         };
 
         window.addNewPartner = async function() {
