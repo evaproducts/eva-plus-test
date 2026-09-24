@@ -301,6 +301,7 @@
                         balance: 0,
                         transactions: [],
                         uplineId: "none",
+                        sponsor: "none",
                         firstLogin: true,
                         lastLogin: "لم يتم الدخول بعد",
                         createdAt: new Date().toISOString()
@@ -315,35 +316,35 @@
                 allPartnersMap = {};
                 snap.forEach(docItem => {
                     let p = docItem.data();
-                    let pName = (p.name || "").toString();
-                    if (pName.includes("زبون مباشر") || p.partnerId === "EVA-908" || !p.partnerId || !p.partnerId.startsWith("EVA-")) {
+                    // إلغاء أي شروط فلترة أو استثناء لضمان ظهور كافة الشركاء دون نقصان
+                    if (!p.partnerId || !p.partnerId.toUpperCase().startsWith("EVA-")) {
                         return;
                     }
 
                     allPartnersMap[p.partnerId] = p;
 
                     if(p.partnerId !== "EVA-001") {
-                        uplineOptions += `<option value="${p.partnerId}">${p.partnerId} - ${p.name}</option>`;
+                        uplineOptions += `<option value="${p.partnerId}">${p.partnerId} - ${p.name || 'بدون اسم'}</option>`;
                     }
-                    searchOptions += `<option value="${p.partnerId}">${p.partnerId} (${p.name})</option>`;
+                    searchOptions += `<option value="${p.partnerId}">${p.partnerId} (${p.name || 'بدون اسم'})</option>`;
 
-                    // تحديد النقطة الحمراء (جديد) أو الخضراء (سجل دخوله)
                     let hasLoggedIn = p.firstLogin === false;
                     let statusDot = hasLoggedIn 
                         ? `<span class="status-dot dot-green" title="سجل دخوله للحساب"></span>` 
                         : `<span class="status-dot dot-red" title="شريك جديد - لم يدخل حسابه بعد"></span>`;
 
                     let lastLoginTime = p.lastLogin || 'لم يتم الدخول بعد';
+                    let uplineDisplay = p.uplineId || p.sponsor || 'EVA-001';
 
                     rowsHtml += `
                         <tr>
                             <td>${statusDot}</td>
                             <td><b>${p.partnerId}</b></td>
-                            <td>${p.name}</td>
+                            <td>${p.name || 'بدون اسم'}</td>
                             <td>${p.phone || 'غير مسجل'}</td>
                             <td><b style="color: #2e7d32;">${p.balance || 0} ₪</b></td>
                             <td><code style="background:#eee; padding:2px 6px; border-radius:4px; color:#c2185b;">${p.password || 'غير محدد'}</code></td>
-                            <td>${p.uplineId || p.sponsor || 'EVA-001'}</td>
+                            <td>${uplineDisplay}</td>
                             <td style="font-size: 12px; color: #555;">${lastLoginTime}</td>
                             <td>
                                 <button class="btn" onclick='openPartnerPreview("${p.partnerId}")'>👁️ عرض الحساب</button>
@@ -353,7 +354,7 @@
                 });
 
                 if(rowsHtml === '') {
-                    rowsHtml = `<tr><td colspan="9" style="text-align:center; color:#888;">لا توجد سجلات شركاء حقيقيين في الشجرة حتى الآن.</td></tr>`;
+                    rowsHtml = `<tr><td colspan="9" style="text-align:center; color:#888;">لا توجد سجلات شركاء في الشجرة حتى الآن.</td></tr>`;
                 }
 
                 document.getElementById('partnersTableBody').innerHTML = rowsHtml;
@@ -436,7 +437,7 @@
 
             while(currentId && currentId !== "none" && allPartnersMap[currentId] && safetyCounter < 50) {
                 let partner = allPartnersMap[currentId];
-                pathArray.push(`${partner.name} (${partner.partnerId})`);
+                pathArray.push(`${partner.name || 'بدون اسم'} (${partner.partnerId})`);
                 currentId = partner.uplineId || partner.sponsor;
                 safetyCounter++;
             }
@@ -478,6 +479,7 @@
                     balance: 0,
                     transactions: [],
                     uplineId: uplineId,
+                    sponsor: uplineId,
                     firstLogin: true,
                     lastLogin: "لم يتم الدخول بعد",
                     createdAt: new Date().toISOString()
