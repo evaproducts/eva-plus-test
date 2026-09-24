@@ -359,7 +359,7 @@
         }
     }
 
-    // دالة تأكيد وتواصل للطلبات العادية (تفتح الواتساب وتحذف الطلب من القائمة)
+    // دالة تأكيد وتواصل للطلبات العادية
     window.confirmAndDeleteNormalOrder = async function(orderId, phone, product, productCode) {
         try {
             if (productCode) {
@@ -393,11 +393,37 @@
         }
     }
 
-    // تأكيد طلب أيفا بلس (توزيع أرباح المنتج على الشجرة حصراً للطلب الوارد من الكتالوج برابط إحالة، دون إنشاء حساب للشريحة المشتري)
+    // تأكيد طلب أيفا بلس (يفرق بدقة بين طلب الانضمام من join.html وطلب الكتالوج المحال من catalog.html?user=...)
     window.confirmPartnerOrder = async function(order) {
         try {
             let sellerId = order.sponsor && order.sponsor !== "الإدارة المركزية" && order.sponsor !== "EVA-ROOT" ? order.sponsor : "EVA-001";
+            
+            // تحديد إذا كان الطلب قادماً من الكتالوج المحال (لا ينشئ حساب شريك) أم من صفحة الانضمام (ينشئ حساب شريك)
+            let isCatalogReferralOrder = order.isCatalogOrder === true || (order.orderType === 'partner' && !order.isJoinProcess);
 
+            let newPartnerId = "";
+            let rawPass = "";
+
+            // 1. إذا كان الطلب قادماً من صفحة الانضمام (join.html أو join.html?ref=...) -> أنشئ حساب شريك جديد
+            if (!isCatalogReferralOrder) {
+                newPartnerId = "EVA-" + Math.floor(1000 + Math.random() * 9000);
+                rawPass = Math.floor(1000 + Math.random() * 9000).toString();
+
+                await setDoc(doc(db, "partners", newPartnerId), {
+                    partnerId: newPartnerId,
+                    name: order.clientName,
+                    phone: order.clientPhone,
+                    password: rawPass,
+                    balance: 0,
+                    uplineId: sellerId,
+                    sponsor: sellerId,
+                    firstLogin: true,
+                    lastLogin: "لم يتم الدخول بعد",
+                    createdAt: new Date().toISOString()
+                });
+            }
+
+            // 2. توزيع الأرباح على الشجرة (لكلا الحالتين)
             if (order.productCode) {
                 let prodRef = doc(db, "products", order.productCode);
                 let prodSnap = await getDoc(prodRef);
@@ -464,14 +490,25 @@
 
             await deleteDoc(doc(db, "orders", order.id));
 
-            // فتح الواتساب للزبون المشتري لتنسيق التوصيل (بدون إنشاء حساب شريك له)
             let rawP = (order.clientPhone || '').toString().trim();
             let cleanPhone = rawP.replace(/^\+/, '').replace(/^00/, '').replace(/[^0-9]/g, '');
-            let msg = `مرحباً بك ${order.clientName}، بخصوص طلبك لمنتج (${order.productName}) في معرض إيفا براند، جاري التنسيق للتوصيل.`;
-            let waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
-            window.open(waUrl, '_blank');
+            let waUrl = "";
 
-            alert('✅ تم تأكيد الطلب بنجاح، وتوزيع ربح الشركاء على الشجرة لصاحب الرابط (' + sellerId + ')، وفتح الواتساب للتنسيق مع الزبون!');
+            // 3. توجيه رسالة الواتساب المناسبة بناءً على مصدر الطلب
+            if (!isCatalogReferralOrder) {
+                // حالة الانضمام (join.html): إرسال رسالة ترحيبية تحتوي على اليوزر والباسورد ورابط الشركاء
+                let partnerPortalUrl = "https://evaproducts.github.io/eva-plus-test/partner.html";
+                let welcomeMsg = `مرحباً بك ${order.clientName} 🌸\nمبروك انضمامك رسمياً لعائلة نظام "إيفا بلس"!\n\nبيانات حسابك الشريك:\n🆔 رقم الشريك: ${newPartnerId}\n🔑 كلمة المرور: ${rawPass}\n\n🔗 رابط صفحة الشركاء لدخول حسابك:\n${partnerPortalUrl}\n\nيمكنك البدء بمشاركة رابط متجرك وتحقيق الأرباح.`;
+                waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(welcomeMsg)}`;
+                alert('✅ تم تأكيد الانضمام، إنشاء حساب الشريك (' + newPartnerId + '), وتوزيع الأرباح على الشجرة بنجاح!');
+            } else {
+                // حالة الكتالوج المحال (catalog.html?user=...): رسالة تنسيق التوصيل للزبون بدون إنشاء حساب
+                let deliveryMsg = `مرحباً بك ${order.clientName}، بخصوص طلبك لمنتج (${order.productName}) في معرض إيفا براند عبر رابط الشريك (${sellerId})، جاري التنسيق للتوصيل.`;
+                waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(deliveryMsg)}`;
+                alert('✅ تم تأكيد الطلب، توزيع الأرباح على الشجرة للداعي (' + sellerId + '), وفتح واتساب تنسيق التوصيل للزبون!');
+            }
+
+            window.open(waUrl, '_blank');
             loadOrders();
 
         } catch (err) {
