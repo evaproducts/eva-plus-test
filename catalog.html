@@ -136,7 +136,7 @@
         جميع الحقوق محفوظة © معرض إيفا براند - نظام EVA PLUS 2026
     </footer>
 
-    <!-- نافذة الطلب مع اختيار رمز الدولة (فلسطين وإسرائيل فقط) -->
+    <!-- نافذة الطلب -->
     <div id="orderModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeOrderModal()">&times;</span>
@@ -191,16 +191,13 @@
         let globalLogoUrl = "";
         let selectedProductForOrder = null;
         let urlParams = new URLSearchParams(window.location.search);
-        let partnerUser = urlParams.get('user');
-        let refParam = urlParams.get('ref');
+        let partnerUser = urlParams.get('user') || urlParams.get('ref');
 
         window.addEventListener('DOMContentLoaded', async () => {
-            if (partnerUser || refParam) {
+            if (partnerUser) {
                 let joinBtn = document.getElementById('joinEvaPlusBtn');
                 if (joinBtn) joinBtn.style.display = 'none';
-            }
 
-            if (partnerUser) {
                 try {
                     let pDoc = await getDoc(doc(db, "partners", partnerUser));
                     let banner = document.getElementById('partnerBanner');
@@ -208,9 +205,9 @@
                         banner.style.display = 'block';
                         banner.innerHTML = `🌸 متجر برعاية الشريك المعتمد: ${pDoc.data().name} (${partnerUser})`;
                     } else {
-                        partnerUser = null;
+                        partnerUser = "EVA-001"; // افتراضي راس الهرم إذا لم يوجد الشريك
                     }
-                } catch(e) { partnerUser = null; }
+                } catch(e) { partnerUser = "EVA-001"; }
             }
 
             try {
@@ -351,6 +348,9 @@
                     reservedUntil: reserveDate
                 }, { merge: true });
 
+                // إذا كان هناك معرف شريك في الرابط أو أن الزبون دخل عبر نظام إيفا بلس (افتراضياً EVA-001 إذا جاء من صفحة الانضمام)
+                let currentSponsor = partnerUser || "EVA-001";
+
                 if (partnerUser) {
                     await setDoc(doc(db, "orders", orderId), {
                         orderType: 'partner',
@@ -359,15 +359,16 @@
                         clientName: name,
                         clientPhone: fullPhone,
                         clientAddress: address,
-                        sponsor: partnerUser,
+                        sponsor: currentSponsor,
                         createdAt: new Date().toISOString()
                     });
 
                     closeOrderModal();
-                    alert('✅ تم إرسال طلبك بنجاح! سيتم تنسيق التوصيل معك قريباً.');
+                    alert('✅ تم إرسال طلب انضمامك وطلب المنتج بنجاح! سيتم مراجعته وتفعيل حسابك قريباً.');
                     location.reload();
 
                 } else {
+                    // زبون عادي تماماً بدون أي رابط شريك
                     await setDoc(doc(db, "orders", orderId), {
                         orderType: 'normal',
                         productCode: selectedProductForOrder.code,
