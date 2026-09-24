@@ -175,6 +175,13 @@
                     let p = docSnap.data();
                     currentActivePartnerId = p.partnerId || cleanId;
 
+                    // التعديل الذكي لتحديث وقت آخر تسجيل دخول وتحويل النقطة إلى خضراء
+                    let nowFormatted = new Date().toLocaleString('ar-EG');
+                    await updateDoc(docRef, {
+                        firstLogin: false,
+                        lastLogin: nowFormatted
+                    });
+
                     document.getElementById('loginContainer').style.display = 'none';
                     document.getElementById('mainContainer').style.display = 'block';
 
