@@ -364,7 +364,6 @@
         if(confirm(actionType === 'partner_reject' ? 'هل أنت متأكد من رفض الطلب؟' : 'هل أنت متأكد من حذف الطلب؟')) {
             try {
                 if (productCode) {
-                    // إبقاء حجز المنتج لمدة 10 دقائق ليتأكد المعرض قبل إتاحته
                     let tenMinutesLater = new Date(Date.now() + 10 * 60 * 1000).toISOString();
                     await setDoc(doc(db, "products", productCode), { reservedUntil: tenMinutesLater }, { merge: true });
                 }
@@ -459,8 +458,9 @@
 
             await deleteDoc(doc(db, "orders", order.id));
 
-            // فتح واتساب مباشرة لرقم الشريك الجديد مع رسالة التهنئة والبيانات
-            let rawP = (order.clientPhone || '').toString().trim(); // إزالة أي رموز زائدة أو أصفار مكررة والتأكد من أخذ الأرقام الصحيحة let cleanPhone = rawP.replace(/^\+/, '').replace(/^00/, '').replace(/[^0-9]/g, '');
+            // فتح واتساب مباشرة لرقم الشريك الجديد وتجنب أي تعليق في الرابط
+            let rawP = (order.clientPhone || '').toString().trim();
+            let cleanPhone = rawP.replace(/^\+/, '').replace(/^00/, '').replace(/[^0-9]/g, '');
             let welcomeMsg = `مرحباً بك ${order.clientName} 🌸\nمبروك انضمامك رسمياً لعائلة نظام "إيفا بلس"!\n\nبيانات حسابك الشريك:\n🆔 رقم الشريك: ${newPartnerId}\n🔑 كلمة المرور: ${rawPass}\n\nيمكنك البدء بمشاركة رابط متجرك وتحقيق الأرباح.`;
             let waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(welcomeMsg)}`;
             window.open(waUrl, '_blank');
