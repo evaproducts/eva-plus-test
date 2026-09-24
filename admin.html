@@ -328,7 +328,7 @@
                             <b>العنوان:</b> <span style="color:#880e4f; font-weight:bold;">${o.clientAddress || 'غير محدد'}</span>
                         </td>
                         <td>
-                            <button onclick="shareWhatsApp('${o.clientPhone}', '${o.productName}')" class="whatsapp-btn" style="padding: 6px; font-size: 11px; margin-bottom:4px;">تواصل واتساب</button>
+                            <button onclick="confirmAndDeleteNormalOrder('${o.id}', '${o.clientPhone}', '${o.productName}', '${o.productCode || ''}')" class="whatsapp-btn" style="padding: 6px; font-size: 11px; margin-bottom:4px;">تأكيد وتواصل 💬</button>
                             <button onclick="handleOrderAction('${o.id}', '${o.productCode || ''}', 'normal_delete')" class="delete-btn" style="padding: 6px; font-size: 11px;">حذف الطلب</button>
                         </td>
                     </tr>
@@ -356,6 +356,26 @@
         } catch(e) {
             normalTable.innerHTML = `<tr><td colspan="2" style="color: red;">خطأ في تحميل الطلبات</td></tr>`;
             partnerTable.innerHTML = `<tr><td colspan="3" style="color: red;">خطأ في تحميل الطلبات</td></tr>`;
+        }
+    }
+
+    // دالة تأكيد وتواصل للطلبات العادية (تفتح الواتساب وتحذف الطلب من القائمة)
+    window.confirmAndDeleteNormalOrder = async function(orderId, phone, product, productCode) {
+        try {
+            if (productCode) {
+                let tenMinutesLater = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+                await setDoc(doc(db, "products", productCode), { reservedUntil: tenMinutesLater }, { merge: true });
+            }
+            await deleteDoc(doc(db, "orders", orderId));
+            
+            let msg = `مرحباً بك، بخصوص طلبك لمنتج (${product}) في معرض إيفا براند، جاري التنسيق للتوصيل.`;
+            let cleanPhone = (phone || '').toString().trim().replace(/^00/, '').replace(/[^0-9]/g, '');
+            window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+            
+            loadOrders();
+        } catch(err) {
+            console.error("Error confirming normal order:", err);
+            alert('حدث خطأ أثناء معالجة الطلب.');
         }
     }
 
@@ -399,7 +419,6 @@
                 
                 if (prodSnap.exists()) {
                     let prodData = prodSnap.data();
-                    // جلب ربح الشركاء المخصص للتوزيع (agentPrice) بدلاً من سعر الكتالوج الكلي
                     let partnerProfit = parseFloat(prodData.agentPrice || 0);
 
                     if (partnerProfit > 0) {
@@ -476,12 +495,6 @@
             console.error("Error confirming partner order:", err);
             alert('حدث خطأ أثناء معالجة الطلب.');
         }
-    }
-
-    window.shareWhatsApp = function(phone, product) {
-        let msg = `مرحباً بك، بخصوص طلبك لمنتج (${product}) في معرض إيفا براند، جاري التنسيق للتوصيل.`;
-        let cleanPhone = (phone || '').toString().trim().replace(/^00/, '').replace(/[^0-9]/g, '');
-        window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
     window.addCategory = async function() {
