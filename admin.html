@@ -393,25 +393,10 @@
         }
     }
 
-    // تأكيد طلب أيفا بلس (سحب "ربح الشركاء" agentPrice وتوزيعه حصراً على الشجرة، توليد حساب شريك، وفتح واتساب)
+    // تأكيد طلب أيفا بلس (توزيع أرباح المنتج على الشجرة حصراً للطلب الوارد من الكتالوج برابط إحالة، دون إنشاء حساب للشريحة المشتري)
     window.confirmPartnerOrder = async function(order) {
         try {
             let sellerId = order.sponsor && order.sponsor !== "الإدارة المركزية" && order.sponsor !== "EVA-ROOT" ? order.sponsor : "EVA-001";
-            let newPartnerId = "EVA-" + Math.floor(100 + Math.random() * 900);
-            let rawPass = Math.floor(1000 + Math.random() * 9000).toString();
-
-            await setDoc(doc(db, "partners", newPartnerId), {
-                partnerId: newPartnerId,
-                name: order.clientName,
-                phone: order.clientPhone,
-                password: rawPass,
-                balance: 0,
-                uplineId: sellerId,
-                sponsor: sellerId,
-                firstLogin: true,
-                lastLogin: "لم يتم الدخول بعد",
-                createdAt: new Date().toISOString()
-            });
 
             if (order.productCode) {
                 let prodRef = doc(db, "products", order.productCode);
@@ -479,16 +464,14 @@
 
             await deleteDoc(doc(db, "orders", order.id));
 
+            // فتح الواتساب للزبون المشتري لتنسيق التوصيل (بدون إنشاء حساب شريك له)
             let rawP = (order.clientPhone || '').toString().trim();
             let cleanPhone = rawP.replace(/^\+/, '').replace(/^00/, '').replace(/[^0-9]/g, '');
-            let partnerPortalUrl = "https://evaproducts.github.io/eva-plus-test/partner.html";
-
-            let welcomeMsg = `مرحباً بك ${order.clientName} 🌸\nمبروك انضمامك رسمياً لعائلة نظام "إيفا بلس"!\n\nبيانات حسابك الشريك:\n🆔 رقم الشريك: ${newPartnerId}\n🔑 كلمة المرور: ${rawPass}\n\n🔗 رابط صفحة الشركاء لدخول حسابك:\n${partnerPortalUrl}\n\nيمكنك البدء بمشاركة رابط متجرك وتحقيق الأرباح.`;
-            
-            let waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(welcomeMsg)}`;
+            let msg = `مرحباً بك ${order.clientName}، بخصوص طلبك لمنتج (${order.productName}) في معرض إيفا براند، جاري التنسيق للتوصيل.`;
+            let waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
             window.open(waUrl, '_blank');
 
-            alert('✅ تم تأكيد الطلب بنجاح، توزيع ربح الشركاء، إنشاء حساب الشريك (' + newPartnerId + ')، وفتح الواتساب لمراسلة الشريك!');
+            alert('✅ تم تأكيد الطلب بنجاح، وتوزيع ربح الشركاء على الشجرة لصاحب الرابط (' + sellerId + ')، وفتح الواتساب للتنسيق مع الزبون!');
             loadOrders();
 
         } catch (err) {
