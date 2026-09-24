@@ -331,7 +331,7 @@
         </div>
 
         <div class="evaplus-power-box">
-            <h3>💎 كيف تقلب موازين دخلك مع نظام EVA PLUS؟</h3>
+            <h3>💎 كيف تقلب موازين دخلك مع نظام EVA PLUS?</h3>
             <p>
                 عبر نظام <b>EVA PLUS</b>، أنت لا تعمل وحدك أبداً. أرباحك تتضاعف تراكمياً صعوداً وهبوطاً عبر الشجرة؛ فكل شخص تدعوه للانضمام تحت شجرتك تصبح شريكاً معه في أرباحه، وكلما توسعت شبكتك وكبرت الشجرة التي أنت أساسها، أصبحوا هم يعملون لأجلك!
             </p>
@@ -411,15 +411,19 @@
         const db = getFirestore(app);
 
         const urlParams = new URLSearchParams(window.location.search);
-        const refId = urlParams.get('ref') || 'EVA-ROOT (الإدارة المركزية)';
+        
+        // التحقق من وجود الشريك الداعي، وإذا لم يوجد يتم تعيين رأس الهرم EVA-001 تلقائياً
+        const rawRef = urlParams.get('ref');
+        const refId = (rawRef && rawRef.toUpperCase().startsWith('EVA-')) ? rawRef.trim().toUpperCase() : 'EVA-001';
+        
         const alertBox = document.getElementById('sponsorAlert');
 
-        if (urlParams.get('ref')) {
+        if (rawRef) {
             alertBox.style.display = 'block';
             alertBox.innerHTML = `🤝 أنت تسجل الآن بدعوة مباشرة من الشريك في الشبكة: <b>${refId}</b>`;
         } else {
             alertBox.style.display = 'block';
-            alertBox.innerHTML = `🌟 أنت تسجل الآن عبر الحملة الإعلانية الرسمية لـ <b>EVA PLUS</b> (تحت إشراف الإدارة المركزية مباشرة).`;
+            alertBox.innerHTML = `🌟 أنت تسجل الآن عبر الحملة الإعلانية الرسمية لـ <b>EVA PLUS</b> (تحت إشراف الإدارة المركزية برعاية رأس الهرم EVA-001).`;
         }
 
         window.submitAndGoToCatalog = async function() {
@@ -445,7 +449,6 @@
 
                 partnersSnap.forEach(docItem => {
                     let pPhone = (docItem.data().phone || "").toString();
-                    // اقتطاع أي مقدمة للمقارنة بالرقم الفعلي فقط
                     let cleanStoredPhone = pPhone.replace(/^00970/, '').replace(/^00972/, '').replace(/^0/, '');
                     if (cleanStoredPhone === rawNumber) {
                         isDuplicate = true;
@@ -476,7 +479,8 @@
                 name: name,
                 address: address,
                 phone: fullPhone,
-                sponsor: refId,
+                sponsor: refId,  // سيتم حفظ الشريك الداعي أو EVA-001 بانتظام
+                uplineId: refId, // لضمان التوافق التام مع شجرة الفريق
                 status: 'pending',
                 date: new Date().toISOString()
             };
