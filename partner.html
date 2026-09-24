@@ -38,6 +38,7 @@
             margin: 0 auto;
             box-sizing: border-box;
             padding: 10px;
+            padding-bottom: 70px; /* مساحة لشريط التثبيت السفلي */
         }
 
         .container {
@@ -225,6 +226,36 @@
         }
         .link-text:hover { text-decoration: underline; }
 
+        /* شريط تثبيت التطبيق السفلي (PWA Banner) */
+        #pwaInstallBanner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(135deg, #880e4f, #ad1457);
+            color: white;
+            padding: 12px 15px;
+            box-sizing: border-box;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 2px solid var(--accent-gold);
+        }
+
+        .pwa-btn {
+            background: var(--accent-gold);
+            color: #333;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
         /* النوافذ المنبثقة (Modals) */
         .modal-overlay {
             position: fixed;
@@ -307,6 +338,18 @@
 <body>
 
     <div class="app-wrapper">
+        <!-- شريط تثبيت التطبيق السفلي (PWA Install Banner) -->
+        <div id="pwaInstallBanner">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 24px;">📱</span>
+                <div>
+                    <div style="font-weight: bold; font-size: 13px;">تطبيق EVA PLUS PARTNER</div>
+                    <div style="font-size: 11px; opacity: 0.9;">ثبّت التطبيق على شاشتك الرئيسية لسهولة الوصول!</div>
+                </div>
+            </div>
+            <button class="pwa-btn" id="installAppBtn">تثبيت الآن</button>
+        </div>
+
         <!-- القائمة الجانبية (3 شحطات) -->
         <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
         <div class="side-drawer" id="sideDrawer">
@@ -478,7 +521,7 @@
         </div>
     </div>
 
-    <!-- كود الـ JavaScript البرمجي الأصلي والكامل بدون مساس بالوظائف -->
+    <!-- كود الـ JavaScript البرمجي الأصلي والكامل مع تفعيل PWA وتثبيت التطبيق -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, getDoc, getDocs, collection, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -498,6 +541,28 @@
         let urlParams = new URLSearchParams(window.location.search);
         let partnerUser = urlParams.get('user');
         let currentActivePartnerId = "";
+
+        // كود تفاعل شريط تثبيت التطبيق (PWA)
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('pwaInstallBanner').style.display = 'flex';
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            let installBtn = document.getElementById('installAppBtn');
+            if (installBtn) {
+                installBtn.addEventListener('click', async () => {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        let { outcome } = await deferredPrompt.userChoice;
+                        deferredPrompt = null;
+                        document.getElementById('pwaInstallBanner').style.display = 'none';
+                    }
+                });
+            }
+        });
 
         // تسجيل خدمة الـ Service Worker لتفعيل PWA بالكامل
         if ('serviceWorker' in navigator) {
