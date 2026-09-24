@@ -374,7 +374,7 @@
         }
     }
 
-    // تأكيد طلب أيفا بلس (توزيع أرباح، توليد حساب شريك، وفتح واتساب برقم الشريك الجديد)
+    // تأكيد طلب أيفا بلس (توزيع أرباح، توليد حساب شريك، وفتح واتساب برقم الشريك الجديد متضمناً رابط صفحة الشركاء)
     window.confirmPartnerOrder = async function(order) {
         try {
             let sellerId = order.sponsor && order.sponsor !== "الإدارة المركزية" && order.sponsor !== "EVA-ROOT" ? order.sponsor : "EVA-001";
@@ -458,14 +458,17 @@
 
             await deleteDoc(doc(db, "orders", order.id));
 
-            // فتح واتساب مباشرة لرقم الشريك الجديد وتجنب أي تعليق في الرابط
+            // فتح واتساب مباشرة لرقم الشريك الجديد مع تضمين بيانات الحساب ورابط صفحة الشركاء
             let rawP = (order.clientPhone || '').toString().trim();
             let cleanPhone = rawP.replace(/^\+/, '').replace(/^00/, '').replace(/[^0-9]/g, '');
-            let welcomeMsg = `مرحباً بك ${order.clientName} 🌸\nمبروك انضمامك رسمياً لعائلة نظام "إيفا بلس"!\n\nبيانات حسابك الشريك:\n🆔 رقم الشريك: ${newPartnerId}\n🔑 كلمة المرور: ${rawPass}\n\nيمكنك البدء بمشاركة رابط متجرك وتحقيق الأرباح.`;
+            let partnerPortalUrl = "https://evaproducts.github.io/eva-plus-test/partner.html";
+
+            let welcomeMsg = `مرحباً بك ${order.clientName} 🌸\nمبروك انضمامك رسمياً لعائلة نظام "إيفا بلس"!\n\nبيانات حسابك الشريك:\n🆔 رقم الشريك: ${newPartnerId}\n🔑 كلمة المرور: ${rawPass}\n\n🔗 رابط صفحة الشركاء لدخول حسابك:\n${partnerPortalUrl}\n\nيمكنك البدء بمشاركة رابط متجرك وتحقيق الأرباح.`;
+            
             let waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(welcomeMsg)}`;
             window.open(waUrl, '_blank');
 
-            alert('✅ تم تأكيد الطلب بنجاح، توزيع الأرباح، إنشاء حساب الشريك (' + newPartnerId + ')، وفتح الواتساب لمراسلة الشريك!');
+            alert('✅ تم تأكيد الطلب بنجاح، توزيع الأرباح، إنشاء حساب الشريك (' + newPartnerId + ')، وفتح الواتساب لمراسلة الشريك متضمنة رابط صفحة الشركاء!');
             loadOrders();
 
         } catch (err) {
