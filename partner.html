@@ -37,6 +37,7 @@
             <p><b>اسم الشريك:</b> <span id="pName"></span></p>
             <p><b>رقم الهاتف:</b> <span id="pPhone"></span></p>
             <p><b>العنوان:</b> <span id="pAddress"></span></p>
+            <p><b>الشريك الداعي لك (Upline):</b> <span id="pUpline" style="color: #b8860b; font-weight: bold;"></span></p>
             <p><b>كلمة المرور الخاصة بك:</b> <code id="pPass" style="background:#fff; padding:2px 8px; border-radius:4px; color:#c2185b; font-weight:bold;"></code></p>
             
             <hr style="border:0; border-top:1px dashed #f8bbd0; margin: 15px 0;">
@@ -52,6 +53,15 @@
         <div class="balance-box">
             <span style="font-size: 14px; color: #1b5e20; font-weight: bold;">💰 رصيدك الحالي المتاح:</span>
             <h2 id="pBalance" style="margin: 5px 0 0 0; color: #2e7d32; border: none;">0 ₪</h2>
+        </div>
+
+        <!-- شجرة فريق التسويق الخاص بك -->
+        <h4>🌳 فريق التسويق والشجرة التابعة لك</h4>
+        <div style="background: #fff8fa; border: 1px solid #f8bbd0; border-radius: 8px; padding: 12px; margin-bottom: 20px;">
+            <p style="font-size: 12px; color: #666; margin-top: 0;">الشركاء والعملاء المسجلون تحت شبكتك المباشرة والفرعية:</p>
+            <div id="teamTreeContainer" style="font-weight: bold; color: #880e4f; font-size: 14px; word-break: break-all; background: #fff; padding: 10px; border-radius: 6px; border: 1px solid #fce4ec;">
+                جاري تحميل الشجرة...
+            </div>
         </div>
 
         <!-- شريط وسجل الحركات والأرباح -->
@@ -124,7 +134,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, getDocs, collection, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAqPpKqqHBEIJZTCGCROFzqZyHOYlnDgP4",
@@ -172,12 +182,16 @@
                     document.getElementById('pName').innerText = p.name || 'بدون اسم';
                     document.getElementById('pPhone').innerText = p.phone || 'غير مسجل';
                     document.getElementById('pAddress').innerText = p.address || 'غير محدد';
+                    document.getElementById('pUpline').innerText = p.uplineId || p.sponsor || 'EVA-001 (رأس الهرم)';
                     document.getElementById('pPass').innerText = p.password || 'غير محدد';
                     document.getElementById('pBalance').innerText = (p.balance || 0) + " ₪";
 
                     let baseUrl = window.location.origin + window.location.pathname.replace('partner.html', '');
                     document.getElementById('catalogLink').value = `${baseUrl}catalog.html?user=${currentActivePartnerId}`;
                     document.getElementById('referralLink').value = `${baseUrl}join.html?ref=${currentActivePartnerId}`;
+
+                    // جلب شجرة الفريق التابعة لهذا الشريك
+                    await loadTeamTree(currentActivePartnerId);
 
                     let txBody = document.getElementById('transactionsBody');
                     let txs = p.transactions || [];
@@ -204,6 +218,31 @@
             } catch (err) {
                 console.error("Error loading partner:", err);
                 alert('حدث خطأ أثناء جلب بيانات الحساب.');
+            }
+        }
+
+        async function loadTeamTree(myId) {
+            let treeContainer = document.getElementById('teamTreeContainer');
+            try {
+                let allPartnersSnap = await getDocs(collection(db, "partners"));
+                let downlines = [];
+
+                allPartnersSnap.forEach(d => {
+                    let data = d.data();
+                    let upline = data.uplineId || data.sponsor || "";
+                    if (upline.toUpperCase() === myId.toUpperCase()) {
+                        downlines.push(d.id);
+                    }
+                });
+
+                if (downlines.length > 0) {
+                    treeContainer.innerHTML = `${myId} ← ` + downlines.join(' - ');
+                } else {
+                    treeContainer.innerHTML = `${myId} (لا يوجد شركاء مسجلين تحت فريقك المباشر حتى الآن)`;
+                }
+            } catch(e) {
+                console.error(e);
+                treeContainer.innerHTML = `${myId}`;
             }
         }
 
