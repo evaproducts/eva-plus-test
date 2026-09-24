@@ -359,7 +359,6 @@
         }
     }
 
-    // دالة عامة للتعامل مع تأكيد أو رفض الطلبات (مع إبقاء الحجز لمدة 10 دقائق)
     window.handleOrderAction = async function(orderId, productCode, actionType) {
         if(confirm(actionType === 'partner_reject' ? 'هل أنت متأكد من رفض الطلب؟' : 'هل أنت متأكد من حذف الطلب؟')) {
             try {
@@ -374,20 +373,23 @@
         }
     }
 
-    // تأكيد طلب أيفا بلس (توزيع أرباح، توليد حساب شريك، وفتح واتساب برقم الشريك الجديد متضمناً رابط صفحة الشركاء)
+    // تأكيد طلب أيفا بلس (سحب "ربح الشركاء" agentPrice وتوزيعه حصراً على الشجرة، توليد حساب شريك، وفتح واتساب)
     window.confirmPartnerOrder = async function(order) {
         try {
             let sellerId = order.sponsor && order.sponsor !== "الإدارة المركزية" && order.sponsor !== "EVA-ROOT" ? order.sponsor : "EVA-001";
             let newPartnerId = "EVA-" + Math.floor(100 + Math.random() * 900);
             let rawPass = Math.floor(1000 + Math.random() * 9000).toString();
 
-            // إنشاء حساب للشريك الجديد تلقائياً في قاعدة البيانات
             await setDoc(doc(db, "partners", newPartnerId), {
+                partnerId: newPartnerId,
                 name: order.clientName,
                 phone: order.clientPhone,
                 password: rawPass,
                 balance: 0,
                 uplineId: sellerId,
+                sponsor: sellerId,
+                firstLogin: true,
+                lastLogin: "لم يتم الدخول بعد",
                 createdAt: new Date().toISOString()
             });
 
@@ -397,6 +399,7 @@
                 
                 if (prodSnap.exists()) {
                     let prodData = prodSnap.data();
+                    // جلب ربح الشركاء المخصص للتوزيع (agentPrice) بدلاً من سعر الكتالوج الكلي
                     let partnerProfit = parseFloat(prodData.agentPrice || 0);
 
                     if (partnerProfit > 0) {
@@ -451,14 +454,12 @@
                     }
                 }
 
-                // إبقاء المنتج محجوزاً لمدة 10 دقائق بعد التأكيد للتأكد النهائي
                 let tenMinutesLater = new Date(Date.now() + 10 * 60 * 1000).toISOString();
                 await setDoc(doc(db, "products", order.productCode), { reservedUntil: tenMinutesLater }, { merge: true });
             }
 
             await deleteDoc(doc(db, "orders", order.id));
 
-            // فتح واتساب مباشرة لرقم الشريك الجديد مع تضمين بيانات الحساب ورابط صفحة الشركاء
             let rawP = (order.clientPhone || '').toString().trim();
             let cleanPhone = rawP.replace(/^\+/, '').replace(/^00/, '').replace(/[^0-9]/g, '');
             let partnerPortalUrl = "https://evaproducts.github.io/eva-plus-test/partner.html";
@@ -468,7 +469,7 @@
             let waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(welcomeMsg)}`;
             window.open(waUrl, '_blank');
 
-            alert('✅ تم تأكيد الطلب بنجاح، توزيع الأرباح، إنشاء حساب الشريك (' + newPartnerId + ')، وفتح الواتساب لمراسلة الشريك متضمنة رابط صفحة الشركاء!');
+            alert('✅ تم تأكيد الطلب بنجاح، توزيع ربح الشركاء، إنشاء حساب الشريك (' + newPartnerId + ')، وفتح الواتساب لمراسلة الشريك!');
             loadOrders();
 
         } catch (err) {
