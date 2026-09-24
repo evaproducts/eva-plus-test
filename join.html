@@ -5,286 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>انضم إلى نظام EVA PLUS | اعمل من المنزل واربح معنا</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #fdfbfb 0%, #fce4ec 100%);
-            color: #333;
-            margin: 0;
-            padding: 0;
-            line-height: 1.8;
-        }
-        .hero {
-            background: linear-gradient(rgba(136,14,79,0.85), rgba(173,20,87,0.85)), url('https://images.unsplash.com/photo-1513201099705-a9746e1e201f?auto=format&fit=crop&w=1200&q=80') center/cover;
-            color: white;
-            text-align: center;
-            padding: 50px 20px;
-            border-bottom: 4px solid #d4af37;
-        }
-        .logo-img {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 50%;
-            border: 3px solid #d4af37;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            background: #fff;
-        }
-        .hero h1 {
-            font-size: 28px;
-            margin-bottom: 5px;
-            color: #fff;
-            letter-spacing: 1px;
-        }
-        .hero p {
-            font-size: 16px;
-            color: #fffde7;
-            max-width: 650px;
-            margin: 0 auto;
-            font-weight: bold;
-        }
-        .container {
-            max-width: 750px;
-            margin: -30px auto 40px auto;
-            background: #fff;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            position: relative;
-            border: 1px solid #f8bbd0;
-        }
-        .sponsor-alert-box {
-            background: #e3f2fd;
-            border: 1px solid #90caf9;
-            color: #0d47a1;
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            font-weight: bold;
-            text-align: center;
-            display: none;
-        }
-        .video-container {
-            position: relative;
-            width: 100%;
-            padding-bottom: 56.25%;
-            height: 0;
-            background: #000;
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            border: 2px solid #d4af37;
-        }
-        .video-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        .shein-hook-box {
-            background: linear-gradient(135deg, #fff3e0 100%, #ffe0b2 0%);
-            border: 2px solid #ffb74d;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 25px;
-            color: #e65100;
-        }
-        .shein-hook-box h3 {
-            margin-top: 0;
-            font-size: 19px;
-            color: #ef6c00;
-            text-align: center;
-        }
-        .shein-hook-box p {
-            font-size: 14px;
-            line-height: 1.8;
-            margin-bottom: 10px;
-            color: #4e342e;
-            font-weight: bold;
-        }
-        .core-idea-box {
-            background: linear-gradient(135deg, #f8bbd0 0%, #f48fb1 100%);
-            color: #fff;
-            padding: 22px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(136,14,79,0.15);
-        }
-        .core-idea-box h3 {
-            margin-top: 0;
-            font-size: 20px;
-            color: #fff;
-        }
-        .core-idea-box p {
-            font-size: 15px;
-            margin-bottom: 0;
-            line-height: 1.8;
-            font-weight: bold;
-        }
-        h2 {
-            color: #880e4f;
-            font-size: 18px;
-            margin-bottom: 15px;
-            border-right: 4px solid #ad1457;
-            padding-right: 10px;
-        }
-        .about-text, .details-box {
-            font-size: 14px;
-            color: #555;
-            margin-bottom: 25px;
-            text-align: justify;
-        }
-        .details-box {
-            background: #fff0f5;
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid #f8bbd0;
-        }
-        .details-box ul {
-            padding-right: 20px;
-            margin: 10px 0;
-        }
-        .details-box li {
-            margin-bottom: 12px;
-            color: #444;
-        }
-        .payout-box {
-            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-            border: 2px solid #81c784;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 25px;
-            color: #1b5e20;
-        }
-        .payout-box h3 {
-            margin-top: 0;
-            font-size: 18px;
-            color: #2e7d32;
-            text-align: center;
-        }
-        .payout-box p {
-            font-size: 14px;
-            line-height: 1.7;
-            margin-bottom: 0;
-            font-weight: bold;
-        }
-        .evaplus-power-box {
-            background: linear-gradient(135deg, #fff9c4 0%, #fffde7 100%);
-            border: 2px dashed #d4af37;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-        }
-        .evaplus-power-box h3 {
-            color: #880e4f;
-            margin-top: 0;
-            font-size: 18px;
-            text-align: center;
-        }
-        .evaplus-power-box p {
-            font-size: 14px;
-            color: #333;
-            line-height: 1.7;
-            margin-bottom: 10px;
-        }
-        .example-box {
-            background: #fff;
-            padding: 12px 15px;
-            border-radius: 8px;
-            border: 1px solid #f9a825;
-            font-size: 13px;
-            color: #5d4037;
-            margin-top: 10px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #444;
-            font-size: 14px;
-        }
-        input, select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 14px;
-            background: #fff;
-        }
-        .phone-input-group {
-            display: flex;
-            gap: 8px;
-        }
-        .phone-input-group select {
-            flex: 0 0 130px;
-            background: #f9f9f9;
-            font-weight: bold;
-            color: #880e4f;
-        }
-        .phone-input-group input {
-            flex: 1;
-        }
-        .register-btn {
-            background: #ad1457;
-            color: white;
-            border: none;
-            width: 100%;
-            padding: 15px;
-            font-size: 17px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            text-align: center;
-            display: block;
-            text-decoration: none;
-            margin-top: 20px;
-            box-shadow: 0 4px 12px rgba(173, 20, 87, 0.3);
-            transition: 0.3s;
-        }
-        .register-btn:hover {
-            background: #880e4f;
-        }
-        .support-box {
-            background: #fce4ec;
-            border: 1px solid #f8bbd0;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            margin-top: 25px;
-            font-size: 14px;
-            color: #880e4f;
-        }
-        .support-box a {
-            color: #ad1457;
-            font-weight: bold;
-            text-decoration: none;
-        }
-        .footer-link {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-        }
-        .footer-link a {
-            color: #880e4f;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        footer {
-            text-align: center;
-            color: #888;
-            font-size: 13px;
-            margin-bottom: 30px;
-            margin-top: 30px;
-        }
+        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #fdfbfb 0%, #fce4ec 100%); color: #333; margin: 0; padding: 0; line-height: 1.8; }
+        .hero { background: linear-gradient(rgba(136,14,79,0.85), rgba(173,20,87,0.85)), url('https://images.unsplash.com/photo-1513201099705-a9746e1e201f?auto=format&fit=crop&w=1200&q=80') center/cover; color: white; text-align: center; padding: 50px 20px; border-bottom: 4px solid #d4af37; }
+        .logo-img { width: 100px; height: 100px; object-fit: cover; border-radius: 50%; border: 3px solid #d4af37; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); background: #fff; }
+        .hero h1 { font-size: 28px; margin-bottom: 5px; color: #fff; letter-spacing: 1px; }
+        .hero p { font-size: 16px; color: #fffde7; max-width: 650px; margin: 0 auto; font-weight: bold; }
+        .container { max-width: 750px; margin: -30px auto 40px auto; background: #fff; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); position: relative; border: 1px solid #f8bbd0; }
+        .sponsor-alert-box { background: #e3f2fd; border: 1px solid #90caf9; color: #0d47a1; padding: 12px 15px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; font-weight: bold; text-align: center; display: none; }
+        .video-container { position: relative; width: 100%; padding-bottom: 56.25%; height: 0; background: #000; border-radius: 12px; overflow: hidden; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); border: 2px solid #d4af37; }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        .shein-hook-box { background: linear-gradient(135deg, #fff3e0 100%, #ffe0b2 0%); border: 2px solid #ffb74d; border-radius: 12px; padding: 20px; margin-bottom: 25px; color: #e65100; }
+        .shein-hook-box h3 { margin-top: 0; font-size: 19px; color: #ef6c00; text-align: center; }
+        .shein-hook-box p { font-size: 14px; line-height: 1.8; margin-bottom: 10px; color: #4e342e; font-weight: bold; }
+        .core-idea-box { background: linear-gradient(135deg, #f8bbd0 0%, #f48fb1 100%); color: #fff; padding: 22px; border-radius: 12px; margin-bottom: 25px; text-align: center; box-shadow: 0 4px 15px rgba(136,14,79,0.15); }
+        .core-idea-box h3 { margin-top: 0; font-size: 20px; color: #fff; }
+        .core-idea-box p { font-size: 15px; margin-bottom: 0; line-height: 1.8; font-weight: bold; }
+        h2 { color: #880e4f; font-size: 18px; margin-bottom: 15px; border-right: 4px solid #ad1457; padding-right: 10px; }
+        .about-text, .details-box { font-size: 14px; color: #555; margin-bottom: 25px; text-align: justify; }
+        .details-box { background: #fff0f5; padding: 20px; border-radius: 10px; border: 1px solid #f8bbd0; }
+        .details-box ul { padding-right: 20px; margin: 10px 0; }
+        .details-box li { margin-bottom: 12px; color: #444; }
+        .payout-box { background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border: 2px solid #81c784; border-radius: 12px; padding: 20px; margin-bottom: 25px; color: #1b5e20; }
+        .payout-box h3 { margin-top: 0; font-size: 18px; color: #2e7d32; text-align: center; }
+        .payout-box p { font-size: 14px; line-height: 1.7; margin-bottom: 0; font-weight: bold; }
+        .evaplus-power-box { background: linear-gradient(135deg, #fff9c4 0%, #fffde7 100%); border: 2px dashed #d4af37; padding: 20px; border-radius: 12px; margin-bottom: 25px; }
+        .evaplus-power-box h3 { color: #880e4f; margin-top: 0; font-size: 18px; text-align: center; }
+        .evaplus-power-box p { font-size: 14px; color: #333; line-height: 1.7; margin-bottom: 10px; }
+        .example-box { background: #fff; padding: 12px 15px; border-radius: 8px; border: 1px solid #f9a825; font-size: 13px; color: #5d4037; margin-top: 10px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #444; font-size: 14px; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px; background: #fff; }
+        .phone-input-group { display: flex; gap: 8px; }
+        .phone-input-group select { flex: 0 0 130px; background: #f9f9f9; font-weight: bold; color: #880e4f; }
+        .phone-input-group input { flex: 1; }
+        .register-btn { background: #ad1457; color: white; border: none; width: 100%; padding: 15px; font-size: 17px; font-weight: bold; border-radius: 8px; cursor: pointer; text-align: center; display: block; text-decoration: none; margin-top: 20px; box-shadow: 0 4px 12px rgba(173, 20, 87, 0.3); transition: 0.3s; }
+        .register-btn:hover { background: #880e4f; }
+        .support-box { background: #fce4ec; border: 1px solid #f8bbd0; padding: 15px; border-radius: 10px; text-align: center; margin-top: 25px; font-size: 14px; color: #880e4f; }
+        .support-box a { color: #ad1457; font-weight: bold; text-decoration: none; }
+        .footer-link { text-align: center; margin-top: 20px; font-size: 14px; }
+        .footer-link a { color: #880e4f; text-decoration: none; font-weight: bold; }
+        footer { text-align: center; color: #888; font-size: 13px; margin-bottom: 30px; margin-top: 30px; }
     </style>
 </head>
 <body>
@@ -333,7 +93,7 @@
         <div class="evaplus-power-box">
             <h3>💎 كيف تقلب موازين دخلك مع نظام EVA PLUS?</h3>
             <p>
-                عبر نظام <b>EVA PLUS</b>، أنت لا تعمل وحدك أبداً. أرباحك تتضاعف تراكمياً صعوداً وهبوطاً عبر الشجرة؛ فكل شخص تدعوه للانضمام تحت شجرتك تصبح شريكاً معه في أرباحه، وكلما توسعت شبكتك وكبرت الشجرة التي أنت أساسها، أصبحوا هم يعملون لأجلك!
+                عبر نظام <b>EVA PLUS</b>، أنت لا تعمل وحدك أبداً. أرباحك تتضاعف تراكمياً صعوداً وهبوطاً عبر الشجرة؛ فكل شخص تدعوه للانضمام تحت شجرتك تصبح شريك معه في أرباحه، وكلما توسعت شبكتك وكبرت الشجرة التي أنت أساسها، أصبحوا هم يعملون لأجلك!
             </p>
             <div class="example-box">
                 <b>💡 مثال توضيحي لقوة EVA PLUS:</b><br>
@@ -411,8 +171,6 @@
         const db = getFirestore(app);
 
         const urlParams = new URLSearchParams(window.location.search);
-        
-        // التحقق من وجود الشريك الداعي، وإذا لم يوجد يتم تعيين رأس الهرم EVA-001 تلقائياً
         const rawRef = urlParams.get('ref');
         const refId = (rawRef && rawRef.toUpperCase().startsWith('EVA-')) ? rawRef.trim().toUpperCase() : 'EVA-001';
         
@@ -430,18 +188,16 @@
             const name = document.getElementById('fullName').value.trim();
             const address = document.getElementById('address').value.trim();
             const prefix = document.getElementById('phonePrefix').value;
-            const rawNumber = document.getElementById('phoneNumber').value.trim().replace(/^0/, ''); // إزالة الصفر البادئ إن وجد للمقارنة الموحدة
+            const rawNumber = document.getElementById('phoneNumber').value.trim().replace(/^0/, '');
 
             if(!name || !address || !rawNumber) {
                 alert('الرجاء تعبئة كافة الحقول (الاسم، العنوان، ورقم الهاتف) للانتقال للكتالوج.');
                 return;
             }
 
-            // الرقم الكامل المخزن في النظام
             const fullPhone = prefix + rawNumber;
 
             try {
-                // جلب كافة الشركاء والطلبات لفحص الرقم الفعلي (بدون المقدمة) منعاً للتلاعب
                 const partnersSnap = await getDocs(collection(db, "partners"));
                 const ordersSnap = await getDocs(collection(db, "orders"));
 
@@ -450,17 +206,13 @@
                 partnersSnap.forEach(docItem => {
                     let pPhone = (docItem.data().phone || "").toString();
                     let cleanStoredPhone = pPhone.replace(/^00970/, '').replace(/^00972/, '').replace(/^0/, '');
-                    if (cleanStoredPhone === rawNumber) {
-                        isDuplicate = true;
-                    }
+                    if (cleanStoredPhone === rawNumber) isDuplicate = true;
                 });
 
                 ordersSnap.forEach(docItem => {
                     let oPhone = (docItem.data().clientPhone || "").toString();
                     let cleanStoredPhone = oPhone.replace(/^00970/, '').replace(/^00972/, '').replace(/^0/, '');
-                    if (cleanStoredPhone === rawNumber) {
-                        isDuplicate = true;
-                    }
+                    if (cleanStoredPhone === rawNumber) isDuplicate = true;
                 });
 
                 if (isDuplicate) {
@@ -479,8 +231,9 @@
                 name: name,
                 address: address,
                 phone: fullPhone,
-                sponsor: refId,  // سيتم حفظ الشريك الداعي أو EVA-001 بانتظام
-                uplineId: refId, // لضمان التوافق التام مع شجرة الفريق
+                sponsor: refId,
+                uplineId: refId,
+                isJoinProcess: true, // علامة مميزة لطلب الانضمام الرئيسي
                 status: 'pending',
                 date: new Date().toISOString()
             };
