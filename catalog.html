@@ -192,7 +192,6 @@
         let selectedProductForOrder = null;
         let urlParams = new URLSearchParams(window.location.search);
         
-        // التقاط رقم الشريك الداعي بدقة من الرابط (ref أو user) حصراً إذا بدأ بـ EVA-
         let rawPartnerInput = (urlParams.get('ref') || urlParams.get('user') || '').trim();
         let partnerUser = null;
         let isSystemPartnerOrder = false;
@@ -203,6 +202,32 @@
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
+            // التحقق من بيانات الانضمام القادمة من join.html وتعبئتها تلقائياً إن وجدت
+            let pendingUserJson = localStorage.getItem('eva_current_user');
+            if (pendingUserJson) {
+                try {
+                    let pData = JSON.parse(pendingUserJson);
+                    if (pData && pData.partnerId) {
+                        partnerUser = pData.sponsor || 'EVA-001';
+                        isSystemPartnerOrder = true;
+                        document.getElementById('clientName').value = pData.name || '';
+                        document.getElementById('clientAddress').value = pData.address || '';
+                        if (pData.phone) {
+                            let phoneStr = pData.phone.toString();
+                            if (phoneStr.startsWith('00970')) {
+                                document.getElementById('phonePrefix').value = '00970';
+                                document.getElementById('clientPhone').value = phoneStr.replace('00970', '');
+                            } else if (phoneStr.startsWith('00972')) {
+                                document.getElementById('phonePrefix').value = '00972';
+                                document.getElementById('clientPhone').value = phoneStr.replace('00972', '');
+                            } else {
+                                document.getElementById('clientPhone').value = phoneStr;
+                            }
+                        }
+                    }
+                } catch(e) { console.error(e); }
+            }
+
             if (isSystemPartnerOrder && partnerUser) {
                 let joinBtn = document.getElementById('joinEvaPlusBtn');
                 if (joinBtn) joinBtn.style.display = 'none';
@@ -328,9 +353,11 @@
         window.openOrderModal = function(code, name) {
             selectedProductForOrder = { code, name };
             document.getElementById('modalProductName').innerText = `المنتج: ${name} (${code})`;
-            document.getElementById('clientName').value = '';
-            document.getElementById('clientPhone').value = '';
-            document.getElementById('clientAddress').value = '';
+            if (!localStorage.getItem('eva_current_user')) {
+                document.getElementById('clientName').value = '';
+                document.getElementById('clientPhone').value = '';
+                document.getElementById('clientAddress').value = '';
+            }
             document.getElementById('orderModal').style.display = 'flex';
         };
 
@@ -358,7 +385,35 @@
                     reservedUntil: reserveDate
                 }, { merge: true });
 
-                // حفظ الطلب حسب نوعه (أيفا بلس مع الداعي الصحيح، أو طلب عادي مباشر)
+                // التحقق من وجود طلب انضمام رئيسي قادم من join.html
+                let pendingUserJson = localStorage.getItem('eva_current_user');
+                if (pendingUserJson) {
+                    try {
+                        let pData = JSON.parse(pendingUserJson);
+                        if (pData && pData.partnerId) {
+                            await setDoc(doc(db, "orders", orderId), {
+                                orderType: 'partner',
+                                isJoinProcess: true, // علامة رئيسية لطلب الانضمام
+                                partnerId: pData.partnerId,
+                                productCode: selectedProductForOrder.code,
+                                productName: selectedProductForOrder.name,
+                                clientName: name,
+                                clientPhone: fullPhone,
+                                clientAddress: address,
+                                sponsor: pData.sponsor || 'EVA-001',
+                                createdAt: new Date().toISOString()
+                            });
+
+                            localStorage.removeItem('eva_current_user');
+                            closeOrderModal();
+                            alert('✅ تم إرسال طلب انضمامك واختيار منتجك بنجاح! سيتم مراجعته وتفعيل حسابك قريباً.');
+                            window.location.href = 'catalog.html';
+                            return;
+                        }
+                    } catch(e) { console.error(e); }
+                }
+
+                // حفظ الطلب حسب نوعه (رابط شريك أو زبون عادي)
                 if (isSystemPartnerOrder && partnerUser) {
                     await setDoc(doc(db, "orders", orderId), {
                         orderType: 'partner',
@@ -367,7 +422,7 @@
                         clientName: name,
                         clientPhone: fullPhone,
                         clientAddress: address,
-                        sponsor: partnerUser, // تخزين رقم الداعي الأصلي صاحب الرابط بدقة
+                        sponsor: partnerUser,
                         createdAt: new Date().toISOString()
                     });
 
@@ -376,7 +431,6 @@
                     location.reload();
 
                 } else {
-                    // زبون عادي تماماً بدون أي رابط شريك (يحول لواتساب المعرض)
                     await setDoc(doc(db, "orders", orderId), {
                         orderType: 'normal',
                         productCode: selectedProductForOrder.code,
