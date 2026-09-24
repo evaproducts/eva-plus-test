@@ -14,7 +14,7 @@
             direction: rtl;
         }
         .container {
-            max-width: 1050px;
+            max-width: 1100px;
             margin: 0 auto;
             background: #fff;
             padding: 25px;
@@ -134,6 +134,16 @@
             border-radius: 8px;
             margin-bottom: 12px;
         }
+        .status-dot {
+            height: 14px;
+            width: 14px;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 4px rgba(0,0,0,0.2);
+        }
+        .dot-red { background-color: #e74c3c; animation: pulseRed 1.5s infinite; }
+        .dot-green { background-color: #27ae60; }
+        @keyframes pulseRed { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
     </style>
 </head>
 <body>
@@ -187,17 +197,19 @@
         <table>
             <thead>
                 <tr>
+                    <th>الحالة</th>
                     <th>الرمز (ID)</th>
                     <th>اسم الشريك</th>
                     <th>رقم الهاتف</th>
                     <th>الرصيد الحالي</th>
                     <th>كلمة المرور</th>
                     <th>الداعي</th>
+                    <th>آخر تسجيل دخول</th>
                     <th>إجراءات الدعم</th>
                 </tr>
             </thead>
             <tbody id="partnersTableBody">
-                <tr><td colspan="7" style="text-align:center;">جاري تحميل الشجرة...</td></tr>
+                <tr><td colspan="9" style="text-align:center;">جاري تحميل الشجرة...</td></tr>
             </tbody>
         </table>
     </div>
@@ -221,7 +233,7 @@
                 <h3 id="mBalance" style="margin: 5px 0 0 0; color: #2e7d32; border: none;">0 ₪</h3>
             </div>
 
-            <!-- شريط وسجل الحركات المالية للشريك (مقتصرة على الحقول الأربعة المطلوبة تماماً) -->
+            <!-- شريط وسجل الحركات المالية للشريك -->
             <h4 style="color: #880e4f; margin-bottom: 8px;">📊 شريط الحركات والأرباح</h4>
             <div style="max-height: 180px; overflow-y: auto; border: 1px solid #f8bbd0; border-radius: 8px; margin-bottom: 15px;">
                 <table style="margin-top: 0;">
@@ -289,6 +301,8 @@
                         balance: 0,
                         transactions: [],
                         uplineId: "none",
+                        firstLogin: true,
+                        lastLogin: "لم يتم الدخول بعد",
                         createdAt: new Date().toISOString()
                     });
                 }
@@ -313,14 +327,24 @@
                     }
                     searchOptions += `<option value="${p.partnerId}">${p.partnerId} (${p.name})</option>`;
 
+                    // تحديد النقطة الحمراء (جديد) أو الخضراء (سجل دخوله)
+                    let hasLoggedIn = p.firstLogin === false;
+                    let statusDot = hasLoggedIn 
+                        ? `<span class="status-dot dot-green" title="سجل دخوله للحساب"></span>` 
+                        : `<span class="status-dot dot-red" title="شريك جديد - لم يدخل حسابه بعد"></span>`;
+
+                    let lastLoginTime = p.lastLogin || 'لم يتم الدخول بعد';
+
                     rowsHtml += `
                         <tr>
+                            <td>${statusDot}</td>
                             <td><b>${p.partnerId}</b></td>
                             <td>${p.name}</td>
                             <td>${p.phone || 'غير مسجل'}</td>
                             <td><b style="color: #2e7d32;">${p.balance || 0} ₪</b></td>
                             <td><code style="background:#eee; padding:2px 6px; border-radius:4px; color:#c2185b;">${p.password || 'غير محدد'}</code></td>
                             <td>${p.uplineId || p.sponsor || 'EVA-001'}</td>
+                            <td style="font-size: 12px; color: #555;">${lastLoginTime}</td>
                             <td>
                                 <button class="btn" onclick='openPartnerPreview("${p.partnerId}")'>👁️ عرض الحساب</button>
                             </td>
@@ -329,7 +353,7 @@
                 });
 
                 if(rowsHtml === '') {
-                    rowsHtml = `<tr><td colspan="7" style="text-align:center; color:#888;">لا توجد سجلات شركاء حقيقيين في الشجرة حتى الآن.</td></tr>`;
+                    rowsHtml = `<tr><td colspan="9" style="text-align:center; color:#888;">لا توجد سجلات شركاء حقيقيين في الشجرة حتى الآن.</td></tr>`;
                 }
 
                 document.getElementById('partnersTableBody').innerHTML = rowsHtml;
@@ -338,7 +362,7 @@
 
             } catch (error) {
                 console.error("Error loading partners:", error);
-                document.getElementById('partnersTableBody').innerHTML = `<tr><td colspan="7" style="color:red;">خطأ في تحميل بيانات الشجرة.</td></tr>`;
+                document.getElementById('partnersTableBody').innerHTML = `<tr><td colspan="9" style="color:red;">خطأ في تحميل بيانات الشجرة.</td></tr>`;
             }
         }
 
@@ -454,6 +478,8 @@
                     balance: 0,
                     transactions: [],
                     uplineId: uplineId,
+                    firstLogin: true,
+                    lastLogin: "لم يتم الدخول بعد",
                     createdAt: new Date().toISOString()
                 });
 
