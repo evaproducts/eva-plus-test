@@ -3,206 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل دخول الشريك | EVA PLUS</title>
+    <title>لوحة تحكم الشريك | EVA PLUS</title>
     <style>
-        :root {
-            --primary-color: #880e4f;
-            --secondary-color: #ad1457;
-            --accent-color: #d4af37;
-            --bg-gradient: linear-gradient(135deg, #fdfbfb 0%, #fce4ec 100%);
-            --card-bg: #ffffff;
-            --text-color: #333333;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg-gradient);
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            direction: rtl;
-        }
-
-        .login-wrapper {
-            width: 100%;
-            max-width: 420px;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        .login-card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(136, 14, 79, 0.1);
-            padding: 35px 30px;
-            border: 1px solid rgba(248, 187, 208, 0.5);
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .login-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 6px;
-            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
-        }
-
-        .brand-logo {
-            width: 85px;
-            height: 85px;
-            object-fit: cover;
-            border-radius: 50%;
-            border: 3px solid var(--accent-color);
-            margin-bottom: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            background: #fff;
-        }
-
-        .login-title {
-            color: var(--primary-color);
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-
-        .login-subtitle {
-            color: #666;
-            font-size: 13px;
-            margin-bottom: 25px;
-            line-height: 1.5;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            text-align: right;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: bold;
-            color: #444;
-            margin-bottom: 6px;
-        }
-
-        .input-with-icon {
-            position: relative;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            box-sizing: border-box;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            background: #fafafa;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--secondary-color);
-            background: #fff;
-            box-shadow: 0 0 0 4px rgba(173, 20, 87, 0.1);
-        }
-
-        .login-btn {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            border: none;
-            width: 100%;
-            padding: 14px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 10px;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(173, 20, 87, 0.3);
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(136, 14, 79, 0.4);
-        }
-
-        .login-footer-links {
-            margin-top: 22px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 13px;
-        }
-
-        .login-footer-links a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: bold;
-            transition: color 0.2s;
-        }
-
-        .login-footer-links a:hover {
-            color: var(--secondary-color);
-            text-decoration: underline;
-        }
-
-        .brand-footer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 12px;
-            color: #888;
-        }
+        body { font-family: Arial, sans-serif; background: #fdf2f4; color: #333; margin: 0; padding: 15px; direction: rtl; }
+        .container { max-width: 700px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-top: 5px solid #880e4f; }
+        h2, h3, h4 { color: #880e4f; border-bottom: 2px solid #f8bbd0; padding-bottom: 8px; margin-top: 0; }
+        .btn { background: #ad1457; color: white; border: none; padding: 10px 18px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; width: 100%; margin-top: 10px; }
+        .btn:hover { background: #880e4f; }
+        .blue-btn { background: #1976d2; }
+        .blue-btn:hover { background: #115293; }
+        .whatsapp-btn { background: #25d366; }
+        .whatsapp-btn:hover { background: #20ba5a; }
+        .logout-btn { background: #e74c3c; width: auto; padding: 6px 12px; font-size: 12px; margin-top: 0; }
+        .logout-btn:hover { background: #c0392b; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; font-size: 13px; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; background: #f9f9f9; font-size: 13px; }
+        .partner-card { background: #fff0f5; border: 1px solid #f8bbd0; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        .balance-box { background: #e8f5e9; border: 1px solid #81c784; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #f8bbd0; padding: 10px; text-align: center; font-size: 13px; }
+        th { background: #fff0f5; color: #880e4f; }
+        .link-text { display: block; text-align: center; margin-top: 15px; color: #880e4f; text-decoration: none; font-weight: bold; font-size: 14px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="login-wrapper">
-        <div class="login-card">
-            <!-- الشعار أو الأيقونة -->
-            <img src="logo.jpg" alt="EVA PLUS" class="brand-logo" onerror="this.src='https://images.unsplash.com/photo-1513201099705-a9746e1e201f?auto=format&fit=crop&w=200&q=80'">
+    <div class="container" id="mainContainer" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+            <h2 style="margin: 0; border: none;">🌸 لوحة تحكم الشريك</h2>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span id="partnerIdBadge" style="background: #880e4f; color: #fff; padding: 4px 10px; border-radius: 6px; font-weight: bold; font-size: 13px;"></span>
+                <button class="btn logout-btn" onclick="logoutPartner()">🚪 تسجيل الخروج</button>
+            </div>
+        </div>
+
+        <div class="partner-card">
+            <p><b>اسم الشريك:</b> <span id="pName"></span></p>
+            <p><b>رقم الهاتف:</b> <span id="pPhone"></span></p>
+            <p><b>العنوان:</b> <span id="pAddress"></span></p>
+            <p><b>الشريك الداعي لك (Upline):</b> <span id="pUpline" style="color: #b8860b; font-weight: bold;"></span></p>
+            <p><b>كلمة المرور الخاصة بك:</b> <code id="pPass" style="background:#fff; padding:2px 8px; border-radius:4px; color:#c2185b; font-weight:bold;"></code></p>
             
-            <div class="login-title">🔐 بوابة الشركاء - EVA PLUS</div>
-            <div class="login-subtitle">الرجاء إدخال رقم الشريك (اليوزر) وكلمة المرور الخاصة بحسابك للوصول إلى لوحة الأرباح والروابط.</div>
-
-            <!-- نموذج تسجيل الدخول البرمجي (تم الحفاظ على المعرفات ودوال الـ JS كما هي تماماً) -->
-            <div class="form-group">
-                <label>رقم الشريك (اليوزر):</label>
-                <input type="text" id="partnerIdInput" class="form-control" placeholder="مثال: EVA-491">
-            </div>
-
-            <div class="form-group">
-                <label>كلمة المرور:</label>
-                <input type="password" id="partnerPasswordInput" class="form-control" placeholder="أدخل كلمة المرور الخاصة بك">
-            </div>
-
-            <button type="button" onclick="loginPartner()" class="login-btn">
-                دخول لوحة التحكم 🚀
-            </button>
-
-            <div class="login-footer-links">
-                <a href="#" onclick="forgotPassword()">نسيت كلمة المرور؟</a>
-                <a href="https://linky.ps/eva" target="_blank">linky.ps/eva 🌐</a>
+            <hr style="border:0; border-top:1px dashed #f8bbd0; margin: 15px 0;">
+            
+            <!-- قسم تعديل كلمة المرور -->
+            <h4 style="font-size: 14px; color: #880e4f; margin-bottom: 8px; border:none;">🔐 تغيير كلمة المرور</h4>
+            <div style="display: flex; gap: 8px;">
+                <input type="text" id="newPasswordInput" placeholder="أدخل كلمة المرور الجديدة" style="margin-bottom: 0; background: #fff;">
+                <button class="btn" style="margin-top: 0; width: 130px; padding: 8px;" onclick="updatePartnerPassword()">تحديث</button>
             </div>
         </div>
 
-        <div class="brand-footer">
-            جميع الحقوق محفوظة © معرض إيفا براند - نظام EVA PLUS 2026
+        <div class="balance-box">
+            <span style="font-size: 14px; color: #1b5e20; font-weight: bold;">💰 رصيدك الحالي المتاح:</span>
+            <h2 id="pBalance" style="margin: 5px 0 0 0; color: #2e7d32; border: none;">0 ₪</h2>
         </div>
+
+        <!-- شجرة فريق التسويق الخاص بك -->
+        <h4>🌳 فريق التسويق والشجرة التابعة لك</h4>
+        <div style="background: #fff8fa; border: 1px solid #f8bbd0; border-radius: 8px; padding: 12px; margin-bottom: 20px;">
+            <p style="font-size: 12px; color: #666; margin-top: 0;">الشركاء والعملاء المسجلون تحت شبكتك المباشرة والفرعية:</p>
+            <div id="teamTreeContainer" style="font-weight: bold; color: #880e4f; font-size: 14px; word-break: break-all; background: #fff; padding: 10px; border-radius: 6px; border: 1px solid #fce4ec;">
+                جاري تحميل الشجرة...
+            </div>
+        </div>
+
+        <!-- شريط وسجل الحركات والأرباح -->
+        <h4>📊 سجل الحركات والأرباح</h4>
+        <div style="max-height: 200px; overflow-y: auto; border: 1px solid #f8bbd0; border-radius: 8px; margin-bottom: 20px;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>التاريخ والوقت (date)</th>
+                        <th>عدد الشركاء (chainLength)</th>
+                        <th>إجمالي الربح (totalProfit)</th>
+                        <th>حصة الشريك (shareAmount)</th>
+                    </tr>
+                </thead>
+                <tbody id="transactionsBody">
+                    <tr><td colspan="4" style="color: #888; text-align: center;">لا توجد حركات أرباح مسجلة حتى الآن.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="form-group">
+            <label>رابط الكتالوج الخاص بك (للمشاركة مع الزبائن):</label>
+            <input type="text" id="catalogLink" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>رابط الاستقطاب الخاص بك (لتسجيل شركاء جدد في فريقك):</label>
+            <input type="text" id="referralLink" readonly>
+        </div>
+
+        <button class="btn blue-btn" onclick="copyInfo()">📋 نسخ روابطك ومعلوماتك</button>
+        <a href="catalog.html" class="link-text">⬅️ تصفح الكتالوج الرقمي</a>
     </div>
 
-    <!-- كود الـ JavaScript البرمجي الأصلي دون أي تعديل في الوظائف لضمان سلامة العمل -->
+    <!-- شاشة تسجيل الدخول -->
+    <div class="container" id="loginContainer" style="max-width: 400px; text-align: center; display: none;">
+        <h2 style="color: #880e4f;">🔐 تسجيل دخول الشريك</h2>
+        <p style="font-size: 13px; color: #666; margin-bottom: 20px;">الرجاء إدخال رقم الشريك (اليوزر) وكلمة المرور الخاصة بك.</p>
+        
+        <div id="loginFormSection">
+            <div class="form-group" style="text-align: right;">
+                <label>رقم الشريك (اليوزر):</label>
+                <input type="text" id="loginId" placeholder="مثلاً: EVA-102" style="background:#fff;">
+            </div>
+            <div class="form-group" style="text-align: right;">
+                <label>كلمة المرور:</label>
+                <input type="password" id="loginPass" placeholder="كلمة المرور" style="background:#fff;">
+            </div>
+            <button class="btn" onclick="partnerLogin()">دخول للوحة التحكم</button>
+            <span class="link-text" onclick="showForgotPassword()">نسيت كلمة المرور؟</span>
+        </div>
+
+        <!-- قسم استعادة كلمة المرور عبر واتساب الدعم -->
+        <div id="forgotSection" style="display: none; text-align: right; margin-top: 15px; border-top: 1px dashed #f8bbd0; padding-top: 15px;">
+            <h4 style="color: #880e4f; margin-bottom: 10px; font-size: 14px;">🔑 استعادة كلمة المرور</h4>
+            <div class="form-group">
+                <label>الاسم الكامل للحساب:</label>
+                <input type="text" id="forgotName" placeholder="ادخل اسمك المسجل" style="background:#fff;">
+            </div>
+            <div class="form-group">
+                <label>رقم الهاتف المعتمد:</label>
+                <input type="text" id="forgotPhone" placeholder="0590000000" style="background:#fff;">
+            </div>
+            <button class="btn whatsapp-btn" onclick="sendForgotPasswordWhatsApp()">💬 إرسال طلب الاستعادة عبر واتساب</button>
+            <span class="link-text" onclick="backToLogin()" style="font-size: 13px; margin-top: 10px;">⬅️ العودة لتسجيل الدخول</span>
+        </div>
+
+        <a href="catalog.html" class="link-text" style="margin-top: 25px;">⬅️ العودة للكتالوج</a>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, getDocs, collection, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAqPpKqqHBEIJZTCGCROFzqZyHOYlnDgP4",
@@ -216,40 +153,199 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        window.loginPartner = async function() {
-            let pId = document.getElementById('partnerIdInput').value.trim().toUpperCase();
-            let pPass = document.getElementById('partnerPasswordInput').value.trim();
+        let urlParams = new URLSearchParams(window.location.search);
+        let partnerUser = urlParams.get('user');
+        let currentActivePartnerId = "";
 
-            if (!pId || !pPass) {
-                alert('الرجاء إدخال رقم الشريك وكلمة المرور.');
-                return;
+        window.addEventListener('DOMContentLoaded', async () => {
+            if (partnerUser) {
+                loadPartnerData(partnerUser);
+            } else {
+                let savedUser = localStorage.getItem('eva_partner_user');
+                if (savedUser) {
+                    loadPartnerData(savedUser);
+                } else {
+                    document.getElementById('loginContainer').style.display = 'block';
+                }
             }
+        });
 
+        async function loadPartnerData(userId) {
             try {
-                let docRef = doc(db, "partners", pId);
+                let cleanId = userId.toUpperCase().trim();
+                let docRef = doc(db, "partners", cleanId);
                 let docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {
-                    let data = docSnap.data();
-                    let storedPass = (data.password || "").toString().trim();
+                    let p = docSnap.data();
+                    currentActivePartnerId = p.partnerId || cleanId;
 
-                    if (storedPass === pPass) {
-                        localStorage.setItem('eva_logged_partner', pId);
-                        window.location.href = `partner_dashboard.html?user=${pId}`;
+                    let nowFormatted = new Date().toLocaleString('ar-EG');
+                    await updateDoc(docRef, {
+                        firstLogin: false,
+                        lastLogin: nowFormatted
+                    });
+
+                    document.getElementById('loginContainer').style.display = 'none';
+                    document.getElementById('mainContainer').style.display = 'block';
+
+                    document.getElementById('partnerIdBadge').innerText = currentActivePartnerId;
+                    document.getElementById('pName').innerText = p.name || 'بدون اسم';
+                    document.getElementById('pPhone').innerText = p.phone || 'غير مسجل';
+                    document.getElementById('pAddress').innerText = p.address || 'غير محدد';
+                    document.getElementById('pUpline').innerText = p.uplineId || p.sponsor || 'EVA-001 (رأس الهرم)';
+                    document.getElementById('pPass').innerText = p.password || 'غير محدد';
+                    document.getElementById('pBalance').innerText = (p.balance || 0) + " ₪";
+
+                    let baseUrl = window.location.origin + window.location.pathname.replace('partner.html', '');
+                    document.getElementById('catalogLink').value = `${baseUrl}catalog.html?user=${currentActivePartnerId}`;
+                    document.getElementById('referralLink').value = `${baseUrl}join.html?ref=${currentActivePartnerId}`;
+
+                    await loadTeamTree(currentActivePartnerId);
+
+                    let txBody = document.getElementById('transactionsBody');
+                    let txs = p.transactions || [];
+                    if (txs.length > 0) {
+                        txBody.innerHTML = txs.slice().reverse().map(t => `
+                            <tr>
+                                <td>${t.date}</td>
+                                <td>${t.chainLength} أفراد</td>
+                                <td>${t.totalProfit} ₪</td>
+                                <td><b style="color: #2e7d32;">+${t.shareAmount} ₪</b></td>
+                            </tr>
+                        `).join('');
                     } else {
-                        alert('⚠️ كلمة المرور غير صحيحة. يرجى المحاولة مرة أخرى.');
+                        txBody.innerHTML = `<tr><td colspan="4" style="color: #888; text-align: center;">لا توجد حركات أرباح مسجلة حتى الآن.</td></tr>`;
                     }
+
+                    localStorage.setItem('eva_partner_user', currentActivePartnerId);
+
                 } else {
-                    alert('❌ رقم الشريك غير مسجل في النظام.');
+                    alert('رقم الشريك غير صحيح.');
+                    localStorage.removeItem('eva_partner_user');
+                    document.getElementById('mainContainer').style.display = 'none';
+                    document.getElementById('loginContainer').style.display = 'block';
                 }
             } catch (err) {
-                console.error("Login error:", err);
-                alert('حدث خطأ أثناء تسجيل الدخول، يرجى المحاولة لاحقاً.');
+                console.error("Error loading partner:", err);
+                alert('حدث خطأ أثناء جلب بيانات الحساب.');
+            }
+        }
+
+        async function loadTeamTree(myId) {
+            let treeContainer = document.getElementById('teamTreeContainer');
+            try {
+                let allPartnersSnap = await getDocs(collection(db, "partners"));
+                let downlines = [];
+
+                allPartnersSnap.forEach(d => {
+                    let data = d.data();
+                    let upline = data.uplineId || data.sponsor || "";
+                    if (upline.toUpperCase() === myId.toUpperCase()) {
+                        downlines.push(d.id);
+                    }
+                });
+
+                if (downlines.length > 0) {
+                    treeContainer.innerHTML = `${myId} ← ` + downlines.join(' - ');
+                } else {
+                    treeContainer.innerHTML = `${myId} (لا يوجد شركاء مسجلين تحت فريقك المباشر حتى الآن)`;
+                }
+            } catch(e) {
+                console.error(e);
+                treeContainer.innerHTML = `${myId}`;
+            }
+        }
+
+        // دالة تسجيل الخروج ومسح الذاكرة وإعادة التوجيه لصفحة الدخول
+        window.logoutPartner = function() {
+            localStorage.removeItem('eva_partner_user');
+            // إزالة بارامترات الرابط إن وجدت وإعادة تحميل الصفحة نظيفة
+            if (window.location.search) {
+                window.location.href = window.location.pathname;
+            } else {
+                document.getElementById('mainContainer').style.display = 'none';
+                document.getElementById('loginContainer').style.display = 'block';
+                document.getElementById('loginId').value = '';
+                document.getElementById('loginPass').value = '';
             }
         };
 
-        window.forgotPassword = function() {
-            alert('للاسترجاع أو المساعدة، يرجى التواصل مع الإدارة المركزية لمعرض إيفا براند عبر الواتساب.');
+        window.updatePartnerPassword = async function() {
+            let newPass = document.getElementById('newPasswordInput').value.trim();
+            if (!newPass) return alert('الرجاء إدخال كلمة المرور الجديدة.');
+
+            if (!currentActivePartnerId) return alert('حدث خطأ في تحديد رقم الشريك.');
+
+            try {
+                let docRef = doc(db, "partners", currentActivePartnerId);
+                await updateDoc(docRef, { password: newPass });
+                document.getElementById('pPass').innerText = newPass;
+                document.getElementById('newPasswordInput').value = '';
+                alert('✅ تم تحديث كلمة المرور بنجاح!');
+            } catch(e) {
+                console.error(e);
+                alert('حدث خطأ أثناء تحديث كلمة المرور.');
+            }
+        };
+
+        window.partnerLogin = async function() {
+            let uId = document.getElementById('loginId').value.toUpperCase().trim();
+            let uPass = document.getElementById('loginPass').value.trim();
+
+            if (!uId || !uPass) return alert('الرجاء إدخال اليوزر وكلمة المرور.');
+
+            try {
+                let docSnap = await getDoc(doc(db, "partners", uId));
+                if (docSnap.exists()) {
+                    let p = docSnap.data();
+                    if (p.password === uPass) {
+                        loadPartnerData(uId);
+                    } else {
+                        alert('كلمة المرور غير صحيحة.');
+                    }
+                } else {
+                    alert('رقم الشريك غير موجود.');
+                }
+            } catch(e) {
+                alert('حدث خطأ في تسجيل الدخول.');
+            }
+        };
+
+        window.showForgotPassword = function() {
+            document.getElementById('loginFormSection').style.display = 'none';
+            document.getElementById('forgotSection').style.display = 'block';
+        };
+
+        window.backToLogin = function() {
+            document.getElementById('forgotSection').style.display = 'none';
+            document.getElementById('loginFormSection').style.display = 'block';
+        };
+
+        window.sendForgotPasswordWhatsApp = function() {
+            let name = document.getElementById('forgotName').value.trim();
+            let phone = document.getElementById('forgotPhone').value.trim();
+
+            if (!name || !phone) {
+                return alert('الرجاء إدخال الاسم ورقم الهاتف.');
+            }
+
+            let supportPhone = "970594101632";
+            let msg = `مرحباً فريق الدعم في إيفا براند، نسيت كلمة المرور الخاص بحساب الشريك الخاص بي.\n\n- الاسم: ${name}\n- رقم الهاتف: ${phone}\n\nالرجاء تزويدي ببيانات الحساب.`;
+            let waUrl = `https://wa.me/${supportPhone}?text=${encodeURIComponent(msg)}`;
+
+            window.open(waUrl, '_blank');
+        };
+
+        window.copyInfo = function() {
+            let cat = document.getElementById('catalogLink').value;
+            let ref = document.getElementById('referralLink').value;
+            let pass = document.getElementById('pPass').innerText;
+            let id = document.getElementById('partnerIdBadge').innerText;
+
+            let text = `🌸 معلومات حسابك في EVA PLUS:\n\n- اليوزر: ${id}\n- كلمة المرور: ${pass}\n\n🔗 رابط الكتالوج الخاص بك:\n${cat}\n\n🌳 رابط الاستقطاب:\n${ref}`;
+            navigator.clipboard.writeText(text);
+            alert('✅ تم نسخ روابط ومعلومات الحساب بنجاح!');
         };
     </script>
 </body>
