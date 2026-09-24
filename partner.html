@@ -14,6 +14,8 @@
         .blue-btn:hover { background: #115293; }
         .whatsapp-btn { background: #25d366; }
         .whatsapp-btn:hover { background: #20ba5a; }
+        .logout-btn { background: #e74c3c; width: auto; padding: 6px 12px; font-size: 12px; margin-top: 0; }
+        .logout-btn:hover { background: #c0392b; }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; font-size: 13px; }
         .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; background: #f9f9f9; font-size: 13px; }
@@ -28,9 +30,12 @@
 <body>
 
     <div class="container" id="mainContainer" style="display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h2>🌸 لوحة تحكم الشريك - EVA PLUS</h2>
-            <span id="partnerIdBadge" style="background: #880e4f; color: #fff; padding: 4px 10px; border-radius: 6px; font-weight: bold; font-size: 13px;"></span>
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+            <h2 style="margin: 0; border: none;">🌸 لوحة تحكم الشريك</h2>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span id="partnerIdBadge" style="background: #880e4f; color: #fff; padding: 4px 10px; border-radius: 6px; font-weight: bold; font-size: 13px;"></span>
+                <button class="btn logout-btn" onclick="logoutPartner()">🚪 تسجيل الخروج</button>
+            </div>
         </div>
 
         <div class="partner-card">
@@ -175,7 +180,6 @@
                     let p = docSnap.data();
                     currentActivePartnerId = p.partnerId || cleanId;
 
-                    // التعديل الذكي لتحديث وقت آخر تسجيل دخول وتحويل النقطة إلى خضراء
                     let nowFormatted = new Date().toLocaleString('ar-EG');
                     await updateDoc(docRef, {
                         firstLogin: false,
@@ -197,7 +201,6 @@
                     document.getElementById('catalogLink').value = `${baseUrl}catalog.html?user=${currentActivePartnerId}`;
                     document.getElementById('referralLink').value = `${baseUrl}join.html?ref=${currentActivePartnerId}`;
 
-                    // جلب شجرة الفريق التابعة لهذا الشريك
                     await loadTeamTree(currentActivePartnerId);
 
                     let txBody = document.getElementById('transactionsBody');
@@ -220,6 +223,7 @@
                 } else {
                     alert('رقم الشريك غير صحيح.');
                     localStorage.removeItem('eva_partner_user');
+                    document.getElementById('mainContainer').style.display = 'none';
                     document.getElementById('loginContainer').style.display = 'block';
                 }
             } catch (err) {
@@ -252,6 +256,20 @@
                 treeContainer.innerHTML = `${myId}`;
             }
         }
+
+        // دالة تسجيل الخروج ومسح الذاكرة وإعادة التوجيه لصفحة الدخول
+        window.logoutPartner = function() {
+            localStorage.removeItem('eva_partner_user');
+            // إزالة بارامترات الرابط إن وجدت وإعادة تحميل الصفحة نظيفة
+            if (window.location.search) {
+                window.location.href = window.location.pathname;
+            } else {
+                document.getElementById('mainContainer').style.display = 'none';
+                document.getElementById('loginContainer').style.display = 'block';
+                document.getElementById('loginId').value = '';
+                document.getElementById('loginPass').value = '';
+            }
+        };
 
         window.updatePartnerPassword = async function() {
             let newPass = document.getElementById('newPasswordInput').value.trim();
