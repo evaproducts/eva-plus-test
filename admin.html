@@ -10,32 +10,65 @@
     <style>
         body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #fdfbfb 0%, #fce4ec 100%); padding: 15px; direction: rtl; margin: 0; min-height: 100vh; padding-bottom: 70px; }
         
-        /* تنسيقات شاشة تسجيل الدخول للإدارة */
+        /* تنسيقات شاشة تسجيل الدخول للإدارة المتوافقة مع الموبايل */
         #adminLoginSection {
-            max-width: 400px;
-            margin: 60px auto;
+            width: 100%;
+            max-width: 380px;
+            margin: 40px auto;
             background: #fff;
-            padding: 30px;
+            padding: 25px;
             border-radius: 16px;
             box-shadow: 0 10px 25px rgba(136,14,79,0.1);
             border: 1px solid #f8bbd0;
             text-align: center;
+            box-sizing: border-box;
         }
         #adminLoginSection h2 {
             color: #880e4f;
             font-size: 20px;
             border-right: none;
             justify-content: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
-        .header-panel { background: #fff; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-bottom: 3px solid #d4af37; }
-        .header-panel h1 { color: #880e4f; margin: 0 0 5px 0; font-size: 22px; }
+        .header-panel { background: #fff; padding: 15px 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-bottom: 3px solid #d4af37; display: flex; justify-content: space-between; align-items: center; position: relative; }
+        .header-panel h1 { color: #880e4f; margin: 0; font-size: 18px; }
         
-        .admin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; max-width: 1000px; margin: 0 auto; }
-        .box { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); border: 1px solid #f8bbd0; display: flex; flex-direction: column; justify-content: space-between; }
+        /* زر القائمة الجانبية (ثلاث شحطات) */
+        .menu-toggle-btn { background: #880e4f; color: #fff; border: none; padding: 8px 12px; border-radius: 8px; font-size: 18px; cursor: pointer; }
+        
+        /* القائمة الجانبية المنبثقة */
+        #sideDrawer {
+            position: fixed;
+            top: 0;
+            right: -320px;
+            width: 300px;
+            height: 100%;
+            background: #fff;
+            box-shadow: -5px 0 20px rgba(0,0,0,0.15);
+            z-index: 4000;
+            transition: right 0.3s ease;
+            box-sizing: border-box;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        #sideDrawer.open { right: 0; }
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            z-index: 3500;
+            display: none;
+        }
+        .drawer-overlay.open { display: block; }
+
+        .admin-grid { display: grid; grid-template-columns: 1fr; gap: 15px; max-width: 800px; margin: 0 auto; }
+        .box { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); border: 1px solid #f8bbd0; display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 15px; }
         .box-full { grid-column: 1 / -1; }
-        h2 { font-size: 16px; color: #880e4f; border-right: 4px solid #d4af37; padding-right: 10px; margin-top: 0; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        h2 { font-size: 15px; color: #880e4f; border-right: 4px solid #d4af37; padding-right: 10px; margin-top: 0; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
         
         .badge-notification { background: #e74c3c; color: #fff; font-size: 12px; padding: 2px 8px; border-radius: 12px; font-weight: bold; animation: pulseBadge 1.5s infinite; }
         @keyframes pulseBadge { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
@@ -57,11 +90,37 @@
         .orange-btn:hover { background: #d35400; }
         .whatsapp-btn { background: #25d366; margin-top: 5px; }
         .whatsapp-btn:hover { background: #20ba5a; }
-        .link-home { display: inline-block; text-align: center; margin: 20px auto; background: #880e4f; color: #fff; padding: 10px 25px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 14px; box-shadow: 0 3px 10px rgba(136,14,79,0.2); }
         hr { border: 0; border-top: 1px solid #eee; margin: 15px 0; }
         .orders-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
         .orders-table th, .orders-table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
         .orders-table th { background-color: #f9f9f9; color: #333; }
+
+        /* تنسيقات نافذة استعلام الرصيد المنبثقة (Modal) */
+        #partnerModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 5000;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+        .modal-content {
+            background: #fff;
+            width: 100%;
+            max-width: 400px;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            position: relative;
+            box-sizing: border-box;
+            border-top: 4px solid #d4af37;
+        }
 
         /* شريط تثبيت لوحة التحكم السفلي (PWA Banner) */
         #pwaInstallBanner {
@@ -117,31 +176,130 @@
         <label>كلمة المرور:</label>
         <input type="password" id="adminLoginPass" placeholder="كلمة المرور">
         <button onclick="verifyAdminLogin()" style="background: #880e4f; margin-top: 10px;">تسجيل الدخول</button>
-        <div style="margin-top: 20px;">
-            <a href="catalog.html" class="link-home" style="margin: 0; padding: 8px 20px; font-size: 12px;">⬅️ العودة للكتالوج الرقمي</a>
-        </div>
     </div>
 
     <!-- المحتوى الرئيسي للوحة التحكم (مخفي لحين تسجيل الدخول) -->
     <div id="adminMainContent" style="display: none;">
         <div class="header-panel">
-            <h1>👑 لوحة التحكم الشاملة - إيفا بلس</h1>
-            <p style="color: #ad1457; font-size: 13px; margin: 5px 0 0 0;">إدارة المنتجات، الطلبات، والأقسام بكل احترافية</p>
-            <div style="display: flex; justify-content: center; gap: 10px; margin-top: 15px;">
-                <a href="catalog.html" class="link-home" style="margin:0;">⬅️ معاينة الكتالوج الرقمي</a>
-                <button onclick="adminLogout()" style="background: #e74c3c; width: auto; padding: 8px 20px; font-size: 13px; border-radius: 20px;">تسجيل خروج 🔒</button>
+            <button class="menu-toggle-btn" onclick="toggleDrawer()">☰</button>
+            <h1>👑 لوحة التحكم الشاملة</h1>
+            <button onclick="adminLogout()" style="background: #e74c3c; width: auto; padding: 6px 14px; font-size: 12px; border-radius: 6px;">خروج 🔒</button>
+        </div>
+
+        <!-- القائمة الجانبية المنبثقة (Drawer) -->
+        <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
+        <div id="sideDrawer">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #d4af37; padding-bottom: 10px;">
+                <h3 style="color: #880e4f; margin:0; font-size: 16px;">📂 أقسام الإدارة</h3>
+                <button onclick="toggleDrawer()" style="background: #e74c3c; width: 30px; height: 30px; padding: 0; border-radius: 50%; font-size: 14px;">✕</button>
+            </div>
+
+            <!-- رسالة الإدارة البارزة -->
+            <div class="box" style="margin-bottom: 15px;">
+                <h2>📢 رسالة الإدارة</h2>
+                <textarea id="adminNoticeInput" rows="2" placeholder="اكتب رسالة الإدارة..."></textarea>
+                <button onclick="saveAdminNotice()" class="blue-btn" style="font-size: 12px; padding: 8px;">حفظ الرسالة</button>
+            </div>
+
+            <!-- إدارة الأقسام -->
+            <div class="box" style="margin-bottom: 15px;">
+                <h2>📂 إدارة الأقسام</h2>
+                <label style="font-size: 11px;">إضافة قسم جديد:</label>
+                <div style="display: flex; gap: 5px; margin-bottom: 8px;">
+                    <input type="text" id="autoCatId" readonly style="width: 50px; text-align: center; margin-bottom: 0; font-size: 12px;">
+                    <input type="text" id="newCatName" placeholder="اسم القسم" style="margin-bottom: 0; font-size: 12px;">
+                </div>
+                <button onclick="addCategory()" class="blue-btn" style="font-size: 12px; padding: 8px; margin-bottom: 10px;">إضافة القسم</button>
+                <hr style="margin: 8px 0;">
+                <label style="font-size: 11px;">تعديل/حذف قسم:</label>
+                <select id="catSelect" onchange="fillCategoryEditName()" style="margin-bottom: 6px; font-size: 12px;"></select>
+                <input type="text" id="editCatName" placeholder="الاسم المعدل" style="font-size: 12px;">
+                <div style="display: flex; gap: 5px;">
+                    <button onclick="updateCategory()" class="blue-btn" style="font-size: 11px; padding: 6px;">حفظ</button>
+                    <button onclick="deleteCategory()" class="delete-btn" style="font-size: 11px; padding: 6px; margin-top: 0;">حذف</button>
+                </div>
+            </div>
+
+            <!-- إضافة منتج جديد -->
+            <div class="box" style="margin-bottom: 15px;">
+                <h2>➕ إضافة منتج</h2>
+                <label style="font-size: 11px;">القسم:</label>
+                <select id="pCategory" onchange="updateProductCodePreview()" style="font-size: 12px;"></select>
+                <label style="font-size: 11px;">صور المنتج:</label>
+                <input type="file" id="pImages" accept="image/*" multiple style="font-size: 11px;">
+                <label style="font-size: 11px;">اسم المنتج:</label>
+                <input type="text" id="pName" placeholder="اسم المنتج" style="font-size: 12px;">
+                <label style="font-size: 11px;">الكود التلقائي:</label>
+                <input type="text" id="pCode" readonly style="font-size: 12px;">
+                <label style="font-size: 11px;">السعر ₪:</label>
+                <input type="number" id="pPrice" placeholder="150" style="font-size: 12px;">
+                <label style="font-size: 11px;">ربح الشركاء ₪:</label>
+                <input type="number" id="pAgentPrice" placeholder="20" style="font-size: 12px;">
+                <button onclick="saveProduct()" style="font-size: 12px; padding: 8px;">حفظ المنتج</button>
+            </div>
+
+            <!-- تعديل منتج -->
+            <div class="box" style="margin-bottom: 15px;">
+                <h2>✏️ تعديل منتج</h2>
+                <label style="font-size: 11px;">أدخل كود المنتج:</label>
+                <div style="display: flex; gap: 5px;">
+                    <input type="text" id="lookupProdCode" placeholder="A1" style="margin-bottom: 8px; font-size: 12px;">
+                    <button onclick="fetchProductDataForEdit()" class="blue-btn" style="width: 80px; height: 35px; font-size: 11px;">بحث</button>
+                </div>
+                <label style="font-size: 11px;">الاسم:</label>
+                <div class="editable-field-wrapper">
+                    <input type="text" id="editProdName" readonly style="font-size: 12px;">
+                    <span class="edit-pen-icon" onclick="enableField('editProdName')">✏️</span>
+                </div>
+                <label style="font-size: 11px;">السعر:</label>
+                <div class="editable-field-wrapper">
+                    <input type="number" id="editProdPrice" readonly style="font-size: 12px;">
+                    <span class="edit-pen-icon" onclick="enableField('editProdPrice')">✏️</span>
+                </div>
+                <label style="font-size: 11px;">ربح الشركاء:</label>
+                <div class="editable-field-wrapper">
+                    <input type="number" id="editProdAgentPrice" readonly style="font-size: 12px;">
+                    <span class="edit-pen-icon" onclick="enableField('editProdAgentPrice')">✏️</span>
+                </div>
+                <label style="font-size: 11px;">تحديث الصور:</label>
+                <input type="file" id="editProdImages" accept="image/*" multiple style="font-size: 11px;">
+                <button onclick="saveUpdatedProductData()" class="orange-btn" style="font-size: 12px; padding: 8px;">حفظ التعديلات</button>
+            </div>
+
+            <!-- حذف منتج -->
+            <div class="box">
+                <h2>🗑️ حذف منتج</h2>
+                <label style="font-size: 11px;">كود المنتج:</label>
+                <input type="text" id="delCode" placeholder="A1" style="font-size: 12px;">
+                <button class="delete-btn" onclick="deleteProduct()" style="font-size: 12px; padding: 8px;">حذف نهائي</button>
             </div>
         </div>
 
+        <!-- الشاشة الرئيسية (بنك إيفا بلس، استعلام الرصيد، والطلبات) -->
         <div class="admin-grid">
 
+            <!-- بنك إيفا بلس واستعلام رصيد الشريك -->
+            <div class="box" style="background: linear-gradient(135deg, #fff5f8, #fff); border: 1px solid #d4af37;">
+                <h2>🏦 بنك إيفا بلس والاستعلام</h2>
+                <div style="text-align: center; margin-bottom: 15px;">
+                    <div style="font-size: 12px; color: #666;">إجمالي أرصدة ومستحقات كافة العملاء والشركاء:</div>
+                    <div id="totalBankBalance" style="font-size: 22px; font-weight: bold; color: #880e4f; margin-top: 5px;">جاري الحساب... ₪</div>
+                </div>
+                <hr>
+                <label>🔍 استعلام عن رصيد شريك:</label>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="searchPartnerIdInput" placeholder="أدخل رقم الشريك (مثال: EVA-491)" style="margin-bottom: 0;">
+                    <button onclick="queryPartnerBalance()" class="blue-btn" style="width: 100px; margin-bottom: 0;">استعلام</button>
+                </div>
+            </div>
+
             <!-- طلبات الزبائن -->
-            <div class="box box-full">
+            <div class="box">
                 <h2>
                     <span>🛍️ طلبات الزبائن (متجر الكتالوج المباشر)</span>
                     <span id="normalOrdersBadge" style="display: none;" class="badge-notification">0</span>
                 </h2>
-                <p style="font-size: 12px; color: #666; margin-top:0;">الطلبات الواردة من الزبائن الذين تصفحوا الكتالوج وطلبوا مباشرة بدون روابط شركاء.</p>
+                <p style="font-size: 12px; color: #666; margin-top:0;">الطلبات الواردة من الكتالوج مباشرة بدون روابط شركاء.</p>
                 <div style="overflow-x: auto;">
                     <table class="orders-table">
                         <thead>
@@ -158,12 +316,12 @@
             </div>
 
             <!-- طلبات أيفا بلس -->
-            <div class="box box-full">
+            <div class="box">
                 <h2>
                     <span>🌳 طلبات أيفا بلس (عبر روابط الشركاء والوسطاء)</span>
                     <span id="partnerOrdersBadge" style="display: none;" class="badge-notification">0</span>
                 </h2>
-                <p style="font-size: 12px; color: #666; margin-top:0;">الطلبات الواردة عبر روابط الشركاء لتوزيع "ربح الشركاء" على الشجرة فور التأكيد والتفعيل.</p>
+                <p style="font-size: 12px; color: #666; margin-top:0;">الطلبات الواردة عبر روابط الشركاء لتوزيع الأرباح على الشجرة.</p>
                 <div style="overflow-x: auto;">
                     <table class="orders-table">
                         <thead>
@@ -180,93 +338,17 @@
                 </div>
             </div>
 
-            <!-- رسالة الإدارة البارزة -->
-            <div class="box">
-                <h2>📢 رسالة الإدارة البارزة</h2>
-                <textarea id="adminNoticeInput" rows="3" placeholder="اكتب رسالة الإدارة لتظهر في أعلى الكتالوج..."></textarea>
-                <button onclick="saveAdminNotice()" class="blue-btn">حفظ رسالة الإدارة</button>
-            </div>
-
-            <!-- إدارة الأقسام -->
-            <div class="box">
-                <h2>📂 إدارة الأقسام</h2>
-                <label>إضافة قسم جديد:</label>
-                <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-                    <input type="text" id="autoCatId" readonly style="width: 70px; text-align: center; margin-bottom: 0;">
-                    <input type="text" id="newCatName" placeholder="اسم القسم الجديد" style="margin-bottom: 0;">
-                </div>
-                <button onclick="addCategory()" class="blue-btn" style="margin-bottom: 15px;">إضافة القسم</button>
-                <hr>
-                <label>تعديل اسم قسم:</label>
-                <select id="catSelect" onchange="fillCategoryEditName()" style="margin-bottom: 8px;"></select>
-                <input type="text" id="editCatName" placeholder="اسم القسم المعدل">
-                <button onclick="updateCategory()" class="blue-btn">حفظ التعديل</button>
-                <button onclick="deleteCategory()" class="delete-btn">حذف القسم</button>
-            </div>
-
-            <!-- إضافة منتج جديد -->
-            <div class="box">
-                <h2>➕ إضافة منتج جديد</h2>
-                <label>القسم:</label>
-                <select id="pCategory" onchange="updateProductCodePreview()"></select>
-                <label>صور المنتج:</label>
-                <input type="file" id="pImages" accept="image/*" multiple>
-                <label>اسم المنتج:</label>
-                <input type="text" id="pName" placeholder="اسم المنتج">
-                <label>كود المنتج التلقائي:</label>
-                <input type="text" id="pCode" readonly placeholder="يُولّد تلقائياً">
-                <label>السعر (للكتالوج) ₪:</label>
-                <input type="number" id="pPrice" placeholder="مثال: 150">
-                <label>ربح الشركاء (للشجرة) ₪:</label>
-                <input type="number" id="pAgentPrice" placeholder="مثال: 20">
-                <button onclick="saveProduct()">حفظ المنتج الجديد</button>
-            </div>
-
-            <!-- تعديل وتحديث منتج موجود -->
-            <div class="box">
-                <h2>✏️ تعديل وتحديث منتج موجود</h2>
-                <label>أدخل كود المنتج:</label>
-                <div style="display: flex; gap: 8px;">
-                    <input type="text" id="lookupProdCode" placeholder="مثال: A1" style="margin-bottom: 12px;">
-                    <button onclick="fetchProductDataForEdit()" class="blue-btn" style="width: 110px; height: 42px;">بحث ورابط</button>
-                </div>
-
-                <label>اسم المنتج:</label>
-                <div class="editable-field-wrapper">
-                    <input type="text" id="editProdName" readonly placeholder="ابحث عن الكود أولاً...">
-                    <span class="edit-pen-icon" onclick="enableField('editProdName')" title="تعديل الاسم">✏️</span>
-                </div>
-
-                <label>السعر (للكتالوج):</label>
-                <div class="editable-field-wrapper">
-                    <input type="number" id="editProdPrice" readonly placeholder="السعر الحالي...">
-                    <span class="edit-pen-icon" onclick="enableField('editProdPrice')" title="تعديل السعر">✏️</span>
-                </div>
-
-                <label>ربح الشركاء (للشجرة):</label>
-                <div class="editable-field-wrapper">
-                    <input type="number" id="editProdAgentPrice" readonly placeholder="ربح الشركاء الحالي...">
-                    <span class="edit-pen-icon" onclick="enableField('editProdAgentPrice')" title="تعديل ربح الشركاء">✏️</span>
-                </div>
-
-                <label>تحديث الصور (اختياري):</label>
-                <input type="file" id="editProdImages" accept="image/*" multiple>
-
-                <button onclick="saveUpdatedProductData()" class="orange-btn" style="margin-top: 5px;">حفظ التعديلات على المنتج</button>
-            </div>
-
-            <!-- حذف منتج -->
-            <div class="box">
-                <h2>🗑️ حذف منتج من الكتالوج</h2>
-                <label>كود المنتج المراد حذفه:</label>
-                <input type="text" id="delCode" placeholder="مثال: A1">
-                <button class="delete-btn" onclick="deleteProduct()" style="margin-top: 10px;">حذف المنتج نهائياً</button>
-            </div>
-
         </div>
+    </div>
 
-        <div style="text-align: center; margin: 30px 0;">
-            <a href="catalog.html" class="link-home">⬅️ معاينة الكتالوج الرقمي</a>
+    <!-- نافذة منبثقة (Modal) لعرض معلومات الرصيد والشريك المستعلم عنه -->
+    <div id="partnerModal">
+        <div class="modal-content">
+            <h3 style="color: #880e4f; margin-top: 0; border-right: 4px solid #d4af37; padding-right: 8px;">👤 بيانات الشريك والرصيد</h3>
+            <div id="partnerModalBody" style="font-size: 13px; color: #333; line-height: 1.6;">
+                <!-- البيانات ستظهر هنا ديناميكياً -->
+            </div>
+            <button onclick="closePartnerModal()" class="blue-btn" style="margin-top: 15px;">إغلاق النافذة</button>
         </div>
     </div>
 
@@ -288,6 +370,12 @@
 
     let allProducts = [];
     let loadedCategoriesData = [];
+
+    // التحكم بالقائمة الجانبية (Drawer)
+    window.toggleDrawer = function() {
+        document.getElementById('sideDrawer').classList.toggle('open');
+        document.getElementById('drawerOverlay').classList.toggle('open');
+    }
 
     // التحقق من حالة تسجيل الدخول مسبقاً في الـ localStorage
     window.addEventListener('DOMContentLoaded', () => {
@@ -320,6 +408,40 @@
         document.getElementById('adminLoginUser').value = '';
         document.getElementById('adminLoginPass').value = '';
     };
+
+    // دالة استعلام رصيد الشريك وعرضه في النافذة المنبثقة
+    window.queryPartnerBalance = async function() {
+        let pId = document.getElementById('searchPartnerIdInput').value.trim().toUpperCase();
+        if(!pId) return alert('الرجاء إدخال رقم الشريك أولاً (مثال: EVA-491)');
+
+        try {
+            let pDocRef = doc(db, "partners", pId);
+            let pSnap = await getDoc(pDocRef);
+
+            let modalBody = document.getElementById('partnerModalBody');
+            if(pSnap.exists()) {
+                let data = pSnap.data();
+                modalBody.innerHTML = `
+                    <b>🆔 رقم الشريك:</b> ${data.partnerId || pId}<br>
+                    <b>👤 اسم الشريك:</b> ${data.name || 'غير محدد'}<br>
+                    <b>📱 الهاتف:</b> ${data.phone || 'غير محدد'}<br>
+                    <b>💰 الرصيد الحالي:</b> <span style="color:#27ae60; font-size:16px; font-weight:bold;">${data.balance || 0} ₪</span><br>
+                    <b>🌳 الداعي (السونسور):</b> ${data.sponsor || 'EVA-001'}<br>
+                    <b>📅 تاريخ الانضمام:</b> ${data.createdAt ? new Date(data.createdAt).toLocaleDateString('ar-EG') : 'غير متوفر'}
+                `;
+            } else {
+                modalBody.innerHTML = `<span style="color:red;">❌ عذراً، لم يتم العثور على شريك بهذا الرقم في النظام.</span>`;
+            }
+            document.getElementById('partnerModal').style.display = 'flex';
+        } catch(err) {
+            console.error(err);
+            alert('حدث خطأ أثناء الاستعلام عن الرصيد.');
+        }
+    }
+
+    window.closePartnerModal = function() {
+        document.getElementById('partnerModal').style.display = 'none';
+    }
 
     // كود تفاعل شريط تثبيت التطبيق (PWA) للوحة الإدارة
     let deferredPrompt;
@@ -424,11 +546,28 @@
 
         updateProductCodePreview();
         loadOrders();
+        loadBankTotalBalance();
 
         const settingsSnap = await getDocs(collection(db, "settings"));
         settingsSnap.forEach(d => {
             if(d.id === 'notice') document.getElementById('adminNoticeInput').value = d.data().text || '';
         });
+    }
+
+    // حساب إجمالي رصيد بنك إيفا بلس (مجموع أرصدة كافة الشركاء)
+    async function loadBankTotalBalance() {
+        try {
+            const partnersSnap = await getDocs(collection(db, "partners"));
+            let totalBank = 0;
+            partnersSnap.forEach(d => {
+                let pData = d.data();
+                totalBank += parseFloat(pData.balance || 0);
+            });
+            document.getElementById('totalBankBalance').innerText = totalBank.toFixed(2) + " ₪";
+        } catch(e) {
+            console.error(e);
+            document.getElementById('totalBankBalance').innerText = "خطأ في الحساب";
+        }
     }
 
     async function loadOrders() {
@@ -546,13 +685,11 @@
         try {
             let sellerId = order.sponsor && order.sponsor !== "الإدارة المركزية" && order.sponsor !== "EVA-ROOT" ? order.sponsor : "EVA-001";
             
-            // تحديد إذا كان الطلب قادماً من الكتالوج المحال (لا ينشئ حساب شريك) أم من صفحة الانضمام (ينشئ حساب شريك)
             let isCatalogReferralOrder = order.isCatalogOrder === true || (order.orderType === 'partner' && !order.isJoinProcess);
 
             let newPartnerId = "";
             let rawPass = "";
 
-            // 1. إذا كان الطلب قادماً من صفحة الانضمام (join.html أو join.html?ref=...) -> أنشئ حساب شريك جديد
             if (!isCatalogReferralOrder) {
                 newPartnerId = "EVA-" + Math.floor(1000 + Math.random() * 9000);
                 rawPass = Math.floor(1000 + Math.random() * 9000).toString();
@@ -571,7 +708,6 @@
                 });
             }
 
-            // 2. توزيع الأرباح على الشجرة (لكلا الحالتين)
             if (order.productCode) {
                 let prodRef = doc(db, "products", order.productCode);
                 let prodSnap = await getDoc(prodRef);
@@ -642,15 +778,12 @@
             let cleanPhone = rawP.replace(/^\+/, '').replace(/^00/, '').replace(/[^0-9]/g, '');
             let waUrl = "";
 
-            // 3. توجيه رسالة الواتساب المناسبة بناءً على مصدر الطلب
             if (!isCatalogReferralOrder) {
-                // حالة الانضمام (join.html): إرسال رسالة ترحيبية تحتوي على اليوزر والباسورد ورابط الشركاء
                 let partnerPortalUrl = "https://evaproducts.github.io/eva-plus-test/partner.html";
                 let welcomeMsg = `مرحباً بك ${order.clientName} 🌸\nمبروك انضمامك رسمياً لعائلة نظام "إيفا بلس"!\n\nبيانات حسابك الشريك:\n🆔 رقم الشريك: ${newPartnerId}\n🔑 كلمة المرور: ${rawPass}\n\n🔗 رابط صفحة الشركاء لدخول حسابك:\n${partnerPortalUrl}\n\nيمكنك البدء بمشاركة رابط متجرك وتحقيق الأرباح.`;
                 waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(welcomeMsg)}`;
                 alert('✅ تم تأكيد الانضمام، إنشاء حساب الشريك (' + newPartnerId + '), وتوزيع الأرباح على الشجرة بنجاح!');
             } else {
-                // حالة الكتالوج المحال (catalog.html?user=...): رسالة تنسيق التوصيل للزبون بدون إنشاء حساب
                 let deliveryMsg = `مرحباً بك ${order.clientName}، بخصوص طلبك لمنتج (${order.productName}) في معرض إيفا براند عبر رابط الشريك (${sellerId})، جاري التنسيق للتوصيل.`;
                 waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(deliveryMsg)}`;
                 alert('✅ تم تأكيد الطلب، توزيع الأرباح على الشجرة للداعي (' + sellerId + '), وفتح واتساب تنسيق التوصيل للزبون!');
@@ -658,6 +791,7 @@
 
             window.open(waUrl, '_blank');
             loadOrders();
+            loadBankTotalBalance();
 
         } catch (err) {
             console.error("Error confirming partner order:", err);
