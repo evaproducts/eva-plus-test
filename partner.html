@@ -3,140 +3,476 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم الشريك | EVA PLUS</title>
+    <title>EVA PLUS PARTNER | لوحة تحكم الشريك</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #fdf2f4; color: #333; margin: 0; padding: 15px; direction: rtl; }
-        .container { max-width: 700px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-top: 5px solid #880e4f; }
-        h2, h3, h4 { color: #880e4f; border-bottom: 2px solid #f8bbd0; padding-bottom: 8px; margin-top: 0; }
-        .btn { background: #ad1457; color: white; border: none; padding: 10px 18px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; width: 100%; margin-top: 10px; }
-        .btn:hover { background: #880e4f; }
-        .blue-btn { background: #1976d2; }
-        .blue-btn:hover { background: #115293; }
-        .whatsapp-btn { background: #25d366; }
-        .whatsapp-btn:hover { background: #20ba5a; }
-        .logout-btn { background: #e74c3c; width: auto; padding: 6px 12px; font-size: 12px; margin-top: 0; }
-        .logout-btn:hover { background: #c0392b; }
+        :root {
+            --primary-burgundy: #880e4f;
+            --secondary-burgundy: #ad1457;
+            --light-burgundy: #fdf2f4;
+            --border-burgundy: #f8bbd0;
+            --accent-gold: #d4af37;
+            --dark-gold: #aa771c;
+            --text-color: #333333;
+            --bg-gradient: linear-gradient(135deg, #fdfbfb 0%, #fce4ec 100%);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-color);
+            margin: 0;
+            padding: 10px;
+            direction: rtl;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .app-wrapper {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(136, 14, 79, 0.08);
+            border: 1px solid rgba(248, 187, 208, 0.6);
+            position: relative;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* رأس الصفحة العلوي والبارز */
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-burgundy);
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+
+        .brand-title {
+            color: var(--primary-burgundy);
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .balance-badge-top {
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            border: 1px solid #81c784;
+            padding: 5px 12px;
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .balance-badge-top span {
+            font-size: 11px;
+            color: #1b5e20;
+            display: block;
+            font-weight: bold;
+        }
+
+        .balance-badge-top h3 {
+            margin: 0;
+            font-size: 15px;
+            color: #2e7d32;
+            border: none;
+            padding: 0;
+        }
+
+        /* القائمة الجانبية (3 شحطات) */
+        .menu-icon {
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--primary-burgundy);
+            padding: 5px;
+            background: var(--light-burgundy);
+            border-radius: 8px;
+            line-height: 1;
+        }
+
+        .side-drawer {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 280px;
+            height: 100%;
+            background: #ffffff;
+            box-shadow: -5px 0 25px rgba(0,0,0,0.15);
+            z-index: 1000;
+            transition: right 0.3s ease;
+            box-sizing: border-box;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .side-drawer.open {
+            right: 0;
+        }
+
+        .drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+
+        .drawer-close {
+            font-size: 20px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .drawer-item {
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            background: var(--light-burgundy);
+            color: var(--primary-burgundy);
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: right;
+            border: 1px solid var(--border-burgundy);
+            transition: all 0.2s;
+        }
+
+        .drawer-item:hover {
+            background: var(--primary-burgundy);
+            color: #fff;
+        }
+
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            z-index: 999;
+            display: none;
+        }
+
+        /* الأزرار والتنسيقات العامة */
+        .btn {
+            background: linear-gradient(135deg, var(--primary-burgundy), var(--secondary-burgundy));
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+            width: 100%;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(136, 14, 79, 0.2);
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .blue-btn { background: linear-gradient(135deg, #1976d2, #115293); box-shadow: 0 4px 12px rgba(25, 118, 210, 0.2); }
+        .whatsapp-btn { background: linear-gradient(135deg, #25d366, #20ba5a); box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2); }
+        .logout-btn { background: linear-gradient(135deg, #e74c3c, #c0392b); width: auto; padding: 6px 12px; font-size: 12px; margin-top: 0; box-shadow: none; }
+
         .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; font-size: 13px; }
-        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; background: #f9f9f9; font-size: 13px; }
-        .partner-card { background: #fff0f5; border: 1px solid #f8bbd0; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-        .balance-box { background: #e8f5e9; border: 1px solid #81c784; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #444; font-size: 12px; }
+        .form-group input { width: 100%; padding: 11px 14px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; background: #fafafa; font-size: 13px; }
+        .form-group input:focus { outline: none; border-color: var(--secondary-burgundy); background: #fff; }
+
+        .partner-card {
+            background: var(--light-burgundy);
+            border: 1px solid var(--border-burgundy);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        .partner-card p {
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .link-text {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: var(--primary-burgundy);
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .link-text:hover { text-decoration: underline; }
+
+        /* النوافذ المنبثقة (Modals) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .modal-content {
+            background: #fff;
+            width: 100%;
+            max-width: 450px;
+            max-height: 85vh;
+            border-radius: 15px;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            animation: modalSlide 0.3s ease;
+        }
+
+        @keyframes modalSlide {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-close-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            float: left;
+            margin-bottom: 10px;
+        }
+
+        /* شجرة الفريق الهرمية الجمالية */
+        .tree-node {
+            background: #fff;
+            border: 2px solid var(--border-burgundy);
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin: 8px 0;
+            text-align: center;
+            font-weight: bold;
+            color: var(--primary-burgundy);
+            box-shadow: 0 3px 10px rgba(136,14,79,0.05);
+        }
+
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #f8bbd0; padding: 10px; text-align: center; font-size: 13px; }
-        th { background: #fff0f5; color: #880e4f; }
-        .link-text { display: block; text-align: center; margin-top: 15px; color: #880e4f; text-decoration: none; font-weight: bold; font-size: 14px; cursor: pointer; }
+        th, td { border: 1px solid var(--border-burgundy); padding: 8px; text-align: center; font-size: 12px; }
+        th { background: var(--light-burgundy); color: var(--primary-burgundy); }
+
+        /* شاشة تسجيل الدخول */
+        .login-card {
+            text-align: center;
+        }
+        .brand-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid var(--accent-gold);
+            margin-bottom: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
 
-    <div class="container" id="mainContainer" style="display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
-            <h2 style="margin: 0; border: none;">🌸 لوحة تحكم الشريك</h2>
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <span id="partnerIdBadge" style="background: #880e4f; color: #fff; padding: 4px 10px; border-radius: 6px; font-weight: bold; font-size: 13px;"></span>
-                <button class="btn logout-btn" onclick="logoutPartner()">🚪 تسجيل الخروج</button>
+    <div class="app-wrapper">
+        <!-- القائمة الجانبية (3 شحطات) -->
+        <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
+        <div class="side-drawer" id="sideDrawer">
+            <div class="drawer-header">
+                <h3 style="margin:0; color:var(--primary-burgundy);">قائمة الحساب</h3>
+                <span class="drawer-close" onclick="toggleDrawer()">✕</span>
+            </div>
+            <div class="drawer-item" onclick="openModal('profileModal'); toggleDrawer();">👤 الملف الشخصي وتعديل البيانات</div>
+            <div class="drawer-item" onclick="openModal('treeModal'); toggleDrawer();">🌳 شجرة فريق التسويق</div>
+            <div class="drawer-item" onclick="openModal('txModal'); toggleDrawer();">📊 سجل الحركات والأرباح</div>
+            <div class="drawer-item" onclick="window.open('https://linky.ps/eva', '_blank')">🌐 زيارة linky.ps/eva</div>
+            <div style="margin-top: auto; padding-top: 15px; border-top: 1px solid #eee; text-align: center;">
+                <button class="btn logout-btn" onclick="logoutPartner()" style="width: 100%; padding: 10px;">🚪 تسجيل الخروج</button>
             </div>
         </div>
 
-        <div class="partner-card">
-            <p><b>اسم الشريك:</b> <span id="pName"></span></p>
-            <p><b>رقم الهاتف:</b> <span id="pPhone"></span></p>
-            <p><b>العنوان:</b> <span id="pAddress"></span></p>
-            <p><b>الشريك الداعي لك (Upline):</b> <span id="pUpline" style="color: #b8860b; font-weight: bold;"></span></p>
-            <p><b>كلمة المرور الخاصة بك:</b> <code id="pPass" style="background:#fff; padding:2px 8px; border-radius:4px; color:#c2185b; font-weight:bold;"></code></p>
+        <!-- لوحة تحكم الشريك (الرئيسية) -->
+        <div class="container" id="mainContainer" style="display: none;">
+            <div class="header-top">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span class="menu-icon" onclick="toggleDrawer()">☰</span>
+                    <h2 class="brand-title">EVA PLUS PARTNER</h2>
+                </div>
+                <div class="balance-badge-top">
+                    <span>رصيدك الحالي</span>
+                    <h3 id="pBalance">0 ₪</h3>
+                </div>
+            </div>
+
+            <!-- معلومات مختصرة مع رقم الشريك -->
+            <div style="display: flex; justify-content: space-between; align-items: center; background: var(--light-burgundy); padding: 10px 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--border-burgundy);">
+                <span style="font-size: 13px; font-weight: bold; color: #555;">رقم الشريك:</span>
+                <span id="partnerIdBadge" style="background: var(--primary-burgundy); color: #fff; padding: 4px 12px; border-radius: 6px; font-weight: bold; font-size: 13px;"></span>
+            </div>
+
+            <!-- الروابط في مقدمة الشاشة مع أزرار المشاركة والنسخ السريع -->
+            <div class="form-group">
+                <label>🔗 رابط الكتالوج الخاص بك (للمشاركة مع الزبائن):</label>
+                <div style="display: flex; gap: 6px;">
+                    <input type="text" id="catalogLink" readonly style="background: #fff; font-size: 11px;">
+                    <button class="btn blue-btn" style="margin-top:0; width: 85px; padding: 0; font-size: 12px;" onclick="copySpecificLink('catalogLink')">📋 نسخ</button>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label>🌳 رابط الاستقطاب الخاص بك (لتسجيل شركاء جدد):</label>
+                <div style="display: flex; gap: 6px;">
+                    <input type="text" id="referralLink" readonly style="background: #fff; font-size: 11px;">
+                    <button class="btn blue-btn" style="margin-top:0; width: 85px; padding: 0; font-size: 12px;" onclick="copySpecificLink('referralLink')">📋 نسخ</button>
+                </div>
+            </div>
+
+            <button class="btn" style="background: linear-gradient(135deg, var(--accent-gold), var(--dark-gold));" onclick="copyInfo()">📋 نسخ كافة روابط ومعلومات الحساب</button>
+        </div>
+
+        <!-- النافذة المنبثقة: الملف الشخصي وتعديل البيانات -->
+        <div class="modal-overlay" id="profileModal">
+            <div class="modal-content">
+                <button class="modal-close-btn" onclick="closeModal('profileModal')">إغلاق ✕</button>
+                <h3 style="color: var(--primary-burgundy); margin-top: 0; border-bottom: 2px solid var(--border-burgundy); padding-bottom: 8px;">👤 الملف الشخصي وتعديل البيانات</h3>
+                
+                <div class="partner-card">
+                    <p><b>اسم الشريك:</b> <span id="pName"></span></p>
+                    <p><b>رقم الهاتف:</b> <span id="pPhone"></span></p>
+                    <p><b>العنوان:</b> <span id="pAddress"></span></p>
+                    <p><b>الشريك الداعي لك (Upline):</b> <span id="pUpline" style="color: var(--dark-gold); font-weight: bold;"></span></p>
+                    <p><b>كلمة المرور الخاصة بك:</b> <code id="pPass" style="background:#fff; padding:2px 8px; border-radius:4px; color:var(--secondary-burgundy); font-weight:bold;"></code></p>
+                </div>
+
+                <!-- نموذج تعديل العنوان ورقم الهاتف المباشر -->
+                <div class="form-group">
+                    <label>تحديث رقم الهاتف:</label>
+                    <input type="text" id="editPhoneInput" placeholder="أدخل رقم الهاتف الجديد">
+                </div>
+                <div class="form-group">
+                    <label>تحديث العنوان:</label>
+                    <input type="text" id="editAddressInput" placeholder="أدخل العنوان الجديد (مثلاً: رام الله، الماصيون)">
+                </div>
+                <button class="btn" onclick="updatePartnerContactInfo()">حفظ تعديلات البيانات الشخصية</button>
+
+                <hr style="border:0; border-top:1px dashed var(--border-burgundy); margin: 20px 0;">
+
+                <h4 style="font-size: 13px; color: var(--primary-burgundy); margin-bottom: 8px;">🔐 تغيير كلمة المرور</h4>
+                <div class="form-group">
+                    <input type="text" id="newPasswordInput" placeholder="أدخل كلمة المرور الجديدة" style="background: #fff;">
+                </div>
+                <button class="btn" onclick="updatePartnerPassword()">تحديث كلمة المرور</button>
+            </div>
+        </div>
+
+        <!-- النافذة المنبثقة: شجرة فريق التسويق -->
+        <div class="modal-overlay" id="treeModal">
+            <div class="modal-content">
+                <button class="modal-close-btn" onclick="closeModal('treeModal')">إغلاق ✕</button>
+                <h3 style="color: var(--primary-burgundy); margin-top: 0; border-bottom: 2px solid var(--border-burgundy); padding-bottom: 8px;">🌳 فريق التسويق والشجرة</h3>
+                <p style="font-size: 12px; color: #666;">الشركاء والعملاء المسجلون تحت شبكتك المباشرة والفرعية:</p>
+                <div id="teamTreeContainer" style="margin-top: 15px;">
+                    <div class="tree-node">جاري تحميل الشجرة...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- النافذة المنبثقة: سجل الحركات والأرباح -->
+        <div class="modal-overlay" id="txModal">
+            <div class="modal-content" style="max-width: 500px;">
+                <button class="modal-close-btn" onclick="closeModal('txModal')">إغلاق ✕</button>
+                <h3 style="color: var(--primary-burgundy); margin-top: 0; border-bottom: 2px solid var(--border-burgundy); padding-bottom: 8px;">📊 سجل الحركات والأرباح</h3>
+                <div style="max-height: 350px; overflow-y: auto; margin-top: 10px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>التاريخ والوقت</th>
+                                <th>عدد الشركاء</th>
+                                <th>إجمالي الربح</th>
+                                <th>حصة الشريك</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsBody">
+                            <tr><td colspan="4" style="color: #888; text-align: center;">لا توجد حركات أرباح مسجلة حتى الآن.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- شاشة تسجيل الدخول -->
+        <div class="container login-card" id="loginContainer" style="display: none;">
+            <img src="logo.jpg" alt="EVA PLUS" class="brand-logo" onerror="this.src='https://images.unsplash.com/photo-1513201099705-a9746e1e201f?auto=format&fit=crop&w=200&q=80'">
+            <h2 style="color: var(--primary-burgundy); font-size: 20px; margin-bottom: 5px;">🔐 تسجيل دخول الشريك</h2>
+            <p style="font-size: 12px; color: #666; margin-bottom: 20px;">الرجاء إدخال رقم الشريك وكلمة المرور الخاصة بك.</p>
             
-            <hr style="border:0; border-top:1px dashed #f8bbd0; margin: 15px 0;">
-            
-            <!-- قسم تعديل كلمة المرور -->
-            <h4 style="font-size: 14px; color: #880e4f; margin-bottom: 8px; border:none;">🔐 تغيير كلمة المرور</h4>
-            <div style="display: flex; gap: 8px;">
-                <input type="text" id="newPasswordInput" placeholder="أدخل كلمة المرور الجديدة" style="margin-bottom: 0; background: #fff;">
-                <button class="btn" style="margin-top: 0; width: 130px; padding: 8px;" onclick="updatePartnerPassword()">تحديث</button>
+            <div id="loginFormSection">
+                <div class="form-group" style="text-align: right;">
+                    <label>رقم الشريك (اليوزر):</label>
+                    <input type="text" id="loginId" placeholder="مثلاً: EVA-102" style="background:#fff;">
+                </div>
+                <div class="form-group" style="text-align: right;">
+                    <label>كلمة المرور:</label>
+                    <input type="password" id="loginPass" placeholder="كلمة المرور" style="background:#fff;">
+                </div>
+                <button class="btn" onclick="partnerLogin()">دخول للوحة التحكم 🚀</button>
+                <span class="link-text" onclick="showForgotPassword()">نسيت كلمة المرور؟</span>
+            </div>
+
+            <!-- استعادة كلمة المرور عبر واتساب الدعم -->
+            <div id="forgotSection" style="display: none; text-align: right; margin-top: 15px; border-top: 1px dashed var(--border-burgundy); padding-top: 15px;">
+                <h4 style="color: var(--primary-burgundy); margin-bottom: 10px; font-size: 13px;">🔑 استعادة كلمة المرور</h4>
+                <div class="form-group">
+                    <label>الاسم الكامل للحساب:</label>
+                    <input type="text" id="forgotName" placeholder="ادخل اسمك المسجل" style="background:#fff;">
+                </div>
+                <div class="form-group">
+                    <label>رقم الهاتف المعتمد:</label>
+                    <input type="text" id="forgotPhone" placeholder="0590000000" style="background:#fff;">
+                </div>
+                <button class="btn whatsapp-btn" onclick="sendForgotPasswordWhatsApp()">💬 إرسال طلب الاستعادة عبر واتساب</button>
+                <span class="link-text" onclick="backToLogin()" style="font-size: 12px; margin-top: 10px;">⬅️ العودة لتسجيل الدخول</span>
+            </div>
+
+            <!-- معلومات الدعم والمساعدة -->
+            <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #eee; text-align: center; font-size: 11px; color: #666;">
+                تحتاج مساعدة؟ تواصل معنا:<br>
+                📞 <a href="https://wa.me/970594101632" target="_blank" style="color:var(--primary-burgundy); font-weight:bold; text-decoration:none;">0594101632</a> | ✉️ <a href="mailto:sahbanmajed@gmail.com" style="color:var(--primary-burgundy); font-weight:bold; text-decoration:none;">sahbanmajed@gmail.com</a>
+            </div>
+
+            <div style="margin-top: 15px;">
+                <a href="https://linky.ps/eva" target="_blank" class="link-text">🌐 linky.ps/eva</a>
             </div>
         </div>
-
-        <div class="balance-box">
-            <span style="font-size: 14px; color: #1b5e20; font-weight: bold;">💰 رصيدك الحالي المتاح:</span>
-            <h2 id="pBalance" style="margin: 5px 0 0 0; color: #2e7d32; border: none;">0 ₪</h2>
-        </div>
-
-        <!-- شجرة فريق التسويق الخاص بك -->
-        <h4>🌳 فريق التسويق والشجرة التابعة لك</h4>
-        <div style="background: #fff8fa; border: 1px solid #f8bbd0; border-radius: 8px; padding: 12px; margin-bottom: 20px;">
-            <p style="font-size: 12px; color: #666; margin-top: 0;">الشركاء والعملاء المسجلون تحت شبكتك المباشرة والفرعية:</p>
-            <div id="teamTreeContainer" style="font-weight: bold; color: #880e4f; font-size: 14px; word-break: break-all; background: #fff; padding: 10px; border-radius: 6px; border: 1px solid #fce4ec;">
-                جاري تحميل الشجرة...
-            </div>
-        </div>
-
-        <!-- شريط وسجل الحركات والأرباح -->
-        <h4>📊 سجل الحركات والأرباح</h4>
-        <div style="max-height: 200px; overflow-y: auto; border: 1px solid #f8bbd0; border-radius: 8px; margin-bottom: 20px;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>التاريخ والوقت (date)</th>
-                        <th>عدد الشركاء (chainLength)</th>
-                        <th>إجمالي الربح (totalProfit)</th>
-                        <th>حصة الشريك (shareAmount)</th>
-                    </tr>
-                </thead>
-                <tbody id="transactionsBody">
-                    <tr><td colspan="4" style="color: #888; text-align: center;">لا توجد حركات أرباح مسجلة حتى الآن.</td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="form-group">
-            <label>رابط الكتالوج الخاص بك (للمشاركة مع الزبائن):</label>
-            <input type="text" id="catalogLink" readonly>
-        </div>
-
-        <div class="form-group">
-            <label>رابط الاستقطاب الخاص بك (لتسجيل شركاء جدد في فريقك):</label>
-            <input type="text" id="referralLink" readonly>
-        </div>
-
-        <button class="btn blue-btn" onclick="copyInfo()">📋 نسخ روابطك ومعلوماتك</button>
-        <a href="catalog.html" class="link-text">⬅️ تصفح الكتالوج الرقمي</a>
     </div>
 
-    <!-- شاشة تسجيل الدخول -->
-    <div class="container" id="loginContainer" style="max-width: 400px; text-align: center; display: none;">
-        <h2 style="color: #880e4f;">🔐 تسجيل دخول الشريك</h2>
-        <p style="font-size: 13px; color: #666; margin-bottom: 20px;">الرجاء إدخال رقم الشريك (اليوزر) وكلمة المرور الخاصة بك.</p>
-        
-        <div id="loginFormSection">
-            <div class="form-group" style="text-align: right;">
-                <label>رقم الشريك (اليوزر):</label>
-                <input type="text" id="loginId" placeholder="مثلاً: EVA-102" style="background:#fff;">
-            </div>
-            <div class="form-group" style="text-align: right;">
-                <label>كلمة المرور:</label>
-                <input type="password" id="loginPass" placeholder="كلمة المرور" style="background:#fff;">
-            </div>
-            <button class="btn" onclick="partnerLogin()">دخول للوحة التحكم</button>
-            <span class="link-text" onclick="showForgotPassword()">نسيت كلمة المرور؟</span>
-        </div>
-
-        <!-- قسم استعادة كلمة المرور عبر واتساب الدعم -->
-        <div id="forgotSection" style="display: none; text-align: right; margin-top: 15px; border-top: 1px dashed #f8bbd0; padding-top: 15px;">
-            <h4 style="color: #880e4f; margin-bottom: 10px; font-size: 14px;">🔑 استعادة كلمة المرور</h4>
-            <div class="form-group">
-                <label>الاسم الكامل للحساب:</label>
-                <input type="text" id="forgotName" placeholder="ادخل اسمك المسجل" style="background:#fff;">
-            </div>
-            <div class="form-group">
-                <label>رقم الهاتف المعتمد:</label>
-                <input type="text" id="forgotPhone" placeholder="0590000000" style="background:#fff;">
-            </div>
-            <button class="btn whatsapp-btn" onclick="sendForgotPasswordWhatsApp()">💬 إرسال طلب الاستعادة عبر واتساب</button>
-            <span class="link-text" onclick="backToLogin()" style="font-size: 13px; margin-top: 10px;">⬅️ العودة لتسجيل الدخول</span>
-        </div>
-
-        <a href="catalog.html" class="link-text" style="margin-top: 25px;">⬅️ العودة للكتالوج</a>
-    </div>
-
+    <!-- كود الـ JavaScript البرمجي الأصلي والكامل بدون مساس بالوظائف -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, getDoc, getDocs, collection, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -156,6 +492,26 @@
         let urlParams = new URLSearchParams(window.location.search);
         let partnerUser = urlParams.get('user');
         let currentActivePartnerId = "";
+
+        window.toggleDrawer = function() {
+            let drawer = document.getElementById('sideDrawer');
+            let overlay = document.getElementById('drawerOverlay');
+            if (drawer.classList.contains('open')) {
+                drawer.classList.remove('open');
+                overlay.style.display = 'none';
+            } else {
+                drawer.classList.add('open');
+                overlay.style.display = 'block';
+            }
+        };
+
+        window.openModal = function(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        };
+
+        window.closeModal = function(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        };
 
         window.addEventListener('DOMContentLoaded', async () => {
             if (partnerUser) {
@@ -196,6 +552,10 @@
                     document.getElementById('pUpline').innerText = p.uplineId || p.sponsor || 'EVA-001 (رأس الهرم)';
                     document.getElementById('pPass').innerText = p.password || 'غير محدد';
                     document.getElementById('pBalance').innerText = (p.balance || 0) + " ₪";
+
+                    // تعبئة حقول التعديل بالبيانات الحالية
+                    if(document.getElementById('editPhoneInput')) document.getElementById('editPhoneInput').value = p.phone || '';
+                    if(document.getElementById('editAddressInput')) document.getElementById('editAddressInput').value = p.address || '';
 
                     let baseUrl = window.location.origin + window.location.pathname.replace('partner.html', '');
                     document.getElementById('catalogLink').value = `${baseUrl}catalog.html?user=${currentActivePartnerId}`;
@@ -247,20 +607,24 @@
                 });
 
                 if (downlines.length > 0) {
-                    treeContainer.innerHTML = `${myId} ← ` + downlines.join(' - ');
+                    treeContainer.innerHTML = `
+                        <div class="tree-node" style="background:var(--light-burgundy);">${myId} (أنت)</div>
+                        <div style="text-align:center; font-size:18px; color:var(--primary-burgundy); margin:5px 0;">⬇️</div>
+                        <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;">
+                            ${downlines.map(id => `<div class="tree-node" style="flex:1; min-width:120px;">👤 ${id}</div>`).join('')}
+                        </div>
+                    `;
                 } else {
-                    treeContainer.innerHTML = `${myId} (لا يوجد شركاء مسجلين تحت فريقك المباشر حتى الآن)`;
+                    treeContainer.innerHTML = `<div class="tree-node">${myId} (لا يوجد شركاء مسجلين تحت فريقك المباشر حتى الآن)</div>`;
                 }
             } catch(e) {
                 console.error(e);
-                treeContainer.innerHTML = `${myId}`;
+                treeContainer.innerHTML = `<div class="tree-node">${myId}</div>`;
             }
         }
 
-        // دالة تسجيل الخروج ومسح الذاكرة وإعادة التوجيه لصفحة الدخول
         window.logoutPartner = function() {
             localStorage.removeItem('eva_partner_user');
-            // إزالة بارامترات الرابط إن وجدت وإعادة تحميل الصفحة نظيفة
             if (window.location.search) {
                 window.location.href = window.location.pathname;
             } else {
@@ -271,10 +635,32 @@
             }
         };
 
+        // دالة تحديث بيانات الاتصال (الهاتف والعنوان)
+        window.updatePartnerContactInfo = async function() {
+            let newPhone = document.getElementById('editPhoneInput').value.trim();
+            let newAddress = document.getElementById('editAddressInput').value.trim();
+
+            if (!currentActivePartnerId) return alert('حدث خطأ في تحديد رقم الشريك.');
+
+            try {
+                let docRef = doc(db, "partners", currentActivePartnerId);
+                await updateDoc(docRef, { 
+                    phone: newPhone,
+                    address: newAddress
+                });
+                document.getElementById('pPhone').innerText = newPhone || 'غير مسجل';
+                document.getElementById('pAddress').innerText = newAddress || 'غير محدد';
+                alert('✅ تم تحديث البيانات الشخصية بنجاح!');
+                closeModal('profileModal');
+            } catch(e) {
+                console.error(e);
+                alert('حدث خطأ أثناء تحديث البيانات.');
+            }
+        };
+
         window.updatePartnerPassword = async function() {
             let newPass = document.getElementById('newPasswordInput').value.trim();
             if (!newPass) return alert('الرجاء إدخال كلمة المرور الجديدة.');
-
             if (!currentActivePartnerId) return alert('حدث خطأ في تحديد رقم الشريك.');
 
             try {
@@ -331,10 +717,18 @@
             }
 
             let supportPhone = "970594101632";
-            let msg = `مرحباً فريق الدعم في إيفا براند، نسيت كلمة المرور الخاص بحساب الشريك الخاص بي.\n\n- الاسم: ${name}\n- رقم الهاتف: ${phone}\n\nالرجاء تزويدي ببيانات الحساب.`;
+            let msg = `مرحباً فريق الدعم في إيفا براند، نسيت كلمة المرور الخاصة بحساب الشريك الخاص بي.\n\n- الاسم: ${name}\n- رقم الهاتف: ${phone}\n\nالرجاء تزويدي ببيانات الحساب.`;
             let waUrl = `https://wa.me/${supportPhone}?text=${encodeURIComponent(msg)}`;
 
             window.open(waUrl, '_blank');
+        };
+
+        window.copySpecificLink = function(elementId) {
+            let inputElem = document.getElementById(elementId);
+            inputElem.select();
+            inputElem.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(inputElem.value);
+            alert('✅ تم نسخ الرابط بنجاح!');
         };
 
         window.copyInfo = function() {
@@ -345,7 +739,7 @@
 
             let text = `🌸 معلومات حسابك في EVA PLUS:\n\n- اليوزر: ${id}\n- كلمة المرور: ${pass}\n\n🔗 رابط الكتالوج الخاص بك:\n${cat}\n\n🌳 رابط الاستقطاب:\n${ref}`;
             navigator.clipboard.writeText(text);
-            alert('✅ تم نسخ روابط ومعلومات الحساب بنجاح!');
+            alert('✅ تم نسخ روابط ومعلومات الحساب بالكامل بنجاح!');
         };
     </script>
 </body>
