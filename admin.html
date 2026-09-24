@@ -460,7 +460,7 @@
             await deleteDoc(doc(db, "orders", order.id));
 
             // فتح واتساب مباشرة لرقم الشريك الجديد مع رسالة التهنئة والبيانات
-            let cleanPhone = (order.clientPhone || '').toString().trim().replace(/^00/, '').replace(/[^0-9]/g, '');
+            let rawP = (order.clientPhone || '').toString().trim(); // إزالة أي رموز زائدة أو أصفار مكررة والتأكد من أخذ الأرقام الصحيحة let cleanPhone = rawP.replace(/^\+/, '').replace(/^00/, '').replace(/[^0-9]/g, '');
             let welcomeMsg = `مرحباً بك ${order.clientName} 🌸\nمبروك انضمامك رسمياً لعائلة نظام "إيفا بلس"!\n\nبيانات حسابك الشريك:\n🆔 رقم الشريك: ${newPartnerId}\n🔑 كلمة المرور: ${rawPass}\n\nيمكنك البدء بمشاركة رابط متجرك وتحقيق الأرباح.`;
             let waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(welcomeMsg)}`;
             window.open(waUrl, '_blank');
