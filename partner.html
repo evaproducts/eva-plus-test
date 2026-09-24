@@ -38,6 +38,15 @@
             <p><b>رقم الهاتف:</b> <span id="pPhone"></span></p>
             <p><b>العنوان:</b> <span id="pAddress"></span></p>
             <p><b>كلمة المرور الخاصة بك:</b> <code id="pPass" style="background:#fff; padding:2px 8px; border-radius:4px; color:#c2185b; font-weight:bold;"></code></p>
+            
+            <hr style="border:0; border-top:1px dashed #f8bbd0; margin: 15px 0;">
+            
+            <!-- قسم تعديل كلمة المرور -->
+            <h4 style="font-size: 14px; color: #880e4f; margin-bottom: 8px; border:none;">🔐 تغيير كلمة المرور</h4>
+            <div style="display: flex; gap: 8px;">
+                <input type="text" id="newPasswordInput" placeholder="أدخل كلمة المرور الجديدة" style="margin-bottom: 0; background: #fff;">
+                <button class="btn" style="margin-top: 0; width: 130px; padding: 8px;" onclick="updatePartnerPassword()">تحديث</button>
+            </div>
         </div>
 
         <div class="balance-box">
@@ -115,7 +124,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAqPpKqqHBEIJZTCGCROFzqZyHOYlnDgP4",
@@ -131,6 +140,7 @@
 
         let urlParams = new URLSearchParams(window.location.search);
         let partnerUser = urlParams.get('user');
+        let currentActivePartnerId = "";
 
         window.addEventListener('DOMContentLoaded', async () => {
             if (partnerUser) {
@@ -153,12 +163,12 @@
 
                 if (docSnap.exists()) {
                     let p = docSnap.data();
-                    let activePartnerId = p.partnerId || cleanId; // معالجة منع ظهور undefined
+                    currentActivePartnerId = p.partnerId || cleanId;
 
                     document.getElementById('loginContainer').style.display = 'none';
                     document.getElementById('mainContainer').style.display = 'block';
 
-                    document.getElementById('partnerIdBadge').innerText = activePartnerId;
+                    document.getElementById('partnerIdBadge').innerText = currentActivePartnerId;
                     document.getElementById('pName').innerText = p.name || 'بدون اسم';
                     document.getElementById('pPhone').innerText = p.phone || 'غير مسجل';
                     document.getElementById('pAddress').innerText = p.address || 'غير محدد';
@@ -166,8 +176,8 @@
                     document.getElementById('pBalance').innerText = (p.balance || 0) + " ₪";
 
                     let baseUrl = window.location.origin + window.location.pathname.replace('partner.html', '');
-                    document.getElementById('catalogLink').value = `${baseUrl}catalog.html?user=${activePartnerId}`;
-                    document.getElementById('referralLink').value = `${baseUrl}join.html?ref=${activePartnerId}`;
+                    document.getElementById('catalogLink').value = `${baseUrl}catalog.html?user=${currentActivePartnerId}`;
+                    document.getElementById('referralLink').value = `${baseUrl}join.html?ref=${currentActivePartnerId}`;
 
                     let txBody = document.getElementById('transactionsBody');
                     let txs = p.transactions || [];
@@ -184,7 +194,7 @@
                         txBody.innerHTML = `<tr><td colspan="4" style="color: #888; text-align: center;">لا توجد حركات أرباح مسجلة حتى الآن.</td></tr>`;
                     }
 
-                    localStorage.setItem('eva_partner_user', activePartnerId);
+                    localStorage.setItem('eva_partner_user', currentActivePartnerId);
 
                 } else {
                     alert('رقم الشريك غير صحيح.');
@@ -196,6 +206,24 @@
                 alert('حدث خطأ أثناء جلب بيانات الحساب.');
             }
         }
+
+        window.updatePartnerPassword = async function() {
+            let newPass = document.getElementById('newPasswordInput').value.trim();
+            if (!newPass) return alert('الرجاء إدخال كلمة المرور الجديدة.');
+
+            if (!currentActivePartnerId) return alert('حدث خطأ في تحديد رقم الشريك.');
+
+            try {
+                let docRef = doc(db, "partners", currentActivePartnerId);
+                await updateDoc(docRef, { password: newPass });
+                document.getElementById('pPass').innerText = newPass;
+                document.getElementById('newPasswordInput').value = '';
+                alert('✅ تم تحديث كلمة المرور بنجاح!');
+            } catch(e) {
+                console.error(e);
+                alert('حدث خطأ أثناء تحديث كلمة المرور.');
+            }
+        };
 
         window.partnerLogin = async function() {
             let uId = document.getElementById('loginId').value.toUpperCase().trim();
