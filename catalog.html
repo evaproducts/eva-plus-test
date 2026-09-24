@@ -191,10 +191,25 @@
         let globalLogoUrl = "";
         let selectedProductForOrder = null;
         let urlParams = new URLSearchParams(window.location.search);
-        let partnerUser = urlParams.get('user') || urlParams.get('ref');
+        
+        let rawPartnerInput = urlParams.get('user') || urlParams.get('ref');
+        let partnerUser = null;
+        let isSystemPartnerOrder = false;
+
+        if (rawPartnerInput) {
+            // إذا كان المدخل يبدأ بـ EVA (مثل رابط شريك حقيقي)، نعتبره هو الشريك
+            if (rawPartnerInput.toUpperCase().startsWith('EVA-')) {
+                partnerUser = rawPartnerInput.trim();
+                isSystemPartnerOrder = true;
+            } else {
+                // إذا كان قادماً من صفحة الانضمام بنص آخر (مثل الإدارة المركزية أو غيره)، نعتبره طلب أيفا بلس تحت رعاية رأس الهرم EVA-001
+                partnerUser = "EVA-001";
+                isSystemPartnerOrder = true;
+            }
+        }
 
         window.addEventListener('DOMContentLoaded', async () => {
-            if (partnerUser) {
+            if (isSystemPartnerOrder && partnerUser) {
                 let joinBtn = document.getElementById('joinEvaPlusBtn');
                 if (joinBtn) joinBtn.style.display = 'none';
 
@@ -204,10 +219,11 @@
                     if (pDoc.exists()) {
                         banner.style.display = 'block';
                         banner.innerHTML = `🌸 متجر برعاية الشريك المعتمد: ${pDoc.data().name} (${partnerUser})`;
-                    } else {
-                        partnerUser = "EVA-001"; // افتراضي راس الهرم إذا لم يوجد الشريك
+                    } else if(partnerUser === "EVA-001") {
+                        banner.style.display = 'block';
+                        banner.innerHTML = `🌸 متجر برعاية النظام المركزي (EVA PLUS)`;
                     }
-                } catch(e) { partnerUser = "EVA-001"; }
+                } catch(e) { console.error(e); }
             }
 
             try {
@@ -348,10 +364,8 @@
                     reservedUntil: reserveDate
                 }, { merge: true });
 
-                // إذا كان هناك معرف شريك في الرابط أو أن الزبون دخل عبر نظام إيفا بلس (افتراضياً EVA-001 إذا جاء من صفحة الانضمام)
-                let currentSponsor = partnerUser || "EVA-001";
-
-                if (partnerUser) {
+                // إذا كان الطلب قادماً من صفحة الانضمام أو رابط شريك (isSystemPartnerOrder صحيحة)، يُحفظ كطلب أيفا بلس حصراً
+                if (isSystemPartnerOrder) {
                     await setDoc(doc(db, "orders", orderId), {
                         orderType: 'partner',
                         productCode: selectedProductForOrder.code,
@@ -359,7 +373,7 @@
                         clientName: name,
                         clientPhone: fullPhone,
                         clientAddress: address,
-                        sponsor: currentSponsor,
+                        sponsor: partnerUser || "EVA-001",
                         createdAt: new Date().toISOString()
                     });
 
@@ -368,7 +382,7 @@
                     location.reload();
 
                 } else {
-                    // زبون عادي تماماً بدون أي رابط شريك
+                    // زبون عادي تماماً بدون أي رابط شريك (يحول لواتساب المعرض)
                     await setDoc(doc(db, "orders", orderId), {
                         orderType: 'normal',
                         productCode: selectedProductForOrder.code,
