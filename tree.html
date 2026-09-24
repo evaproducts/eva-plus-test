@@ -316,17 +316,20 @@
                 allPartnersMap = {};
                 snap.forEach(docItem => {
                     let p = docItem.data();
-                    // إلغاء أي شروط فلترة أو استثناء لضمان ظهور كافة الشركاء دون نقصان
-                    if (!p.partnerId || !p.partnerId.toUpperCase().startsWith("EVA-")) {
+                    let pId = p.partnerId || docItem.id;
+                    
+                    // استبعاد أي حساب وهمي أو غير صالح وعرض الشركاء الحقيقيين فقط
+                    if (!pId || !pId.toUpperCase().startsWith("EVA-") || pId.includes("زبون") || pId.includes("عام")) {
                         return;
                     }
 
-                    allPartnersMap[p.partnerId] = p;
+                    p.partnerId = pId;
+                    allPartnersMap[pId] = p;
 
-                    if(p.partnerId !== "EVA-001") {
-                        uplineOptions += `<option value="${p.partnerId}">${p.partnerId} - ${p.name || 'بدون اسم'}</option>`;
+                    if(pId !== "EVA-001") {
+                        uplineOptions += `<option value="${pId}">${pId} - ${p.name || 'بدون اسم'}</option>`;
                     }
-                    searchOptions += `<option value="${p.partnerId}">${p.partnerId} (${p.name || 'بدون اسم'})</option>`;
+                    searchOptions += `<option value="${pId}">${pId} (${p.name || 'بدون اسم'})</option>`;
 
                     let hasLoggedIn = p.firstLogin === false;
                     let statusDot = hasLoggedIn 
@@ -339,7 +342,7 @@
                     rowsHtml += `
                         <tr>
                             <td>${statusDot}</td>
-                            <td><b>${p.partnerId}</b></td>
+                            <td><b>${pId}</b></td>
                             <td>${p.name || 'بدون اسم'}</td>
                             <td>${p.phone || 'غير مسجل'}</td>
                             <td><b style="color: #2e7d32;">${p.balance || 0} ₪</b></td>
@@ -347,7 +350,7 @@
                             <td>${uplineDisplay}</td>
                             <td style="font-size: 12px; color: #555;">${lastLoginTime}</td>
                             <td>
-                                <button class="btn" onclick='openPartnerPreview("${p.partnerId}")'>👁️ عرض الحساب</button>
+                                <button class="btn" onclick='openPartnerPreview("${pId}")'>👁️ عرض الحساب</button>
                             </td>
                         </tr>
                     `;
