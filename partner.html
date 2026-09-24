@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EVA PLUS PARTNER | لوحة تحكم الشريك</title>
+    <!-- ربط ملف الـ Manifest لتفعيل ميزات التطبيق (PWA) -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#880e4f">
     <style>
         :root {
             --primary-burgundy: #880e4f;
@@ -21,7 +24,7 @@
             background: var(--bg-gradient);
             color: var(--text-color);
             margin: 0;
-            padding: 10px;
+            padding: 0;
             direction: rtl;
             min-height: 100vh;
             display: flex;
@@ -31,20 +34,23 @@
 
         .app-wrapper {
             width: 100%;
-            max-width: 480px;
+            max-width: 100%;
             margin: 0 auto;
             box-sizing: border-box;
+            padding: 10px;
         }
 
         .container {
             background: #ffffff;
-            padding: 20px;
+            padding: 20px 18px;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(136, 14, 79, 0.08);
             border: 1px solid rgba(248, 187, 208, 0.6);
             position: relative;
-            margin-top: 10px;
-            margin-bottom: 20px;
+            margin: 10px auto;
+            width: 100%;
+            max-width: 520px;
+            box-sizing: border-box;
         }
 
         /* رأس الصفحة العلوي والبارز */
@@ -238,7 +244,7 @@
         .modal-content {
             background: #fff;
             width: 100%;
-            max-width: 450px;
+            max-width: 480px;
             max-height: 85vh;
             border-radius: 15px;
             padding: 20px;
@@ -493,6 +499,13 @@
         let partnerUser = urlParams.get('user');
         let currentActivePartnerId = "";
 
+        // تسجيل خدمة الـ Service Worker لتفعيل PWA بالكامل
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed: ', err));
+            });
+        }
+
         window.toggleDrawer = function() {
             let drawer = document.getElementById('sideDrawer');
             let overlay = document.getElementById('drawerOverlay');
@@ -553,7 +566,6 @@
                     document.getElementById('pPass').innerText = p.password || 'غير محدد';
                     document.getElementById('pBalance').innerText = (p.balance || 0) + " ₪";
 
-                    // تعبئة حقول التعديل بالبيانات الحالية
                     if(document.getElementById('editPhoneInput')) document.getElementById('editPhoneInput').value = p.phone || '';
                     if(document.getElementById('editAddressInput')) document.getElementById('editAddressInput').value = p.address || '';
 
@@ -635,7 +647,6 @@
             }
         };
 
-        // دالة تحديث بيانات الاتصال (الهاتف والعنوان)
         window.updatePartnerContactInfo = async function() {
             let newPhone = document.getElementById('editPhoneInput').value.trim();
             let newAddress = document.getElementById('editAddressInput').value.trim();
