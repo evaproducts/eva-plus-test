@@ -8,7 +8,7 @@
     <style>
         body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #fdfbfb 0%, #fce4ec 100%); padding: 15px; direction: rtl; margin: 0; min-height: 100vh; padding-bottom: 70px; }
         
-        /* تنسيقات شاشة تسجيل الدخول للشجرة المتوافقة مع الموبايل */
+        /* تنسيقات شاشة تسجيل الدخول للشجرة المحسنة والمتوافقة مع الموبايل */
         #treeLoginSection {
             width: 100%;
             max-width: 380px;
@@ -18,15 +18,54 @@
             border-radius: 16px;
             box-shadow: 0 10px 25px rgba(136,14,79,0.1);
             border: 1px solid #f8bbd0;
-            text-align: center;
+            text-align: right;
             box-sizing: border-box;
         }
         #treeLoginSection h2 {
             color: #880e4f;
             font-size: 20px;
             border-right: none;
-            justify-content: center;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        #treeLoginSection p {
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        #treeLoginSection label {
+            display: block;
+            font-weight: bold;
+            color: #444;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+        #treeLoginSection input {
+            width: 100%;
+            padding: 10px;
             margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 13px;
+            font-family: Arial, sans-serif;
+            text-align: right;
+        }
+        #treeLoginSection button {
+            background: #880e4f;
+            color: #fff;
+            border: none;
+            width: 100%;
+            padding: 11px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        #treeLoginSection button:hover {
+            background: #ad1457;
         }
 
         .header-panel { background: #fff; padding: 15px 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-bottom: 3px solid #d4af37; display: flex; justify-content: space-between; align-items: center; position: relative; }
@@ -99,15 +138,18 @@
 </head>
 <body>
 
-    <!-- شاشة تسجيل الدخول لشجرة الشركاء -->
+    <!-- شاشة تسجيل الدخول لشجرة الشركاء (محسنة ومنظمة عمودياً) -->
     <div id="treeLoginSection">
         <h2>🔐 تسجيل دخول إدارة الشجرة</h2>
-        <p style="font-size: 12px; color: #666; margin-bottom: 20px;">الرجاء إدخال بيانات الاعتماد المعتمدة.</p>
-        <label style="text-align: right;">اسم المستخدم (اليوزر):</label>
+        <p>الرجاء إدخال بيانات الاعتماد المعتمدة.</p>
+        
+        <label>اسم المستخدم (اليوزر):</label>
         <input type="text" id="treeLoginUser" placeholder="مثال: EVA-001">
-        <label style="text-align: right;">كلمة المرور:</label>
+        
+        <label>كلمة المرور:</label>
         <input type="password" id="treeLoginPass" placeholder="كلمة المرور">
-        <button onclick="verifyTreeLogin()" style="background: #880e4f; margin-top: 10px; width: 100%; padding: 10px; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">تسجيل الدخول</button>
+        
+        <button onclick="verifyTreeLogin()">تسجيل الدخول</button>
     </div>
 
     <!-- المحتوى الرئيسي للشجرة (مخفي لحين تسجيل الدخول) -->
