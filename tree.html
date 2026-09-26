@@ -204,7 +204,7 @@
                 </div>
             </div>
 
-            <!-- 2. طلبات سحب الأرباح المعلقة (مع إرفاق وصل التحويل) -->
+            <!-- 2. طلبات سحب الأرباح المعلقة -->
             <div id="sectionPayoutRequests" class="content-section">
                 <h3 style="color: #d4af37;">🔔 طلبات سحب الأرباح المعلقة من الشركاء</h3>
                 <p style="font-size: 12px; color: #666;">الطلبات الواردة من الشركاء. انقر على قبول لإرفاق وصل التحويل وتصفية الرصيد فوراً:</p>
@@ -439,7 +439,6 @@
             document.getElementById('treeLoginPass').value = '';
         };
 
-        // دالة ضغط الصور لتقليص حجمها وتوفير مساحة التخزين
         function compressImage(file, maxWidth = 900, quality = 0.7) {
             return new Promise((resolve) => {
                 let reader = new FileReader();
@@ -463,14 +462,15 @@
                         ctx.drawImage(img, 0, 0, width, height);
 
                         canvas.toBlob((blob) => {
-                            resolve(blob);
+                            resolve(blob || file);
                         }, 'image/jpeg', quality);
                     };
+                    img.onerror = () => resolve(file);
                 };
+                reader.onerror = () => resolve(file);
             });
         }
 
-        // فحص وحذف الوصلات القديمة التي مضى عليها أكثر من 3 أشهر تلقائياً
         async function checkAndDeleteExpiredReceipts(snap) {
             let threeMonthsAgo = new Date();
             threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
@@ -551,7 +551,6 @@
                         uplineOptions += `<option value="${pId}">${pId} - ${p.name || 'بدون اسم'}</option>`;
                     }
 
-                    // تجميع طلبات سحب الأرباح المعلقة مع زر فتح نافذة إرفاق الوصل
                     if (p.payoutRequested && p.payoutRequestDetails) {
                         hasPayoutRequests = true;
                         let pr = p.payoutRequestDetails;
@@ -617,13 +616,14 @@
             }
         }
 
-        // فتح نافذة إرفاق الوصل للطلب المعلق
         window.openApproveModal = function(pId, amount) {
             activeApprovalPartnerId = pId;
             activeApprovalAmount = amount;
             document.getElementById('approvePartnerIdDisplay').innerText = pId;
             document.getElementById('approveAmountDisplay').innerText = amount + " ₪";
             document.getElementById('approveReceiptInput').value = '';
+            document.getElementById('confirmApproveBtn').innerText = "إتمام التصفية وإرسال الوصل للشريك 🚀";
+            document.getElementById('confirmApproveBtn').disabled = false;
             document.getElementById('approveModal').style.display = 'flex';
         };
 
@@ -631,40 +631,53 @@
             document.getElementById('approveModal').style.display = 'none';
         };
 
-        // تأكيد الطلب المعلق مع ضغط ورفع وصل التحويل
         window.confirmApprovePayout = async function() {
             let pId = activeApprovalPartnerId;
             let amount = activeApprovalAmount;
             let fileInput = document.getElementById('approveReceiptInput');
-
-            let pDocRef = doc(db, "partners", pId);
-            let pSnap = await getDoc(pDocRef);
-
-            if(!pSnap.exists()) return alert('الشريك غير موجود.');
-
-            let pData = pSnap.data();
-            let currentBal = parseFloat(pData.balance || 0);
-
-            if(amount > currentBal) {
-                return alert(`⚠️ رصيد الشريك الحالي (${currentBal} ₪) أقل من قيمة السحب المطلوب.`);
-            }
-
             let confirmBtn = document.getElementById('confirmApproveBtn');
+
+            if (!pId) return alert('رقم الشريك غير معروف.');
+
             confirmBtn.innerText = "جاري ضغط ورفع الوصل والتصفية... ⏳";
             confirmBtn.disabled = true;
 
-            let downloadUrl = "";
-
             try {
+                let pDocRef = doc(db, "partners", pId);
+                let pSnap = await getDoc(pDocRef);
+
+                if(!pSnap.exists()) {
+                    alert('الشريك غير موجود في قاعدة البيانات.');
+                    confirmBtn.innerText = "إتمام التصفية وإرسال الوصل للشريك 🚀";
+                    confirmBtn.disabled = false;
+                    return;
+                }
+
+                let pData = pSnap.data();
+                let currentBal = parseFloat(pData.balance || 0);
+
+                if(amount > currentBal) {
+                    alert(`⚠️ رصيد الشريك الحالي (${currentBal} ₪) أقل من قيمة السحب المطلوب.`);
+                    confirmBtn.innerText = "إتمام التصفية وإرسال الوصل للشريك 🚀";
+                    confirmBtn.disabled = false;
+                    return;
+                }
+
+                let downloadUrl = "";
+
                 if (fileInput.files && fileInput.files[0]) {
-                    let file = fileInput.files[0];
-                    let compressedBlob = await compressImage(file, 900, 0.7);
-                    
-                    let fileName = `receipts/${pId}_${Date.now()}.jpg`;
-                    let fileRef = storageRef(storage, fileName);
-                    
-                    let snapshot = await uploadBytes(fileRef, compressedBlob);
-                    downloadUrl = await getDownloadURL(snapshot.ref);
+                    try {
+                        let file = fileInput.files[0];
+                        let compressedBlob = await compressImage(file, 900, 0.7);
+                        let fileName = `receipts/${pId}_${Date.now()}.jpg`;
+                        let fileRef = storageRef(storage, fileName);
+                        let snapshot = await uploadBytes(fileRef, compressedBlob);
+                        downloadUrl = await getDownloadURL(snapshot.ref);
+                    } catch (uploadErr) {
+                        console.error("Storage upload error:", uploadErr);
+                        // في حال فشل التخزين، يمكن الاستمرار بدون صورة أو إعلام المدير
+                        alert('⚠️ تنبيه: لم يتم رفع صورة الوصل بنجاح، لكن سيتم تتمة التصفية بدون صورة.');
+                    }
                 }
 
                 let newBalance = parseFloat((currentBal - amount).toFixed(2));
@@ -684,12 +697,13 @@
                     transactions: arrayUnion(paymentTx)
                 });
 
-                alert(`✅ تم اعتماد صرف المبلغ للشريك (${pId}) بنجاح وإرفاق وصل الدفع وتصفية رصيده!`);
+                alert(`✅ تم اعتماد صرف المبلغ للشريك (${pId}) بنجاح وتحديث رصيده وإغلاق الطلب!`);
                 closeApproveModal();
                 loadPartnersData();
+
             } catch(e) {
-                console.error(e);
-                alert('حدث خطأ أثناء معالجة الطلب.');
+                console.error("Approval error:", e);
+                alert('❌ حدث خطأ غير متوقع أثناء معالجة الطلب. يرجى المحاولة مرة أخرى.');
             } finally {
                 confirmBtn.innerText = "إتمام التصفية وإرسال الوصل للشريك 🚀";
                 confirmBtn.disabled = false;
@@ -785,46 +799,54 @@
             resultBox.innerHTML = `📍 تسلسل الشجرة للشريك (${selectedId}):<br>` + pathArray.join(' ⬅ ');
         };
 
-        // إصدار الدفعة اليدوية المباشرة (مع إرفاق الوصل)
         window.issuePartnerPayment = async function() {
             let pId = document.getElementById('payPartnerId').value.trim().toUpperCase();
             let amount = parseFloat(document.getElementById('payAmount').value);
             let fileInput = document.getElementById('receiptImageInput');
+            let submitBtn = document.getElementById('issuePaymentBtn');
 
             if(!pId || isNaN(amount) || amount <= 0) {
                 return alert('الرجاء إدخال رقم شريك صحيح وقيمة دفعة سليمة.');
             }
 
-            let pDocRef = doc(db, "partners", pId);
-            let pSnap = await getDoc(pDocRef);
-
-            if(!pSnap.exists()) {
-                return alert('❌ عذراً، رقم الشريك غير موجود في النظام.');
-            }
-
-            let pData = pSnap.data();
-            let currentBal = parseFloat(pData.balance || 0);
-
-            if(amount > currentBal) {
-                return alert(`⚠️ المبلغ المطلوب دفع (${amount} ₪) أكبر من رصيد الشريك الحالي (${currentBal} ₪).`);
-            }
-
-            let submitBtn = document.getElementById('issuePaymentBtn');
             submitBtn.innerText = "جاري ضغط ورفع الوصل... ⏳";
             submitBtn.disabled = true;
 
-            let downloadUrl = "";
-
             try {
+                let pDocRef = doc(db, "partners", pId);
+                let pSnap = await getDoc(pDocRef);
+
+                if(!pSnap.exists()) {
+                    alert('❌ عذراً، رقم الشريك غير موجود في النظام.');
+                    submitBtn.innerText = "إصدار الدفعة وتصفية الرصيد فوراً 💳";
+                    submitBtn.disabled = false;
+                    return;
+                }
+
+                let pData = pSnap.data();
+                let currentBal = parseFloat(pData.balance || 0);
+
+                if(amount > currentBal) {
+                    alert(`⚠️ المبلغ المطلوب دفع (${amount} ₪) أكبر من رصيد الشريك الحالي (${currentBal} ₪).`);
+                    submitBtn.innerText = "إصدار الدفعة وتصفية الرصيد فوراً 💳";
+                    submitBtn.disabled = false;
+                    return;
+                }
+
+                let downloadUrl = "";
+
                 if (fileInput.files && fileInput.files[0]) {
-                    let file = fileInput.files[0];
-                    let compressedBlob = await compressImage(file, 900, 0.7);
-                    
-                    let fileName = `receipts/${pId}_${Date.now()}.jpg`;
-                    let fileRef = storageRef(storage, fileName);
-                    
-                    let snapshot = await uploadBytes(fileRef, compressedBlob);
-                    downloadUrl = await getDownloadURL(snapshot.ref);
+                    try {
+                        let file = fileInput.files[0];
+                        let compressedBlob = await compressImage(file, 900, 0.7);
+                        let fileName = `receipts/${pId}_${Date.now()}.jpg`;
+                        let fileRef = storageRef(storage, fileName);
+                        let snapshot = await uploadBytes(fileRef, compressedBlob);
+                        downloadUrl = await getDownloadURL(snapshot.ref);
+                    } catch (uploadErr) {
+                        console.error("Storage upload error:", uploadErr);
+                        alert('⚠️ تنبيه: لم يتم رفع صورة الوصل، لكن سيتم إصدار الدفعة بدون صورة.');
+                    }
                 }
 
                 let newBalance = parseFloat((currentBal - amount).toFixed(2));
@@ -853,7 +875,7 @@
 
             } catch(e) {
                 console.error(e);
-                alert('حدث خطأ أثناء معالجة الدفعة أو رفع الوصل.');
+                alert('❌ حدث خطأ أثناء معالجة الدفعة أو رفع الوصل.');
             } finally {
                 submitBtn.innerText = "إصدار الدفعة وتصفية الرصيد فوراً 💳";
                 submitBtn.disabled = false;
