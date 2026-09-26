@@ -133,7 +133,8 @@
     </div>
 
     <footer>
-        جميع الحقوق محفوظة © معرض إيفا براند - نظام EVA PLUS 2026
+        جميع الحقوق محفوظة © معرض إيفا براند - نظام EVA PLUS 2026<br>
+        <a href="privacy.html" style="color: #ad1457; text-decoration: underline; font-size: 11px; margin-top: 5px; display: inline-block;">سياسة الخصوصية</a>
     </footer>
 
     <!-- نافذة الطلب -->
@@ -202,7 +203,6 @@
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
-            // التحقق من بيانات الانضمام القادمة من join.html وتعبئتها تلقائياً إن وجدت
             let pendingUserJson = localStorage.getItem('eva_current_user');
             if (pendingUserJson) {
                 try {
@@ -385,7 +385,6 @@
                     reservedUntil: reserveDate
                 }, { merge: true });
 
-                // التحقق من وجود طلب انضمام رئيسي قادم من join.html
                 let pendingUserJson = localStorage.getItem('eva_current_user');
                 if (pendingUserJson) {
                     try {
@@ -393,7 +392,7 @@
                         if (pData && pData.partnerId) {
                             await setDoc(doc(db, "orders", orderId), {
                                 orderType: 'partner',
-                                isJoinProcess: true, // علامة رئيسية لطلب الانضمام
+                                isJoinProcess: true,
                                 partnerId: pData.partnerId,
                                 productCode: selectedProductForOrder.code,
                                 productName: selectedProductForOrder.name,
@@ -413,7 +412,6 @@
                     } catch(e) { console.error(e); }
                 }
 
-                // حفظ الطلب حسب نوعه (رابط شريك أو زبون عادي)
                 if (isSystemPartnerOrder && partnerUser) {
                     await setDoc(doc(db, "orders", orderId), {
                         orderType: 'partner',
