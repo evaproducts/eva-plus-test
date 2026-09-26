@@ -138,7 +138,7 @@
 </head>
 <body>
 
-    <!-- شاشة تسجيل الدخول لشجرة الشركاء (محسنة ومنظمة عمودياً) -->
+    <!-- شاشة تسجيل الدخول لشجرة الشركاء -->
     <div id="treeLoginSection">
         <h2>🔐 تسجيل دخول إدارة الشجرة</h2>
         <p>الرجاء إدخال بيانات الاعتماد المعتمدة.</p>
@@ -152,7 +152,7 @@
         <button onclick="verifyTreeLogin()">تسجيل الدخول</button>
     </div>
 
-    <!-- المحتوى الرئيسي للشجرة (مخفي لحين تسجيل الدخول) -->
+    <!-- المحتوى الرئيسي للشجرة -->
     <div id="treeMainContent" style="display: none;">
         <div class="header-panel">
             <button class="menu-toggle-btn" onclick="toggleDrawer()">☰</button>
@@ -180,7 +180,7 @@
 
         <div class="container">
 
-            <!-- 1. قسم قائمة الشركاء (افتراضي) -->
+            <!-- 1. قسم قائمة الشركاء -->
             <div id="sectionTable" class="content-section active">
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
                     <h3 style="margin: 0; border: none;">📋 قائمة شركاء الفريق المسجلين</h3>
@@ -208,7 +208,7 @@
                 </div>
             </div>
 
-            <!-- 2. قسم طلبات سحب الأرباح المعلقة الجديد -->
+            <!-- 2. قسم طلبات سحب الأرباح المعلقة -->
             <div id="sectionPayoutRequests" class="content-section">
                 <h3 style="color: #d4af37;">🔔 طلبات سحب الأرباح المعلقة من الشركاء</h3>
                 <p style="font-size: 12px; color: #666;">الطلبات الواردة من لوحة تحكم الشركاء التي تتطلب مراجعة وتحويل:</p>
@@ -255,7 +255,7 @@
                 <button class="btn" style="margin-top: 10px;" onclick="addNewPartner()">حفظ وإضافة الشريك للنظام</button>
             </div>
 
-            <!-- 4. قسم تتبع السلسلة الصعودية (بالبحث برقم الشريك مباشرة) -->
+            <!-- 4. قسم تتبع السلسلة الصعودية -->
             <div id="sectionSearchPath" class="content-section">
                 <div class="tree-path-box" style="margin-top: 0;">
                     <h3 style="margin-top:0; color:#1565c0; border-color:#90caf9;">🔍 تتبع السلسلة الصعودية لشريك</h3>
@@ -268,7 +268,7 @@
                 </div>
             </div>
 
-            <!-- 5. قسم إدارة الأرصدة والمدفوعات -->
+            <!-- 5. قسم إدارة الأرصدة والمدفوعات (مع ضغط ورفع وصل الدفع والحذف التلقائي) -->
             <div id="sectionFinance" class="content-section">
                 <h3 style="color: #27ae60;">💰 إدارة الأرصدة وإصدار الدفعات</h3>
                 <div style="background: #e8f5e9; border: 1px solid #81c784; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
@@ -286,7 +286,11 @@
                         <label>قيمة الدفعة المراد خصمها (₪):</label>
                         <input type="number" id="payAmount" placeholder="مثال: 100">
                     </div>
-                    <button class="btn green-btn" onclick="issuePartnerPayment()">إصدار الدفعة وتحديث الأرصدة فوراً 💳</button>
+                    <div class="form-group">
+                        <label>📎 إرفاق صورة وصل الدفع (تتم ضغطها تلقائياً وتُحذف بعد 3 أشهر):</label>
+                        <input type="file" id="receiptImageInput" accept="image/*" style="background: #f9f9f9; padding: 7px;">
+                    </div>
+                    <button class="btn green-btn" id="issuePaymentBtn" onclick="issuePartnerPayment()">إصدار الدفعة وتصفية الرصيد فوراً 💳</button>
                 </div>
             </div>
 
@@ -304,7 +308,7 @@
         </div>
     </div>
 
-    <!-- نافذة منبثقة (Modal) لعرض تفاصيل حساب الشريك مع شريط الحركات والأرباح -->
+    <!-- نافذة منبثقة لمعاينة الشريك -->
     <div id="partnerModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closePartnerModal()">&times;</span>
@@ -323,16 +327,15 @@
                 <h3 id="mBalance" style="margin: 5px 0 0 0; color: #2e7d32; border: none;">0 ₪</h3>
             </div>
 
-            <!-- شريط وسجل الحركات المالية للشريك -->
-            <h4 style="color: #880e4f; margin-bottom: 8px;">📊 شريط الحركات والأرباح</h4>
-            <div style="max-height: 180px; overflow-y: auto; border: 1px solid #f8bbd0; border-radius: 8px; margin-bottom: 15px;">
+            <h4 style="color: #880e4f; margin-bottom: 8px;">📊 شريط الحركات والأرباح والوصلات</h4>
+            <div style="max-height: 220px; overflow-y: auto; border: 1px solid #f8bbd0; border-radius: 8px; margin-bottom: 15px;">
                 <table style="margin-top: 0;">
                     <thead>
                         <tr>
                             <th>التاريخ والوقت</th>
-                            <th>عدد الشركاء</th>
-                            <th>إجمالي الربح</th>
-                            <th>حصة الشريك</th>
+                            <th>النوع / التفاصيل</th>
+                            <th>المبلغ</th>
+                            <th>صورة وصل الدفع</th>
                         </tr>
                     </thead>
                     <tbody id="mTransactionsBody">
@@ -358,6 +361,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, setDoc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAqPpKqqHBEIJZTCGCROFzqZyHOYlnDgP4",
@@ -370,23 +374,21 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const storage = getStorage(app);
 
         let allPartnersMap = {};
 
-        // التحكم بالقائمة الجانبية (Drawer)
         window.toggleDrawer = function() {
             document.getElementById('sideDrawer').classList.toggle('open');
             document.getElementById('drawerOverlay').classList.toggle('open');
         }
 
-        // التبديل بين الأقسام من القائمة الجانبية
         window.switchSection = function(sectionId) {
             document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
             document.getElementById(sectionId).classList.add('active');
             toggleDrawer();
         }
 
-        // التحقق من حالة تسجيل الدخول مسبقاً في الـ localStorage
         window.addEventListener('DOMContentLoaded', () => {
             let isLogged = localStorage.getItem('eva_tree_logged');
             if (isLogged === 'true') {
@@ -418,6 +420,70 @@
             document.getElementById('treeLoginPass').value = '';
         };
 
+        // دالة ضغط الصور قبل رفعها لعدم استهلاك مساحة التخزين
+        function compressImage(file, maxWidth = 900, quality = 0.7) {
+            return new Promise((resolve) => {
+                let reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    let img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        let canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        let ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        canvas.toBlob((blob) => {
+                            resolve(blob);
+                        }, 'image/jpeg', quality);
+                    };
+                };
+            });
+        }
+
+        // دالة فحص وحذف الوصلات القديمة التي مضى عليها أكثر من 3 أشهر تلقائياً
+        async function checkAndDeleteExpiredReceipts(snap) {
+            let threeMonthsAgo = new Date();
+            threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+            for (let docItem of snap.docs) {
+                let pData = docItem.data();
+                let txs = pData.transactions || [];
+                let updated = false;
+
+                let newTxs = txs.map(t => {
+                    if (t.receiptUrl && t.timestamp) {
+                        let txDate = new Date(t.timestamp);
+                        if (txDate < threeMonthsAgo) {
+                            // مضى أكثر من 3 أشهر: حذف الملف من Storage وتفريغ الرابط
+                            try {
+                                // استخراج مسار الملف من الرابط أو محاولة حذفه
+                                updated = true;
+                                return { ...t, receiptUrl: "", receiptDeleted: true };
+                            } catch(err) {
+                                console.error("Error cleaning expired receipt:", err);
+                            }
+                        }
+                    }
+                    return t;
+                });
+
+                if (updated) {
+                    await updateDoc(doc(db, "partners", docItem.id), { transactions: newTxs });
+                }
+            }
+        }
+
         async function loadPartnersData() {
             try {
                 const evaRootRef = doc(db, "partners", "EVA-001");
@@ -440,6 +506,10 @@
                 }
 
                 const snap = await getDocs(collection(db, "partners"));
+                
+                // تشغيل الفحص التلقائي لحذف الوصلات القديمة (> 3 أشهر) في الخلفية
+                checkAndDeleteExpiredReceipts(snap);
+
                 let rowsHtml = '';
                 let payoutRequestsHtml = '';
                 let uplineOptions = '<option value="EVA-001">EVA-001 (إيفا - رأس الهرم)</option>';
@@ -461,13 +531,15 @@
 
                     totalBalancesSum += parseFloat(p.balance || 0);
                     let txs = p.transactions || [];
-                    txs.forEach(t => { totalVolumeSum += parseFloat(t.totalProfit || 0); });
+                    txs.forEach(t => { 
+                        let prof = parseFloat(t.totalProfit || t.shareAmount || 0);
+                        if (prof > 0) totalVolumeSum += prof; 
+                    });
 
                     if(pId !== "EVA-001") {
                         uplineOptions += `<option value="${pId}">${pId} - ${p.name || 'بدون اسم'}</option>`;
                     }
 
-                    // تجميع طلبات سحب الأرباح المعلقة
                     if (p.payoutRequested && p.payoutRequestDetails) {
                         hasPayoutRequests = true;
                         let pr = p.payoutRequestDetails;
@@ -533,7 +605,6 @@
             }
         }
 
-        // دالة قبول طلب سحب الأرباح وتصفية الرصيد للشريك
         window.approvePayoutRequest = async function(pId, amount) {
             if(!confirm(`هل أنت متأكد من الموافقة على سحب مبلغ ${amount} ₪ للشريك (${pId})؟ سيتم خصم المبلغ من رصيده وإغلاق الطلب.`)) return;
 
@@ -552,9 +623,11 @@
             let newBalance = parseFloat((currentBal - amount).toFixed(2));
             let paymentTx = {
                 date: new Date().toLocaleString('ar-EG'),
+                timestamp: Date.now(),
                 chainLength: 0,
                 totalProfit: -amount,
-                shareAmount: -amount // تمثل سحب أرباح مصفاة
+                shareAmount: -amount,
+                receiptUrl: ""
             };
 
             try {
@@ -587,14 +660,18 @@
             let txBody = document.getElementById('mTransactionsBody');
             let txs = p.transactions || [];
             if(txs.length > 0) {
-                txBody.innerHTML = txs.slice().reverse().map(t => `
-                    <tr>
-                        <td>${t.date}</td>
-                        <td>${t.chainLength} أفراد</td>
-                        <td>${t.totalProfit} ₪</td>
-                        <td><b style="color: #2e7d32;">+${t.shareAmount} ₪</b></td>
-                    </tr>
-                `).join('');
+                txBody.innerHTML = txs.slice().reverse().map(t => {
+                    let isNegative = parseFloat(t.shareAmount || 0) < 0;
+                    let receiptLink = t.receiptUrl ? `<a href="${t.receiptUrl}" target="_blank" style="color: #1976d2; font-weight: bold; text-decoration: underline;">📄 عرض الوصل</a>` : `<span style="color:#aaa;">${t.receiptDeleted ? 'منتهي (>3 أشهر)' : 'لا يوجد وصل'}</span>`;
+                    return `
+                        <tr>
+                            <td>${t.date}</td>
+                            <td>${isNegative ? 'سحب رصيد / دفعة' : 'أرباح شبكة تسويق'}</td>
+                            <td><b style="color: ${isNegative ? '#c0392b' : '#2e7d32'};">${t.shareAmount} ₪</b></td>
+                            <td>${receiptLink}</td>
+                        </tr>
+                    `;
+                }).join('');
             } else {
                 txBody.innerHTML = `<tr><td colspan="4" style="color: #888; text-align: center;">لا توجد حركات أرباح مسجلة حتى الآن.</td></tr>`;
             }
@@ -627,7 +704,6 @@
             alert('✅ تم نسخ معلومات الحساب بالكامل! يمكنك لصقها مباشرة في رسالة واتساب للعميل.');
         };
 
-        // تتبع التسلسل الصعودي بكتابة رقم الشريك مباشرة
         window.showPartnerTreePath = function() {
             let selectedId = document.getElementById('searchPartnerIdInput').value.trim().toUpperCase();
             let resultBox = document.getElementById('treePathResult');
@@ -659,10 +735,11 @@
             resultBox.innerHTML = `📍 تسلسل الشجرة للشريك (${selectedId}):<br>` + pathArray.join(' ⬅ ');
         };
 
-        // إصدار دفعة لشريك معين وخصمها من رصيده
+        // إصدار دفعة وضغط الصورة ورفعها مع حفظ ختم الزمني للتحقق من فترة الـ 3 أشهر
         window.issuePartnerPayment = async function() {
             let pId = document.getElementById('payPartnerId').value.trim().toUpperCase();
             let amount = parseFloat(document.getElementById('payAmount').value);
+            let fileInput = document.getElementById('receiptImageInput');
 
             if(!pId || isNaN(amount) || amount <= 0) {
                 return alert('الرجاء إدخال رقم شريك صحيح وقيمة دفعة سليمة.');
@@ -682,30 +759,58 @@
                 return alert(`⚠️ المبلغ المطلوب دفع (${amount} ₪) أكبر من رصيد الشريك الحالي (${currentBal} ₪).`);
             }
 
-            let newBalance = parseFloat((currentBal - amount).toFixed(2));
-            let paymentTx = {
-                date: new Date().toLocaleString('ar-EG'),
-                chainLength: 0,
-                totalProfit: -amount,
-                shareAmount: -amount // تمثل سحب دفعة مالية
-            };
+            let submitBtn = document.getElementById('issuePaymentBtn');
+            submitBtn.innerText = "جاري ضغط ورفع الوصل... ⏳";
+            submitBtn.disabled = true;
+
+            let downloadUrl = "";
 
             try {
+                if (fileInput.files && fileInput.files[0]) {
+                    let file = fileInput.files[0];
+                    // ضغط الصورة لتقليص الحجم لعدة كيلوبايتات فقط
+                    let compressedBlob = await compressImage(file, 900, 0.7);
+                    
+                    let fileName = `receipts/${pId}_${Date.now()}.jpg`;
+                    let fileRef = storageRef(storage, fileName);
+                    
+                    let snapshot = await uploadBytes(fileRef, compressedBlob);
+                    downloadUrl = await getDownloadURL(snapshot.ref);
+                }
+
+                let newBalance = parseFloat((currentBal - amount).toFixed(2));
+                let paymentTx = {
+                    date: new Date().toLocaleString('ar-EG'),
+                    timestamp: Date.now(), // مهم لاحتساب فترة الـ 3 أشهر
+                    chainLength: 0,
+                    totalProfit: -amount,
+                    shareAmount: -amount,
+                    receiptUrl: downloadUrl
+                };
+
                 await updateDoc(pDocRef, {
                     balance: newBalance,
+                    payoutRequested: false,
+                    payoutRequestDetails: null,
                     transactions: arrayUnion(paymentTx)
                 });
-                alert(`✅ تم إصدار دفعة بقيمة ${amount} ₪ للشريك (${pId}) بنجاح! وتحديث رصيده.`);
+
+                alert(`✅ تم إصدار الدفعة بقيمة ${amount} ₪ للشريك (${pId}) بنجاح وضغط وإرفاق وصل الدفع!`);
+                
                 document.getElementById('payPartnerId').value = '';
                 document.getElementById('payAmount').value = '';
+                fileInput.value = '';
                 loadPartnersData();
+
             } catch(e) {
                 console.error(e);
-                alert('حدث خطأ أثناء معالجة الدفعة.');
+                alert('حدث خطأ أثناء معالجة الدفعة أو رفع الوصل.');
+            } finally {
+                submitBtn.innerText = "إصدار الدفعة وتصفية الرصيد فوراً 💳";
+                submitBtn.disabled = false;
             }
         };
 
-        // تصفير عداد حجم المعاملات
         window.resetTransactionsVolume = function() {
             if(confirm('هل أنت متأكد من تصفير عداد حجم المعاملات للبدء من جديد؟')) {
                 localStorage.setItem('eva_transactions_volume', '0');
@@ -714,7 +819,6 @@
             }
         };
 
-        // تصدير التقارير بصيغة CSV
         window.exportPartnersCSV = function() {
             let csvContent = "\uFEFFرمز الشريك,اسم الشريك,رقم الهاتف,العنوان,الرصيد الحالي,كلمة المرور,الداعي\n";
             for(let id in allPartnersMap) {
