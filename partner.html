@@ -97,6 +97,25 @@
             padding: 0;
         }
 
+        /* زر اطلب الأموال بجانب الرصيد */
+        .request-money-btn {
+            background: linear-gradient(135deg, var(--accent-gold), var(--dark-gold));
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(212, 175, 55, 0.3);
+            transition: transform 0.2s;
+            display: none; /* يظهر فقط إذا تحققت الشروط */
+            text-align: center;
+        }
+        .request-money-btn:hover {
+            transform: translateY(-1px);
+        }
+
         /* القائمة الجانبية (3 شحطات) */
         .menu-icon {
             font-size: 22px;
@@ -416,9 +435,13 @@
                     <span class="menu-icon" onclick="toggleDrawer()">☰</span>
                     <h2 class="brand-title">EVA PLUS PARTNER</h2>
                 </div>
-                <div class="balance-badge-top">
-                    <span>رصيدك الحالي</span>
-                    <h3 id="pBalance">0 ₪</h3>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <!-- زر اطلب الأموال (يظهر إذا كان الرصيد >= 100 وشروط دورة الشهر مستوفاة) -->
+                    <button id="requestMoneyBtn" class="request-money-btn" onclick="openModal('requestMoneyModal')">💵 اطلب الأموال</button>
+                    <div class="balance-badge-top">
+                        <span>رصيدك الحالي</span>
+                        <h3 id="pBalance">0 ₪</h3>
+                    </div>
                 </div>
             </div>
 
@@ -498,6 +521,32 @@
                     <input type="text" id="newPasswordInput" placeholder="أدخل كلمة المرور الجديدة" style="background: #fff;">
                 </div>
                 <button class="btn" onclick="updatePartnerPassword()">تحديث كلمة المرور</button>
+            </div>
+        </div>
+
+        <!-- النافذة المنبثقة: طلب الأموال وطرق الدفع -->
+        <div class="modal-overlay" id="requestMoneyModal">
+            <div class="modal-content" style="max-width: 450px;">
+                <button class="modal-close-btn" onclick="closeModal('requestMoneyModal')">إغلاق ✕</button>
+                <h3 style="color: var(--primary-burgundy); margin-top: 0; border-bottom: 2px solid var(--border-burgundy); padding-bottom: 8px;">💵 طلب سحب الأرباح والأموال</h3>
+                
+                <div class="partner-card" style="margin-bottom: 15px;">
+                    <p><b>رصيد السحب المتاح:</b> <span id="modalBalanceDisplay" style="color: #2e7d32; font-weight: bold; font-size: 15px;">0 ₪</span></p>
+                </div>
+
+                <div class="form-group">
+                    <label>اختر طريقة الدفع (جميعها بعملة الشيكل):</label>
+                    <select id="payoutMethodSelect" style="background: #fff; font-weight: bold;">
+                        <option value="IBAN">تحويل بنكي (IBAN بعملة الشيكل)</option>
+                        <option value="IBURAQ">آي براق (IBURAQ بعملة الشيكل)</option>
+                        <option value="CASH">كاش في معرض إيفا براند</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="btn whatsapp-btn" onclick="confirmPayoutRequest()" style="flex: 2; margin-top: 0;">✅ تأكيد الطلب وإرسال عبر الواتساب</button>
+                    <button class="btn" onclick="closeModal('requestMoneyModal')" style="flex: 1; margin-top: 0; background: #7f8c8d;">إلغاء الطلب</button>
+                </div>
             </div>
         </div>
 
@@ -668,6 +717,9 @@
         let partnerUser = urlParams.get('user');
         let currentActivePartnerId = "";
         let currentPartnerName = "";
+        let currentPartnerBalance = 0;
+        let partnerPayoutData = {};
+        let partnerLastPayoutMonth = "";
 
         // تفعيل وتحرير الحقول باستخدام القلم الجانبي
         window.toggleFieldEdit = function(fieldId) {
@@ -680,6 +732,51 @@
                 inputField.setAttribute('readonly', true);
                 inputField.style.background = '#eef2f5';
             }
+        };
+
+        // تأكيد طلب سحب الأموال وإرساله عبر الواتساب
+        window.confirmPayoutRequest = async function() {
+            let method = document.getElementById('payoutMethodSelect').value;
+            let supportPhone = "970594101632";
+            let detailsText = "";
+
+            if (method === 'IBAN') {
+                if (!partnerPayoutData.iban || !partnerPayoutData.ibanName) {
+                    alert('⚠️ يرجى تعبئة المعلومات المالية في حقل معلومات استقبال الأموال أولاً.');
+                    openModal('payoutInfoModal');
+                    return;
+                }
+                detailsText = `طريقة الدفع: IBAN (عملة الشيكل)\n- رقم الحساب/IBAN: ${partnerPayoutData.iban}\n- اسم صاحب الحساب: ${partnerPayoutData.ibanName}`;
+            } else if (method === 'IBURAQ') {
+                if (!partnerPayoutData.iburaq || !partnerPayoutData.iburaqName) {
+                    alert('⚠️ يرجى تعبئة المعلومات المالية في حقل معلومات استقبال الأموال أولاً.');
+                    openModal('payoutInfoModal');
+                    return;
+                }
+                detailsText = `طريقة الدفع: IBURAQ (عملة الشيكل)\n- معرف آي براق: ${partnerPayoutData.iburaq}\n- اسم صاحب الحساب: ${partnerPayoutData.iburaqName}`;
+            } else {
+                detailsText = `طريقة الدفع: كاش (استلام نقدي من معرض إيفا براند)`;
+            }
+
+            let msg = `مرحباً إدارة إيفا بلس، أرغب بطلب سحب أرباحي الحالية:\n\n- اسم الشريك: ${currentPartnerName}\n- رقم الشريك: ${currentActivePartnerId}\n- قيمة المبلغ المراد سحبه: ${currentPartnerBalance} ₪\n\n${detailsText}`;
+
+            // تسجيل أن الشريك قام بطلب سحب لهذا الشهر وتحديث قاعدة البيانات
+            let currentMonthStr = new Date().toISOString().slice(0, 7); // مثال: "2026-09"
+            try {
+                let docRef = doc(db, "partners", currentActivePartnerId);
+                await updateDoc(docRef, {
+                    lastPayoutRequestedMonth: currentMonthStr
+                });
+                partnerLastPayoutMonth = currentMonthStr;
+                document.getElementById('requestMoneyBtn').style.display = 'none';
+            } catch(e) {
+                console.error("Error updating payout status:", e);
+            }
+
+            let waUrl = `https://wa.me/${supportPhone}?text=${encodeURIComponent(msg)}`;
+            window.open(waUrl, '_blank');
+            closeModal('requestMoneyModal');
+            alert('✅ تم إرسال تفاصيل طلب السحب بنجاح!');
         };
 
         // كود تفاعل شريط تثبيت التطبيق (PWA)
@@ -754,6 +851,8 @@
                     let p = docSnap.data();
                     currentActivePartnerId = p.partnerId || cleanId;
                     currentPartnerName = p.name || 'بدون اسم';
+                    currentPartnerBalance = p.balance || 0;
+                    partnerLastPayoutMonth = p.lastPayoutRequestedMonth || "";
 
                     let nowFormatted = new Date().toLocaleString('ar-EG');
                     await updateDoc(docRef, {
@@ -770,10 +869,21 @@
                     document.getElementById('pAddress').innerText = p.address || 'غير محدد';
                     document.getElementById('pUpline').innerText = p.uplineId || p.sponsor || 'EVA-001 (رأس الهرم)';
                     document.getElementById('pPass').innerText = p.password || 'غير محدد';
-                    document.getElementById('pBalance').innerText = (p.balance || 0) + " ₪";
+                    document.getElementById('pBalance').innerText = currentPartnerBalance + " ₪";
+                    document.getElementById('modalBalanceDisplay').innerText = currentPartnerBalance + " ₪";
+
+                    // فحص شرط ظهور زر "اطلب الأموال": الرصيد >= 100 ولم يتم طلبه في الشهر الحالي
+                    let currentMonthStr = new Date().toISOString().slice(0, 7);
+                    let requestBtn = document.getElementById('requestMoneyBtn');
+                    if (currentPartnerBalance >= 100 && partnerLastPayoutMonth !== currentMonthStr) {
+                        requestBtn.style.display = 'inline-block';
+                    } else {
+                        requestBtn.style.display = 'none';
+                    }
 
                     // تعبئة معلومات استقبال الأموال المحفوظة مسبقاً إن وجدت
                     if (p.payoutInfo) {
+                        partnerPayoutData = p.payoutInfo;
                         document.getElementById('ibanInput').value = p.payoutInfo.iban || '';
                         document.getElementById('ibanNameInput').value = p.payoutInfo.ibanName || '';
                         document.getElementById('iburaqInput').value = p.payoutInfo.iburaq || '';
@@ -876,6 +986,8 @@
             let iburaqName = document.getElementById('iburaqNameInput').value.trim();
 
             if (!currentActivePartnerId) return alert('حدث خطأ في تحديد رقم الشريك.');
+
+            partnerPayoutData = { iban, ibanName, iburaq, iburaqName };
 
             try {
                 let docRef = doc(db, "partners", currentActivePartnerId);
