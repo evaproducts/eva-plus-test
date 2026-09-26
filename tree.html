@@ -166,10 +166,9 @@
             
             <div style="display: flex; flex-direction: column; gap: 10px;">
                 <button class="btn blue-btn" onclick="switchSection('sectionTable')">📋 قائمة الشركاء والأعضاء</button>
-                <button class="btn" style="background: #d4af37; color: #333;" onclick="switchSection('sectionPayoutRequests')">🔔 طلبات سحب الأرباح المعلقة</button>
                 <button class="btn" onclick="switchSection('sectionAdd')">➕ إضافة شريك جديد</button>
                 <button class="btn blue-btn" onclick="switchSection('sectionSearchPath')">🔍 تتبع السلسلة الصعودية</button>
-                <button class="btn green-btn" onclick="switchSection('sectionFinance')">💰 إدارة الأرصدة والمدفوعات</button>
+                <button class="btn green-btn" onclick="switchSection('sectionFinance')">💰 إدارة الأرصدة والمدفوعات والطلبات</button>
                 <button class="btn" style="background: #6c757d; color: #fff;" onclick="switchSection('sectionCounter')">📈 صندوق حجم المعاملات</button>
             </div>
         </div>
@@ -179,9 +178,25 @@
             <!-- 1. قائمة الشركاء -->
             <div id="sectionTable" class="content-section active">
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
-                    <h3 style="margin: 0; border: none;">📋 قائمة شركاء الفريق المسجلين</h3>
+                    <div>
+                        <h3 style="margin: 0; border: none;">📋 قائمة شركاء الفريق المسجلين</h3>
+                        <span id="totalSubscribersCount" style="font-size: 12px; color: #880e4f; font-weight: bold; background: #fff0f5; padding: 3px 8px; border-radius: 6px; display: inline-block; margin-top: 5px;">إجمالي المشتركين: جاري التحميل...</span>
+                    </div>
                     <button class="btn blue-btn" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="exportPartnersCSV()">📥 تصدير التقارير (CSV)</button>
                 </div>
+
+                <!-- خانات الفلترة السريعة أعلى الجدول -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin-bottom: 10px; background: #fdf2f8; padding: 10px; border-radius: 8px; border: 1px solid #f8bbd0;">
+                    <input type="text" id="filterStatus" placeholder="فلتر الحالة" onkeyup="filterPartnersTable()" style="padding:6px; font-size:11px; border:1px solid #ddd; border-radius:6px; text-align:right; background:#fff;">
+                    <input type="text" id="filterId" placeholder="فلتر الرمز ID" onkeyup="filterPartnersTable()" style="padding:6px; font-size:11px; border:1px solid #ddd; border-radius:6px; text-align:right; background:#fff;">
+                    <input type="text" id="filterName" placeholder="فلتر اسم الشريك" onkeyup="filterPartnersTable()" style="padding:6px; font-size:11px; border:1px solid #ddd; border-radius:6px; text-align:right; background:#fff;">
+                    <input type="text" id="filterPhone" placeholder="فلتر الهاتف" onkeyup="filterPartnersTable()" style="padding:6px; font-size:11px; border:1px solid #ddd; border-radius:6px; text-align:right; background:#fff;">
+                    <input type="text" id="filterBalance" placeholder="فلتر الرصيد" onkeyup="filterPartnersTable()" style="padding:6px; font-size:11px; border:1px solid #ddd; border-radius:6px; text-align:right; background:#fff;">
+                    <input type="text" id="filterPassword" placeholder="فلتر كلمة المرور" onkeyup="filterPartnersTable()" style="padding:6px; font-size:11px; border:1px solid #ddd; border-radius:6px; text-align:right; background:#fff;">
+                    <input type="text" id="filterUpline" placeholder="فلتر الداعي" onkeyup="filterPartnersTable()" style="padding:6px; font-size:11px; border:1px solid #ddd; border-radius:6px; text-align:right; background:#fff;">
+                    <input type="text" id="filterTeamCount" placeholder="فلتر حجم الفريق" onkeyup="filterPartnersTable()" style="padding:6px; font-size:11px; border:1px solid #ddd; border-radius:6px; text-align:right; background:#fff;">
+                </div>
+
                 <div style="overflow-x: auto;">
                     <table>
                         <thead>
@@ -193,35 +208,13 @@
                                 <th>الرصيد الحالي</th>
                                 <th>كلمة المرور</th>
                                 <th>الداعي</th>
+                                <th>عدد أعضاء الفريق</th>
                                 <th>آخر دخول</th>
                                 <th>إجراءات الدعم</th>
                             </tr>
                         </thead>
                         <tbody id="partnersTableBody">
-                            <tr><td colspan="9" style="text-align:center;">جاري تحميل الشجرة...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- 2. طلبات سحب الأرباح المعلقة -->
-            <div id="sectionPayoutRequests" class="content-section">
-                <h3 style="color: #d4af37;">🔔 طلبات سحب الأرباح المعلقة من الشركاء</h3>
-                <p style="font-size: 12px; color: #666;">الطلبات الواردة من الشركاء. انقر على قبول لإرفاق وصل التحويل وتصفية الرصيد فوراً:</p>
-                <div style="overflow-x: auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>رمز الشريك</th>
-                                <th>اسم الشريك</th>
-                                <th>مبلغ السحب</th>
-                                <th>طريقة الدفع والتفاصيل</th>
-                                <th>تاريخ الطلب</th>
-                                <th>إجراءات الإدارة ورفع الوصل</th>
-                            </tr>
-                        </thead>
-                        <tbody id="payoutRequestsTableBody">
-                            <tr><td colspan="6" style="text-align:center; color:#888;">لا توجد طلبات سحب معلقة حالياً.</td></tr>
+                            <tr><td colspan="10" style="text-align:center;">جاري تحميل الشجرة...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -264,9 +257,32 @@
                 </div>
             </div>
 
-            <!-- 5. إدارة الأرصدة والدفعات اليدوية -->
+            <!-- 5. إدارة الأرصدة والدفعات اليدوية وطلبات السحب المعلقة -->
             <div id="sectionFinance" class="content-section">
-                <h3 style="color: #27ae60;">💰 إدارة الأرصدة وإصدار الدفعات اليدوية</h3>
+                <h3 style="color: #27ae60;">💰 إدارة الأرصدة والمدفوعات وطلبات السحب</h3>
+                
+                <!-- قسم طلبات السحب المعلقة المدمج هنا -->
+                <div style="background: #fff8e1; border: 1px solid #ffe082; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <h4 style="margin-top: 0; color: #b78103;">🔔 طلبات سحب الأرباح المعلقة من الشركاء</h4>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>رمز الشريك</th>
+                                    <th>اسم الشريك</th>
+                                    <th>مبلغ السحب</th>
+                                    <th>طريقة الدفع والتفاصيل</th>
+                                    <th>تاريخ الطلب</th>
+                                    <th>إجراءات الإدارة ورفع الوصل</th>
+                                </tr>
+                            </thead>
+                            <tbody id="payoutRequestsTableBody">
+                                <tr><td colspan="6" style="text-align:center; color:#888;">لا توجد طلبات سحب معلقة حالياً.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <div style="background: #e8f5e9; border: 1px solid #81c784; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
                     <span style="font-size: 13px; color: #1b5e20; font-weight: bold;">💎 رصيد كافة العملاء والشركاء في النظام:</span>
                     <h2 id="totalAllPartnersBalance" style="margin: 5px 0 0 0; color: #2e7d32; border: none; font-size: 24px;">جاري الحساب... ₪</h2>
@@ -337,11 +353,17 @@
                 <p><b>كلمة المرور:</b> <span id="mPass" style="color: #2e7d32; font-weight: bold;"></span></p>
                 <p><b>رقم الهاتف:</b> <span id="mPhone"></span></p>
                 <p><b>العنوان:</b> <span id="mAddress"></span></p>
+                <p><b>المعلومات المالية (IBAN / IBURAQ / تفاصيل الدفع):</b> <span id="mFinancial" style="color: #1976d2; font-weight: bold;"></span></p>
             </div>
 
             <div style="background: #e8f5e9; border: 1px solid #81c784; padding: 12px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
                 <span style="font-size: 13px; color: #1b5e20; font-weight: bold;">💰 الرصيد الحالي المتاح:</span>
                 <h3 id="mBalance" style="margin: 5px 0 0 0; color: #2e7d32; border: none;">0 ₪</h3>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <button class="btn green-btn" style="flex: 1;" onclick="openPartnerWhatsApp()">💬 تواصل واتساب</button>
+                <button class="btn blue-btn" style="flex: 1;" onclick="exportPartnerStatementCSV()">📥 تصدير الكشف (CSV)</button>
             </div>
 
             <h4 style="color: #880e4f; margin-bottom: 8px;">📊 شريط الحركات والأرباح والوصلات</h4>
@@ -396,6 +418,7 @@
         let allPartnersMap = {};
         let activeApprovalPartnerId = "";
         let activeApprovalAmount = 0;
+        let currentPreviewPartner = null;
 
         window.toggleDrawer = function() {
             document.getElementById('sideDrawer').classList.toggle('open');
@@ -496,8 +519,10 @@
                 let totalBalancesSum = 0;
                 let totalVolumeSum = 0;
                 let hasPayoutRequests = false;
+                let totalSubscribers = 0;
 
                 allPartnersMap = {};
+                let tempPartnersList = [];
                 snap.forEach(docItem => {
                     let p = docItem.data();
                     let pId = p.partnerId || docItem.id;
@@ -507,8 +532,32 @@
                     }
 
                     p.partnerId = pId;
-                    allPartnersMap[pId] = p;
+                    tempPartnersList.push(p);
+                });
 
+                // حساب عدد أعضاء الفريق لكل شريك (المباشرين والفرعيين تحت سلسلته)
+                tempPartnersList.forEach(p => {
+                    let teamCount = 0;
+                    tempPartnersList.forEach(sub => {
+                        let curr = sub.uplineId || sub.sponsor;
+                        let safety = 0;
+                        while(curr && curr !== "none" && safety < 50) {
+                            if(curr === p.partnerId) {
+                                teamCount++;
+                                break;
+                            }
+                            let parentObj = tempPartnersList.find(x => x.partnerId === curr);
+                            curr = parentObj ? (parentObj.uplineId || parentObj.sponsor) : null;
+                            safety++;
+                        }
+                    });
+                    p.calculatedTeamCount = teamCount;
+                    allPartnersMap[p.partnerId] = p;
+                });
+
+                tempPartnersList.forEach(p => {
+                    let pId = p.partnerId;
+                    totalSubscribers++;
                     totalBalancesSum += parseFloat(p.balance || 0);
                     let txs = p.transactions || [];
                     txs.forEach(t => { 
@@ -554,6 +603,7 @@
                             <td><b style="color: #2e7d32;">${p.balance || 0} ₪</b></td>
                             <td><code style="background:#eee; padding:2px 6px; border-radius:4px; color:#c2185b;">${p.password || 'غير محدد'}</code></td>
                             <td>${uplineDisplay}</td>
+                            <td><span style="background: #e3f2fd; color: #0d47a1; padding: 3px 8px; border-radius: 6px; font-weight: bold;">👥 ${p.calculatedTeamCount}</span></td>
                             <td style="font-size: 11px; color: #555;">${lastLoginTime}</td>
                             <td>
                                 <button class="btn" style="padding: 5px 10px; font-size: 11px;" onclick='openPartnerPreview("${pId}")'>👁️ عرض الحساب</button>
@@ -563,7 +613,7 @@
                 });
 
                 if(rowsHtml === '') {
-                    rowsHtml = `<tr><td colspan="9" style="text-align:center; color:#888;">لا توجد سجلات شركاء في الشجرة حتى الآن.</td></tr>`;
+                    rowsHtml = `<tr><td colspan="10" style="text-align:center; color:#888;">لا توجد سجلات شركاء في الشجرة حتى الآن.</td></tr>`;
                 }
 
                 if(!hasPayoutRequests) {
@@ -574,6 +624,7 @@
                 document.getElementById('payoutRequestsTableBody').innerHTML = payoutRequestsHtml;
                 document.getElementById('uplineSelect').innerHTML = uplineOptions;
                 document.getElementById('totalAllPartnersBalance').innerText = totalBalancesSum.toFixed(2) + " ₪";
+                document.getElementById('totalSubscribersCount').innerText = `إجمالي المشتركين في النظام: ${totalSubscribers}`;
 
                 let savedVolume = localStorage.getItem('eva_transactions_volume');
                 let finalVolume = savedVolume ? parseFloat(savedVolume) : totalVolumeSum;
@@ -581,9 +632,50 @@
 
             } catch (error) {
                 console.error("Error loading partners:", error);
-                document.getElementById('partnersTableBody').innerHTML = `<tr><td colspan="9" style="color:red;">خطأ في تحميل بيانات الشجرة.</td></tr>`;
+                document.getElementById('partnersTableBody').innerHTML = `<tr><td colspan="10" style="color:red;">خطأ في تحميل بيانات الشجرة.</td></tr>`;
             }
         }
+
+        // دالة الفلترة السريعة لأعمدة الجدول
+        window.filterPartnersTable = function() {
+            let fStatus = document.getElementById('filterStatus').value.toLowerCase();
+            let fId = document.getElementById('filterId').value.toLowerCase();
+            let fName = document.getElementById('filterName').value.toLowerCase();
+            let fPhone = document.getElementById('filterPhone').value.toLowerCase();
+            let fBalance = document.getElementById('filterBalance').value.toLowerCase();
+            let fPassword = document.getElementById('filterPassword').value.toLowerCase();
+            let fUpline = document.getElementById('filterUpline').value.toLowerCase();
+            let fTeamCount = document.getElementById('filterTeamCount').value.toLowerCase();
+
+            let tbody = document.getElementById('partnersTableBody');
+            let trs = tbody.getElementsByTagName('tr');
+
+            for (let i = 0; i < trs.length; i++) {
+                let tds = trs[i].getElementsByTagName('td');
+                if (tds.length < 10) continue;
+
+                let statusText = tds[0].innerHTML.includes('dot-green') ? 'نشط' : 'جديد';
+                let idText = tds[1].innerText.toLowerCase();
+                let nameText = tds[2].innerText.toLowerCase();
+                let phoneText = tds[3].innerText.toLowerCase();
+                let balanceText = tds[4].innerText.toLowerCase();
+                let passwordText = tds[5].innerText.toLowerCase();
+                let uplineText = tds[6].innerText.toLowerCase();
+                let teamCountText = tds[7].innerText.toLowerCase();
+
+                let match = true;
+                if (fStatus && !statusText.includes(fStatus)) match = false;
+                if (fId && !idText.includes(fId)) match = false;
+                if (fName && !nameText.includes(fName)) match = false;
+                if (fPhone && !phoneText.includes(fPhone)) match = false;
+                if (fBalance && !balanceText.includes(fBalance)) match = false;
+                if (fPassword && !passwordText.includes(fPassword)) match = false;
+                if (fUpline && !uplineText.includes(fUpline)) match = false;
+                if (fTeamCount && !teamCountText.includes(fTeamCount)) match = false;
+
+                trs[i].style.display = match ? '' : 'none';
+            }
+        };
 
         window.openApproveModal = function(pId, amount) {
             activeApprovalPartnerId = pId;
@@ -673,11 +765,14 @@
             let p = allPartnersMap[partnerId];
             if(!p) return alert('لم يتم العثور على بيانات الشريك.');
 
+            currentPreviewPartner = p;
+
             document.getElementById('mName').innerText = p.name || 'بدون اسم';
             document.getElementById('mId').innerText = p.partnerId;
             document.getElementById('mPass').innerText = p.password || 'غير محدد';
             document.getElementById('mPhone').innerText = p.phone || 'غير مسجل';
             document.getElementById('mAddress').innerText = p.address || 'غير محدد';
+            document.getElementById('mFinancial').innerText = p.financialDetails || p.iban || 'غير مسجل (لم يتم إدخال معلومات مالية)';
             document.getElementById('mBalance').innerText = (p.balance || 0) + " ₪";
 
             let txBody = document.getElementById('mTransactionsBody');
@@ -708,6 +803,37 @@
 
         window.closePartnerModal = function() {
             document.getElementById('partnerModal').style.display = 'none';
+        };
+
+        // زر تواصل واتساب بالرسالة المطلوبة
+        window.openPartnerWhatsApp = function() {
+            if (!currentPreviewPartner || !currentPreviewPartner.phone) {
+                return alert('رقم الهاتف غير متوفر لهذا الشريك.');
+            }
+            let cleanPhone = currentPreviewPartner.phone.replace(/[^0-9]/g, '');
+            if (cleanPhone.startsWith('0')) {
+                cleanPhone = '970' + cleanPhone.substring(1); // تحويل الرقم للتنسيق الدولي لفلسطين أو حسب الحاجة
+            }
+            let msg = encodeURIComponent(`مرحبا .. نحن ادارة ايفا بلس .. هل هذا الرقم المرتبط بالحساب ${currentPreviewPartner.partnerId}`);
+            window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
+        };
+
+        // زر تصدير الكشف الخاص بالشريك (CSV)
+        window.exportPartnerStatementCSV = function() {
+            if (!currentPreviewPartner) return;
+            let p = currentPreviewPartner;
+            let csvContent = "\uFEFFالتاريخ والوقت,النوع / التفاصيل,المبلغ (₪)\n";
+            let txs = p.transactions || [];
+            txs.forEach(t => {
+                let isNegative = parseFloat(t.shareAmount || 0) < 0;
+                let typeStr = isNegative ? 'سحب رصيد / دفعة' : 'أرباح شبكة تسويق';
+                csvContent += `"${t.date}","${typeStr}","${t.shareAmount}"\n`;
+            });
+            let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            let link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `Statement_${p.partnerId}.csv`;
+            link.click();
         };
 
         window.copyPartnerInfoToClipboard = function() {
@@ -840,10 +966,10 @@
         };
 
         window.exportPartnersCSV = function() {
-            let csvContent = "\uFEFFرمز الشريك,اسم الشريك,رقم الهاتف,العنوان,الرصيد الحالي,كلمة المرور,الداعي\n";
+            let csvContent = "\uFEFFرمز الشريك,اسم الشريك,رقم الهاتف,العنوان,الرصيد الحالي,كلمة المرور,الداعي,عدد أعضاء الفريق\n";
             for(let id in allPartnersMap) {
                 let p = allPartnersMap[id];
-                csvContent += `"${p.partnerId}","${p.name || ''}","${p.phone || ''}","${p.address || ''}","${p.balance || 0}","${p.password || ''}","${p.uplineId || p.sponsor || ''}"\n`;
+                csvContent += `"${p.partnerId}","${p.name || ''}","${p.phone || ''}","${p.address || ''}","${p.balance || 0}","${p.password || ''}","${p.uplineId || p.sponsor || ''}","${p.calculatedTeamCount || 0}"\n`;
             }
             let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             let link = document.createElement("a");
