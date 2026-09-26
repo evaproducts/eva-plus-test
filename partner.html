@@ -399,6 +399,7 @@
                 <span class="drawer-close" onclick="toggleDrawer()">✕</span>
             </div>
             <div class="drawer-item" onclick="openModal('profileModal'); toggleDrawer();">👤 الملف الشخصي وتعديل البيانات</div>
+            <div class="drawer-item" onclick="openModal('payoutInfoModal'); toggleDrawer();">💳 معلومات استقبال الأموال</div>
             <div class="drawer-item" onclick="openModal('treeModal'); toggleDrawer();">🌳 شجرة فريق التسويق</div>
             <div class="drawer-item" onclick="openModal('txModal'); toggleDrawer();">📊 سجل الحركات والأرباح</div>
             <div class="drawer-item" onclick="openModal('videoModal'); toggleDrawer();">▶️ دليل الانضمام لايفا بلس</div>
@@ -497,6 +498,54 @@
                     <input type="text" id="newPasswordInput" placeholder="أدخل كلمة المرور الجديدة" style="background: #fff;">
                 </div>
                 <button class="btn" onclick="updatePartnerPassword()">تحديث كلمة المرور</button>
+            </div>
+        </div>
+
+        <!-- النافذة المنبثقة: معلومات استقبال الأموال (IBAN & IBURAQ) -->
+        <div class="modal-overlay" id="payoutInfoModal">
+            <div class="modal-content">
+                <button class="modal-close-btn" onclick="closeModal('payoutInfoModal')">إغلاق ✕</button>
+                <h3 style="color: var(--primary-burgundy); margin-top: 0; border-bottom: 2px solid var(--border-burgundy); padding-bottom: 8px;">💳 معلومات استقبال الأموال</h3>
+                
+                <div style="background: #e8f4fd; border: 1px solid #b6e0fe; padding: 10px 12px; border-radius: 8px; margin-bottom: 15px; font-size: 12px; color: #0c5460; line-height: 1.5;">
+                    🔒 <b>تنبيه أمني هام:</b> هذه المعلومات سرية وتستخدم فقط لارسال الاموال لكم. انقر على أيقونة القلم ✏️ لتعديل الحقول.
+                </div>
+
+                <!-- خيار IBAN بعملة الشيكل -->
+                <div class="form-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <label style="margin:0;">IBAN (عملة الشيكل):</label>
+                        <span onclick="toggleFieldEdit('ibanInput')" style="cursor: pointer; font-size: 16px;" title="تعديل الحقل">✏️</span>
+                    </div>
+                    <input type="text" id="ibanInput" placeholder="PS00... مثال" readonly style="background: #eef2f5;">
+                </div>
+                <div class="form-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <label style="margin:0;">اسم صاحب الحساب (IBAN):</label>
+                        <span onclick="toggleFieldEdit('ibanNameInput')" style="cursor: pointer; font-size: 16px;" title="تعديل الحقل">✏️</span>
+                    </div>
+                    <input type="text" id="ibanNameInput" placeholder="الاسم الثلاثي حسب البنك" readonly style="background: #eef2f5;">
+                </div>
+
+                <hr style="border:0; border-top:1px dashed var(--border-burgundy); margin: 15px 0;">
+
+                <!-- خيار IBURAQ بعملة الشيكل -->
+                <div class="form-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <label style="margin:0;">IBURAQ (عملة الشيكل):</label>
+                        <span onclick="toggleFieldEdit('iburaqInput')" style="cursor: pointer; font-size: 16px;" title="تعديل الحقل">✏️</span>
+                    </div>
+                    <input type="text" id="iburaqInput" placeholder="معرف آي براق أو رقم الحساب" readonly style="background: #eef2f5;">
+                </div>
+                <div class="form-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <label style="margin:0;">اسم صاحب الحساب (IBURAQ):</label>
+                        <span onclick="toggleFieldEdit('iburaqNameInput')" style="cursor: pointer; font-size: 16px;" title="تعديل الحقل">✏️</span>
+                    </div>
+                    <input type="text" id="iburaqNameInput" placeholder="الاسم الثلاثي حسب الحساب" readonly style="background: #eef2f5;">
+                </div>
+
+                <button class="btn" onclick="savePayoutInfo()" style="margin-top: 15px;">💾 حفظ معلومات الاستقبال</button>
             </div>
         </div>
 
@@ -620,6 +669,19 @@
         let currentActivePartnerId = "";
         let currentPartnerName = "";
 
+        // تفعيل وتحرير الحقول باستخدام القلم الجانبي
+        window.toggleFieldEdit = function(fieldId) {
+            let inputField = document.getElementById(fieldId);
+            if (inputField.hasAttribute('readonly')) {
+                inputField.removeAttribute('readonly');
+                inputField.style.background = '#fff';
+                inputField.focus();
+            } else {
+                inputField.setAttribute('readonly', true);
+                inputField.style.background = '#eef2f5';
+            }
+        };
+
         // كود تفاعل شريط تثبيت التطبيق (PWA)
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -710,6 +772,21 @@
                     document.getElementById('pPass').innerText = p.password || 'غير محدد';
                     document.getElementById('pBalance').innerText = (p.balance || 0) + " ₪";
 
+                    // تعبئة معلومات استقبال الأموال المحفوظة مسبقاً إن وجدت
+                    if (p.payoutInfo) {
+                        document.getElementById('ibanInput').value = p.payoutInfo.iban || '';
+                        document.getElementById('ibanNameInput').value = p.payoutInfo.ibanName || '';
+                        document.getElementById('iburaqInput').value = p.payoutInfo.iburaq || '';
+                        document.getElementById('iburaqNameInput').value = p.payoutInfo.iburaqName || '';
+                    }
+
+                    // إرجاع الحقول لحالة الـ readonly عند التحميل
+                    ['ibanInput', 'ibanNameInput', 'iburaqInput', 'iburaqNameInput'].forEach(id => {
+                        let el = document.getElementById(id);
+                        el.setAttribute('readonly', true);
+                        el.style.background = '#eef2f5';
+                    });
+
                     // تفكيك رقم الهاتف للمقدمة ورقم الحقل
                     if (p.phone) {
                         let phoneStr = p.phone.toString().trim();
@@ -791,6 +868,41 @@
                 treeContainer.innerHTML = `<div class="tree-node">${myId}</div>`;
             }
         }
+
+        window.savePayoutInfo = async function() {
+            let iban = document.getElementById('ibanInput').value.trim();
+            let ibanName = document.getElementById('ibanNameInput').value.trim();
+            let iburaq = document.getElementById('iburaqInput').value.trim();
+            let iburaqName = document.getElementById('iburaqNameInput').value.trim();
+
+            if (!currentActivePartnerId) return alert('حدث خطأ في تحديد رقم الشريك.');
+
+            try {
+                let docRef = doc(db, "partners", currentActivePartnerId);
+                await updateDoc(docRef, {
+                    payoutInfo: {
+                        iban: iban,
+                        ibanName: ibanName,
+                        iburaq: iburaq,
+                        iburaqName: iburaqName,
+                        updatedAt: new Date().toLocaleString('ar-EG')
+                    }
+                });
+
+                // إقفال الحقول مرة أخرى بعد الحفظ
+                ['ibanInput', 'ibanNameInput', 'iburaqInput', 'iburaqNameInput'].forEach(id => {
+                    let el = document.getElementById(id);
+                    el.setAttribute('readonly', true);
+                    el.style.background = '#eef2f5';
+                });
+
+                alert('✅ تم حفظ معلومات استقبال الأموال بنجاح وبسرية تامة!');
+                closeModal('payoutInfoModal');
+            } catch(e) {
+                console.error(e);
+                alert('حدث خطأ أثناء حفظ المعلومات.');
+            }
+        };
 
         window.logoutPartner = function() {
             localStorage.removeItem('eva_partner_user');
