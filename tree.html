@@ -439,70 +439,31 @@
             document.getElementById('treeLoginPass').value = '';
         };
 
-        // دالة آمنة لضغط الصورة بدون أن تعطل النظام أبداً في حال فشل الكانفاس
-        function compressImage(file) {
-            return new Promise((resolve) => {
-                if (!file || !file.type.startsWith('image/')) {
-                    return resolve(file);
-                }
-                let reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = (event) => {
-                    let img = new Image();
-                    img.src = event.target.result;
-                    img.onload = () => {
-                        try {
-                            let canvas = document.createElement('canvas');
-                            let width = img.width;
-                            let height = img.height;
-                            let maxWidth = 900;
-
-                            if (width > maxWidth) {
-                                height = Math.round((height * maxWidth) / width);
-                                width = maxWidth;
-                            }
-
-                            canvas.width = width;
-                            canvas.height = height;
-                            let ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0, width, height);
-
-                            canvas.toBlob((blob) => {
-                                resolve(blob || file);
-                            }, 'image/jpeg', 0.7);
-                        } catch (err) {
-                            resolve(file); // في حال حدث خطأ، تمرر الملف الأصلي
-                        }
-                    };
-                    img.onerror = () => resolve(file);
-                };
-                reader.onerror = () => resolve(file);
-            });
-        }
-
-        async function checkAndDeleteExpiredReceipts(snap) {
-            let threeMonthsAgo = new Date();
-            threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-
-            for (let docItem of snap.docs) {
-                let pData = docItem.data();
-                let txs = pData.transactions || [];
-                let updated = false;
-
-                let newTxs = txs.map(t => {
-                    if (t.receiptUrl && t.timestamp) {
-                        let txDate = new Date(t.timestamp);
-                        if (txDate < threeMonthsAgo) {
-                            updated = true;
-                            return { ...t, receiptUrl: "", receiptDeleted: true };
-                        }
+        // دالة آمنة تماماً لرفع الصورة مع حماية من التعليق (Timeout)
+        async function uploadReceiptSafely(file, pId) {
+            if (!file) return "";
+            try {
+                let storagePromise = new Promise(async (resolve, reject) => {
+                    try {
+                        let fileName = `receipts/${pId}_${Date.now()}.jpg`;
+                        let fileRef = storageRef(storage, fileName);
+                        let snapshot = await uploadBytes(fileRef, file);
+                        let url = await getDownloadURL(snapshot.ref);
+                        resolve(url);
+                    } catch (err) {
+                        reject(err);
                     }
-                    return t;
                 });
 
-                if (updated) {
-                    await updateDoc(doc(db, "partners", docItem.id), { transactions: newTxs });
-                }
+                // مهلة 6 ثوانٍ كحد أقصى للرفع، وإلا يكمل النظام عمله بشكل طبيعي
+                let timeoutPromise = new Promise((resolve) => {
+                    setTimeout(() => resolve(""), 6000);
+                });
+
+                return await Promise.race([storagePromise, timeoutPromise]);
+            } catch (e) {
+                console.warn("Upload skipped due to error:", e);
+                return "";
             }
         }
 
@@ -528,7 +489,6 @@
                 }
 
                 const snap = await getDocs(collection(db, "partners"));
-                checkAndDeleteExpiredReceipts(snap);
 
                 let rowsHtml = '';
                 let payoutRequestsHtml = '';
@@ -649,24 +609,14 @@
 
             if (!pId) return alert('رقم الشريك غير معروف.');
 
-            confirmBtn.innerText = "جاري معالجة الطلب وتحديث الرصيد... ⏳";
+            confirmBtn.innerText = "جاري تصفية الرصيد وتحديث الحساب... ⏳";
             confirmBtn.disabled = true;
 
             let downloadUrl = "";
 
             try {
-                // محاولة رفع الصورة إن وجدت دون أن توقف العملية لو حدث خطأ أمني في Storage
                 if (fileInput.files && fileInput.files[0]) {
-                    try {
-                        let file = fileInput.files[0];
-                        let processedFile = await compressImage(file);
-                        let fileName = `receipts/${pId}_${Date.now()}.jpg`;
-                        let fileRef = storageRef(storage, fileName);
-                        let snapshot = await uploadBytes(fileRef, processedFile);
-                        downloadUrl = await getDownloadURL(snapshot.ref);
-                    } catch (uploadErr) {
-                        console.warn("Storage upload skipped/failed:", uploadErr);
-                    }
+                    downloadUrl = await uploadReceiptSafely(fileInput.files[0], pId);
                 }
 
                 let pDocRef = doc(db, "partners", pId);
@@ -735,7 +685,7 @@
             if(txs.length > 0) {
                 txBody.innerHTML = txs.slice().reverse().map(t => {
                     let isNegative = parseFloat(t.shareAmount || 0) < 0;
-                    let receiptLink = t.receiptUrl ? `<a href="${t.receiptUrl}" target="_blank" style="color: #1976d2; font-weight: bold; text-decoration: underline;">📄 عرض الوصل</a>` : `<span style="color:#aaa;">${t.receiptDeleted ? 'منتهي (>3 أشهر)' : 'لا يوجد وصل'}</span>`;
+                    let receiptLink = t.receiptUrl ? `<a href="${t.receiptUrl}" target="_blank" style="color: #1976d2; font-weight: bold; text-decoration: underline;">📄 عرض الوصل</a>` : `<span style="color:#aaa;">لا يوجد وصل</span>`;
                     return `
                         <tr>
                             <td>${t.date}</td>
@@ -818,23 +768,14 @@
                 return alert('الرجاء إدخال رقم شريك صحيح وقيمة دفعة سليمة.');
             }
 
-            submitBtn.innerText = "جاري معالجة الدفعة... ⏳";
+            submitBtn.innerText = "جاري معالجة الدفعة وتحديث الرصيد... ⏳";
             submitBtn.disabled = true;
 
             let downloadUrl = "";
 
             try {
                 if (fileInput.files && fileInput.files[0]) {
-                    try {
-                        let file = fileInput.files[0];
-                        let processedFile = await compressImage(file);
-                        let fileName = `receipts/${pId}_${Date.now()}.jpg`;
-                        let fileRef = storageRef(storage, fileName);
-                        let snapshot = await uploadBytes(fileRef, processedFile);
-                        downloadUrl = await getDownloadURL(snapshot.ref);
-                    } catch (uploadErr) {
-                        console.warn("Storage upload skipped/failed:", uploadErr);
-                    }
+                    downloadUrl = await uploadReceiptSafely(fileInput.files[0], pId);
                 }
 
                 let pDocRef = doc(db, "partners", pId);
