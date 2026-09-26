@@ -439,31 +439,40 @@
             document.getElementById('treeLoginPass').value = '';
         };
 
-        function compressImage(file, maxWidth = 900, quality = 0.7) {
+        // دالة آمنة لضغط الصورة بدون أن تعطل النظام أبداً في حال فشل الكانفاس
+        function compressImage(file) {
             return new Promise((resolve) => {
+                if (!file || !file.type.startsWith('image/')) {
+                    return resolve(file);
+                }
                 let reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = (event) => {
                     let img = new Image();
                     img.src = event.target.result;
                     img.onload = () => {
-                        let canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
+                        try {
+                            let canvas = document.createElement('canvas');
+                            let width = img.width;
+                            let height = img.height;
+                            let maxWidth = 900;
 
-                        if (width > maxWidth) {
-                            height = Math.round((height * maxWidth) / width);
-                            width = maxWidth;
+                            if (width > maxWidth) {
+                                height = Math.round((height * maxWidth) / width);
+                                width = maxWidth;
+                            }
+
+                            canvas.width = width;
+                            canvas.height = height;
+                            let ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+
+                            canvas.toBlob((blob) => {
+                                resolve(blob || file);
+                            }, 'image/jpeg', 0.7);
+                        } catch (err) {
+                            resolve(file); // في حال حدث خطأ، تمرر الملف الأصلي
                         }
-
-                        canvas.width = width;
-                        canvas.height = height;
-                        let ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-
-                        canvas.toBlob((blob) => {
-                            resolve(blob || file);
-                        }, 'image/jpeg', quality);
                     };
                     img.onerror = () => resolve(file);
                 };
@@ -622,8 +631,9 @@
             document.getElementById('approvePartnerIdDisplay').innerText = pId;
             document.getElementById('approveAmountDisplay').innerText = amount + " ₪";
             document.getElementById('approveReceiptInput').value = '';
-            document.getElementById('confirmApproveBtn').innerText = "إتمام التصفية وإرسال الوصل للشريك 🚀";
-            document.getElementById('confirmApproveBtn').disabled = false;
+            let btn = document.getElementById('confirmApproveBtn');
+            btn.innerText = "إتمام التصفية وإرسال الوصل للشريك 🚀";
+            btn.disabled = false;
             document.getElementById('approveModal').style.display = 'flex';
         };
 
@@ -639,15 +649,31 @@
 
             if (!pId) return alert('رقم الشريك غير معروف.');
 
-            confirmBtn.innerText = "جاري ضغط ورفع الوصل والتصفية... ⏳";
+            confirmBtn.innerText = "جاري معالجة الطلب وتحديث الرصيد... ⏳";
             confirmBtn.disabled = true;
 
+            let downloadUrl = "";
+
             try {
+                // محاولة رفع الصورة إن وجدت دون أن توقف العملية لو حدث خطأ أمني في Storage
+                if (fileInput.files && fileInput.files[0]) {
+                    try {
+                        let file = fileInput.files[0];
+                        let processedFile = await compressImage(file);
+                        let fileName = `receipts/${pId}_${Date.now()}.jpg`;
+                        let fileRef = storageRef(storage, fileName);
+                        let snapshot = await uploadBytes(fileRef, processedFile);
+                        downloadUrl = await getDownloadURL(snapshot.ref);
+                    } catch (uploadErr) {
+                        console.warn("Storage upload skipped/failed:", uploadErr);
+                    }
+                }
+
                 let pDocRef = doc(db, "partners", pId);
                 let pSnap = await getDoc(pDocRef);
 
                 if(!pSnap.exists()) {
-                    alert('الشريك غير موجود في قاعدة البيانات.');
+                    alert('الشريك غير موجود.');
                     confirmBtn.innerText = "إتمام التصفية وإرسال الوصل للشريك 🚀";
                     confirmBtn.disabled = false;
                     return;
@@ -661,23 +687,6 @@
                     confirmBtn.innerText = "إتمام التصفية وإرسال الوصل للشريك 🚀";
                     confirmBtn.disabled = false;
                     return;
-                }
-
-                let downloadUrl = "";
-
-                if (fileInput.files && fileInput.files[0]) {
-                    try {
-                        let file = fileInput.files[0];
-                        let compressedBlob = await compressImage(file, 900, 0.7);
-                        let fileName = `receipts/${pId}_${Date.now()}.jpg`;
-                        let fileRef = storageRef(storage, fileName);
-                        let snapshot = await uploadBytes(fileRef, compressedBlob);
-                        downloadUrl = await getDownloadURL(snapshot.ref);
-                    } catch (uploadErr) {
-                        console.error("Storage upload error:", uploadErr);
-                        // في حال فشل التخزين، يمكن الاستمرار بدون صورة أو إعلام المدير
-                        alert('⚠️ تنبيه: لم يتم رفع صورة الوصل بنجاح، لكن سيتم تتمة التصفية بدون صورة.');
-                    }
                 }
 
                 let newBalance = parseFloat((currentBal - amount).toFixed(2));
@@ -703,7 +712,7 @@
 
             } catch(e) {
                 console.error("Approval error:", e);
-                alert('❌ حدث خطأ غير متوقع أثناء معالجة الطلب. يرجى المحاولة مرة أخرى.');
+                alert('❌ حدث خطأ أثناء تصفية الطلب. يرجى المحاولة مرة أخرى.');
             } finally {
                 confirmBtn.innerText = "إتمام التصفية وإرسال الوصل للشريك 🚀";
                 confirmBtn.disabled = false;
@@ -809,10 +818,25 @@
                 return alert('الرجاء إدخال رقم شريك صحيح وقيمة دفعة سليمة.');
             }
 
-            submitBtn.innerText = "جاري ضغط ورفع الوصل... ⏳";
+            submitBtn.innerText = "جاري معالجة الدفعة... ⏳";
             submitBtn.disabled = true;
 
+            let downloadUrl = "";
+
             try {
+                if (fileInput.files && fileInput.files[0]) {
+                    try {
+                        let file = fileInput.files[0];
+                        let processedFile = await compressImage(file);
+                        let fileName = `receipts/${pId}_${Date.now()}.jpg`;
+                        let fileRef = storageRef(storage, fileName);
+                        let snapshot = await uploadBytes(fileRef, processedFile);
+                        downloadUrl = await getDownloadURL(snapshot.ref);
+                    } catch (uploadErr) {
+                        console.warn("Storage upload skipped/failed:", uploadErr);
+                    }
+                }
+
                 let pDocRef = doc(db, "partners", pId);
                 let pSnap = await getDoc(pDocRef);
 
@@ -833,22 +857,6 @@
                     return;
                 }
 
-                let downloadUrl = "";
-
-                if (fileInput.files && fileInput.files[0]) {
-                    try {
-                        let file = fileInput.files[0];
-                        let compressedBlob = await compressImage(file, 900, 0.7);
-                        let fileName = `receipts/${pId}_${Date.now()}.jpg`;
-                        let fileRef = storageRef(storage, fileName);
-                        let snapshot = await uploadBytes(fileRef, compressedBlob);
-                        downloadUrl = await getDownloadURL(snapshot.ref);
-                    } catch (uploadErr) {
-                        console.error("Storage upload error:", uploadErr);
-                        alert('⚠️ تنبيه: لم يتم رفع صورة الوصل، لكن سيتم إصدار الدفعة بدون صورة.');
-                    }
-                }
-
                 let newBalance = parseFloat((currentBal - amount).toFixed(2));
                 let paymentTx = {
                     date: new Date().toLocaleString('ar-EG'),
@@ -866,7 +874,7 @@
                     transactions: arrayUnion(paymentTx)
                 });
 
-                alert(`✅ تم إصدار الدفعة بقيمة ${amount} ₪ للشريك (${pId}) بنجاح وتحديث رصيده وإرفاق الوصل!`);
+                alert(`✅ تم إصدار الدفعة بقيمة ${amount} ₪ للشريك (${pId}) بنجاح وتحديث رصيده!`);
                 
                 document.getElementById('payPartnerId').value = '';
                 document.getElementById('payAmount').value = '';
@@ -875,7 +883,7 @@
 
             } catch(e) {
                 console.error(e);
-                alert('❌ حدث خطأ أثناء معالجة الدفعة أو رفع الوصل.');
+                alert('❌ حدث خطأ أثناء معالجة الدفعة.');
             } finally {
                 submitBtn.innerText = "إصدار الدفعة وتصفية الرصيد فوراً 💳";
                 submitBtn.disabled = false;
