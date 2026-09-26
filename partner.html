@@ -226,6 +226,45 @@
         }
         .link-text:hover { text-decoration: underline; }
 
+        /* صندوق التحفيز والإرشاد الجديد (Hok Box) */
+        .partner-hook-box {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            border: 1.5px solid #ffb74d;
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 15px;
+            color: #e65100;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .partner-hook-box h4 {
+            margin: 0 0 6px 0;
+            font-size: 14px;
+            color: #ef6c00;
+        }
+
+        /* تنسيق حاوية فيديو يوتيوب المدمج */
+        .partner-video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            height: 0;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-burgundy);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        .partner-video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
         /* شريط تثبيت التطبيق السفلي (PWA Banner) */
         #pwaInstallBanner {
             position: fixed;
@@ -380,9 +419,22 @@
             </div>
 
             <!-- معلومات مختصرة مع رقم الشريك -->
-            <div style="display: flex; justify-content: space-between; align-items: center; background: var(--light-burgundy); padding: 10px 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--border-burgundy);">
+            <div style="display: flex; justify-content: space-between; align-items: center; background: var(--light-burgundy); padding: 10px 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid var(--border-burgundy);">
                 <span style="font-size: 13px; font-weight: bold; color: #555;">رقم الشريك:</span>
                 <span id="partnerIdBadge" style="background: var(--primary-burgundy); color: #fff; padding: 4px 12px; border-radius: 6px; font-weight: bold; font-size: 13px;"></span>
+            </div>
+
+            <!-- صندوق الهوك التحفيزي الجديد -->
+            <div class="partner-hook-box">
+                <h4>💡 ضاعف أرباحك الآن واجعل رصيدك يرتفع بسرعة!</h4>
+                <p style="margin: 0; color: #5d4037; font-weight: bold;">
+                    كل شخص يبحث عن هدية فاخرة أو عطر مميز، ابعث له <b>رابط الكتالوج الخاص بك</b>. وإذا كان صديقك يريد العمل وزيادة دخله، شارك معه <b>رابط الاستقطاب</b> ليدخل في فريقك وتربح من نمو شبكتك بلا توقف!
+                </p>
+            </div>
+
+            <!-- فيديو شرح فكرة النظام المدمج -->
+            <div class="partner-video-container">
+                <iframe src="https://www.youtube.com/embed/XlYoHwowL74" title="شرح فكرة ونظام EVA PLUS" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
 
             <!-- الروابط في مقدمة الشاشة مع أزرار المشاركة والنسخ السريع -->
