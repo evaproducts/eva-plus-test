@@ -8,7 +8,6 @@
     <style>
         body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #fdfbfb 0%, #fce4ec 100%); padding: 15px; direction: rtl; margin: 0; min-height: 100vh; padding-bottom: 70px; }
         
-        /* تنسيقات شاشة تسجيل الدخول للشجرة المحسنة والمتوافقة مع الموبايل */
         #treeLoginSection {
             width: 100%;
             max-width: 380px;
@@ -71,10 +70,8 @@
         .header-panel { background: #fff; padding: 15px 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-bottom: 3px solid #d4af37; display: flex; justify-content: space-between; align-items: center; position: relative; }
         .header-panel h1 { color: #880e4f; margin: 0; font-size: 18px; }
         
-        /* زر القائمة الجانبية (ثلاث شحطات) */
         .menu-toggle-btn { background: #880e4f; color: #fff; border: none; padding: 8px 12px; border-radius: 8px; font-size: 18px; cursor: pointer; }
         
-        /* القائمة الجانبية المنبثقة */
         #sideDrawer {
             position: fixed;
             top: 0;
@@ -131,14 +128,13 @@
         .dot-green { background-color: #27ae60; }
         @keyframes pulseRed { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
 
-        /* الأقسام المخفية للتبديل من القائمة الجانبية */
         .content-section { display: none; }
         .content-section.active { display: block; }
     </style>
 </head>
 <body>
 
-    <!-- شاشة تسجيل الدخول لشجرة الشركاء -->
+    <!-- شاشة تسجيل الدخول -->
     <div id="treeLoginSection">
         <h2>🔐 تسجيل دخول إدارة الشجرة</h2>
         <p>الرجاء إدخال بيانات الاعتماد المعتمدة.</p>
@@ -160,7 +156,7 @@
             <button onclick="treeLogout()" style="background: #e74c3c; width: auto; padding: 6px 14px; font-size: 12px; border-radius: 6px; color: #fff; border: none; cursor: pointer;">خروج 🔒</button>
         </div>
 
-        <!-- القائمة الجانبية المنبثقة (Drawer) -->
+        <!-- القائمة الجانبية المنبثقة -->
         <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
         <div id="sideDrawer">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #d4af37; padding-bottom: 10px;">
@@ -180,7 +176,7 @@
 
         <div class="container">
 
-            <!-- 1. قسم قائمة الشركاء -->
+            <!-- 1. قائمة الشركاء -->
             <div id="sectionTable" class="content-section active">
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
                     <h3 style="margin: 0; border: none;">📋 قائمة شركاء الفريق المسجلين</h3>
@@ -208,10 +204,10 @@
                 </div>
             </div>
 
-            <!-- 2. قسم طلبات سحب الأرباح المعلقة -->
+            <!-- 2. طلبات سحب الأرباح المعلقة (مع إرفاق وصل التحويل) -->
             <div id="sectionPayoutRequests" class="content-section">
                 <h3 style="color: #d4af37;">🔔 طلبات سحب الأرباح المعلقة من الشركاء</h3>
-                <p style="font-size: 12px; color: #666;">الطلبات الواردة من لوحة تحكم الشركاء التي تتطلب مراجعة وتحويل:</p>
+                <p style="font-size: 12px; color: #666;">الطلبات الواردة من الشركاء. انقر على قبول لإرفاق وصل التحويل وتصفية الرصيد فوراً:</p>
                 <div style="overflow-x: auto;">
                     <table>
                         <thead>
@@ -221,7 +217,7 @@
                                 <th>مبلغ السحب</th>
                                 <th>طريقة الدفع والتفاصيل</th>
                                 <th>تاريخ الطلب</th>
-                                <th>إجراءات الإدارة</th>
+                                <th>إجراءات الإدارة ورفع الوصل</th>
                             </tr>
                         </thead>
                         <tbody id="payoutRequestsTableBody">
@@ -231,7 +227,7 @@
                 </div>
             </div>
 
-            <!-- 3. قسم إضافة شريك جديد -->
+            <!-- 3. إضافة شريك جديد -->
             <div id="sectionAdd" class="content-section">
                 <h3>➕ إضافة شريك جديد للشجرة</h3>
                 <div class="form-group">
@@ -255,7 +251,7 @@
                 <button class="btn" style="margin-top: 10px;" onclick="addNewPartner()">حفظ وإضافة الشريك للنظام</button>
             </div>
 
-            <!-- 4. قسم تتبع السلسلة الصعودية -->
+            <!-- 4. تتبع السلسلة الصعودية -->
             <div id="sectionSearchPath" class="content-section">
                 <div class="tree-path-box" style="margin-top: 0;">
                     <h3 style="margin-top:0; color:#1565c0; border-color:#90caf9;">🔍 تتبع السلسلة الصعودية لشريك</h3>
@@ -268,16 +264,16 @@
                 </div>
             </div>
 
-            <!-- 5. قسم إدارة الأرصدة والمدفوعات (مع ضغط ورفع وصل الدفع والحذف التلقائي) -->
+            <!-- 5. إدارة الأرصدة والدفعات اليدوية -->
             <div id="sectionFinance" class="content-section">
-                <h3 style="color: #27ae60;">💰 إدارة الأرصدة وإصدار الدفعات</h3>
+                <h3 style="color: #27ae60;">💰 إدارة الأرصدة وإصدار الدفعات اليدوية</h3>
                 <div style="background: #e8f5e9; border: 1px solid #81c784; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
                     <span style="font-size: 13px; color: #1b5e20; font-weight: bold;">💎 رصيد كافة العملاء والشركاء في النظام:</span>
                     <h2 id="totalAllPartnersBalance" style="margin: 5px 0 0 0; color: #2e7d32; border: none; font-size: 24px;">جاري الحساب... ₪</h2>
                 </div>
 
                 <div style="background: #fff; border: 1px solid #f8bbd0; padding: 20px; border-radius: 8px;">
-                    <h4 style="margin-top: 0; color: #880e4f;">💸 خانة دفع وتصفية مستحقات شريك</h4>
+                    <h4 style="margin-top: 0; color: #880e4f;">💸 خانة دفع وتصفية مستحقات شريك (يدوي)</h4>
                     <div class="form-group">
                         <label>رقم الشريك (اليوزر):</label>
                         <input type="text" id="payPartnerId" placeholder="مثال: EVA-491">
@@ -287,14 +283,14 @@
                         <input type="number" id="payAmount" placeholder="مثال: 100">
                     </div>
                     <div class="form-group">
-                        <label>📎 إرفاق صورة وصل الدفع (تتم ضغطها تلقائياً وتُحذف بعد 3 أشهر):</label>
+                        <label>📎 إرفاق صورة وصل الدفع (اختياري):</label>
                         <input type="file" id="receiptImageInput" accept="image/*" style="background: #f9f9f9; padding: 7px;">
                     </div>
                     <button class="btn green-btn" id="issuePaymentBtn" onclick="issuePartnerPayment()">إصدار الدفعة وتصفية الرصيد فوراً 💳</button>
                 </div>
             </div>
 
-            <!-- 6. قسم صندوق حجم المعاملات -->
+            <!-- 6. صندوق حجم المعاملات -->
             <div id="sectionCounter" class="content-section">
                 <h3 style="color: #d4af37;">📈 صندوق حجم المعاملات والسيولة التراكمية</h3>
                 <div style="background: #fff8e1; border: 1px solid #ffe082; padding: 20px; border-radius: 8px; text-align: center;">
@@ -308,7 +304,28 @@
         </div>
     </div>
 
-    <!-- نافذة منبثقة لمعاينة الشريك -->
+    <!-- نافذة منبثقة للموافقة على الطلب المعلق مع إرفاق الوصل -->
+    <div id="approveModal" class="modal">
+        <div class="modal-content" style="max-width: 450px;">
+            <span class="close-modal" onclick="closeApproveModal()">&times;</span>
+            <h3 style="color: #880e4f; margin-top: 0; border-bottom: 2px solid #f8bbd0; padding-bottom: 8px;">✅ قبول طلب السحب وإرفاق الوصل</h3>
+            
+            <div class="form-group">
+                <label><b>رقم الشريك:</b> <span id="approvePartnerIdDisplay"></span></label>
+            </div>
+            <div class="form-group">
+                <label><b>المبلغ المطلوب صرفه:</b> <span id="approveAmountDisplay" style="color:#2e7d32; font-size:15px;"></span></label>
+            </div>
+            <div class="form-group">
+                <label>📎 اختر صورة وصل التحويل (سكرين شوت):</label>
+                <input type="file" id="approveReceiptInput" accept="image/*" style="background: #f9f9f9; padding: 7px;">
+            </div>
+
+            <button class="btn green-btn" id="confirmApproveBtn" onclick="confirmApprovePayout()" style="margin-top: 15px;">إتمام التصفية وإرسال الوصل للشريك 🚀</button>
+        </div>
+    </div>
+
+    <!-- نافذة معاينة الشريك -->
     <div id="partnerModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closePartnerModal()">&times;</span>
@@ -361,7 +378,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, setDoc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAqPpKqqHBEIJZTCGCROFzqZyHOYlnDgP4",
@@ -377,6 +394,8 @@
         const storage = getStorage(app);
 
         let allPartnersMap = {};
+        let activeApprovalPartnerId = "";
+        let activeApprovalAmount = 0;
 
         window.toggleDrawer = function() {
             document.getElementById('sideDrawer').classList.toggle('open');
@@ -420,7 +439,7 @@
             document.getElementById('treeLoginPass').value = '';
         };
 
-        // دالة ضغط الصور قبل رفعها لعدم استهلاك مساحة التخزين
+        // دالة ضغط الصور لتقليص حجمها وتوفير مساحة التخزين
         function compressImage(file, maxWidth = 900, quality = 0.7) {
             return new Promise((resolve) => {
                 let reader = new FileReader();
@@ -451,7 +470,7 @@
             });
         }
 
-        // دالة فحص وحذف الوصلات القديمة التي مضى عليها أكثر من 3 أشهر تلقائياً
+        // فحص وحذف الوصلات القديمة التي مضى عليها أكثر من 3 أشهر تلقائياً
         async function checkAndDeleteExpiredReceipts(snap) {
             let threeMonthsAgo = new Date();
             threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
@@ -465,14 +484,8 @@
                     if (t.receiptUrl && t.timestamp) {
                         let txDate = new Date(t.timestamp);
                         if (txDate < threeMonthsAgo) {
-                            // مضى أكثر من 3 أشهر: حذف الملف من Storage وتفريغ الرابط
-                            try {
-                                // استخراج مسار الملف من الرابط أو محاولة حذفه
-                                updated = true;
-                                return { ...t, receiptUrl: "", receiptDeleted: true };
-                            } catch(err) {
-                                console.error("Error cleaning expired receipt:", err);
-                            }
+                            updated = true;
+                            return { ...t, receiptUrl: "", receiptDeleted: true };
                         }
                     }
                     return t;
@@ -506,8 +519,6 @@
                 }
 
                 const snap = await getDocs(collection(db, "partners"));
-                
-                // تشغيل الفحص التلقائي لحذف الوصلات القديمة (> 3 أشهر) في الخلفية
                 checkAndDeleteExpiredReceipts(snap);
 
                 let rowsHtml = '';
@@ -540,6 +551,7 @@
                         uplineOptions += `<option value="${pId}">${pId} - ${p.name || 'بدون اسم'}</option>`;
                     }
 
+                    // تجميع طلبات سحب الأرباح المعلقة مع زر فتح نافذة إرفاق الوصل
                     if (p.payoutRequested && p.payoutRequestDetails) {
                         hasPayoutRequests = true;
                         let pr = p.payoutRequestDetails;
@@ -551,7 +563,7 @@
                                 <td>${pr.method}: ${pr.details}</td>
                                 <td>${pr.date}</td>
                                 <td>
-                                    <button class="btn green-btn" style="padding: 5px 10px; font-size: 11px;" onclick='approvePayoutRequest("${pId}", ${pr.amount})'>✅ قبول وتصفية الطلب</button>
+                                    <button class="btn green-btn" style="padding: 6px 12px; font-size: 11px;" onclick='openApproveModal("${pId}", ${pr.amount})'>📎 قبول ورفع الوصل والتصفية</button>
                                 </td>
                             </tr>
                         `;
@@ -605,8 +617,25 @@
             }
         }
 
-        window.approvePayoutRequest = async function(pId, amount) {
-            if(!confirm(`هل أنت متأكد من الموافقة على سحب مبلغ ${amount} ₪ للشريك (${pId})؟ سيتم خصم المبلغ من رصيده وإغلاق الطلب.`)) return;
+        // فتح نافذة إرفاق الوصل للطلب المعلق
+        window.openApproveModal = function(pId, amount) {
+            activeApprovalPartnerId = pId;
+            activeApprovalAmount = amount;
+            document.getElementById('approvePartnerIdDisplay').innerText = pId;
+            document.getElementById('approveAmountDisplay').innerText = amount + " ₪";
+            document.getElementById('approveReceiptInput').value = '';
+            document.getElementById('approveModal').style.display = 'flex';
+        };
+
+        window.closeApproveModal = function() {
+            document.getElementById('approveModal').style.display = 'none';
+        };
+
+        // تأكيد الطلب المعلق مع ضغط ورفع وصل التحويل
+        window.confirmApprovePayout = async function() {
+            let pId = activeApprovalPartnerId;
+            let amount = activeApprovalAmount;
+            let fileInput = document.getElementById('approveReceiptInput');
 
             let pDocRef = doc(db, "partners", pId);
             let pSnap = await getDoc(pDocRef);
@@ -620,17 +649,34 @@
                 return alert(`⚠️ رصيد الشريك الحالي (${currentBal} ₪) أقل من قيمة السحب المطلوب.`);
             }
 
-            let newBalance = parseFloat((currentBal - amount).toFixed(2));
-            let paymentTx = {
-                date: new Date().toLocaleString('ar-EG'),
-                timestamp: Date.now(),
-                chainLength: 0,
-                totalProfit: -amount,
-                shareAmount: -amount,
-                receiptUrl: ""
-            };
+            let confirmBtn = document.getElementById('confirmApproveBtn');
+            confirmBtn.innerText = "جاري ضغط ورفع الوصل والتصفية... ⏳";
+            confirmBtn.disabled = true;
+
+            let downloadUrl = "";
 
             try {
+                if (fileInput.files && fileInput.files[0]) {
+                    let file = fileInput.files[0];
+                    let compressedBlob = await compressImage(file, 900, 0.7);
+                    
+                    let fileName = `receipts/${pId}_${Date.now()}.jpg`;
+                    let fileRef = storageRef(storage, fileName);
+                    
+                    let snapshot = await uploadBytes(fileRef, compressedBlob);
+                    downloadUrl = await getDownloadURL(snapshot.ref);
+                }
+
+                let newBalance = parseFloat((currentBal - amount).toFixed(2));
+                let paymentTx = {
+                    date: new Date().toLocaleString('ar-EG'),
+                    timestamp: Date.now(),
+                    chainLength: 0,
+                    totalProfit: -amount,
+                    shareAmount: -amount,
+                    receiptUrl: downloadUrl
+                };
+
                 await updateDoc(pDocRef, {
                     balance: newBalance,
                     payoutRequested: false,
@@ -638,11 +684,15 @@
                     transactions: arrayUnion(paymentTx)
                 });
 
-                alert(`✅ تم اعتماد صرف المبلغ للشريك (${pId}) بنجاح وتحديث رصيده.`);
+                alert(`✅ تم اعتماد صرف المبلغ للشريك (${pId}) بنجاح وإرفاق وصل الدفع وتصفية رصيده!`);
+                closeApproveModal();
                 loadPartnersData();
             } catch(e) {
                 console.error(e);
                 alert('حدث خطأ أثناء معالجة الطلب.');
+            } finally {
+                confirmBtn.innerText = "إتمام التصفية وإرسال الوصل للشريك 🚀";
+                confirmBtn.disabled = false;
             }
         };
 
@@ -735,7 +785,7 @@
             resultBox.innerHTML = `📍 تسلسل الشجرة للشريك (${selectedId}):<br>` + pathArray.join(' ⬅ ');
         };
 
-        // إصدار دفعة وضغط الصورة ورفعها مع حفظ ختم الزمني للتحقق من فترة الـ 3 أشهر
+        // إصدار الدفعة اليدوية المباشرة (مع إرفاق الوصل)
         window.issuePartnerPayment = async function() {
             let pId = document.getElementById('payPartnerId').value.trim().toUpperCase();
             let amount = parseFloat(document.getElementById('payAmount').value);
@@ -768,7 +818,6 @@
             try {
                 if (fileInput.files && fileInput.files[0]) {
                     let file = fileInput.files[0];
-                    // ضغط الصورة لتقليص الحجم لعدة كيلوبايتات فقط
                     let compressedBlob = await compressImage(file, 900, 0.7);
                     
                     let fileName = `receipts/${pId}_${Date.now()}.jpg`;
@@ -781,7 +830,7 @@
                 let newBalance = parseFloat((currentBal - amount).toFixed(2));
                 let paymentTx = {
                     date: new Date().toLocaleString('ar-EG'),
-                    timestamp: Date.now(), // مهم لاحتساب فترة الـ 3 أشهر
+                    timestamp: Date.now(),
                     chainLength: 0,
                     totalProfit: -amount,
                     shareAmount: -amount,
@@ -795,7 +844,7 @@
                     transactions: arrayUnion(paymentTx)
                 });
 
-                alert(`✅ تم إصدار الدفعة بقيمة ${amount} ₪ للشريك (${pId}) بنجاح وضغط وإرفاق وصل الدفع!`);
+                alert(`✅ تم إصدار الدفعة بقيمة ${amount} ₪ للشريك (${pId}) بنجاح وتحديث رصيده وإرفاق الوصل!`);
                 
                 document.getElementById('payPartnerId').value = '';
                 document.getElementById('payAmount').value = '';
