@@ -170,10 +170,11 @@
             
             <div style="display: flex; flex-direction: column; gap: 10px;">
                 <button class="btn blue-btn" onclick="switchSection('sectionTable')">📋 قائمة الشركاء والأعضاء</button>
+                <button class="btn" style="background: #d4af37; color: #333;" onclick="switchSection('sectionPayoutRequests')">🔔 طلبات سحب الأرباح المعلقة</button>
                 <button class="btn" onclick="switchSection('sectionAdd')">➕ إضافة شريك جديد</button>
                 <button class="btn blue-btn" onclick="switchSection('sectionSearchPath')">🔍 تتبع السلسلة الصعودية</button>
                 <button class="btn green-btn" onclick="switchSection('sectionFinance')">💰 إدارة الأرصدة والمدفوعات</button>
-                <button class="btn" style="background: #d4af37; color: #333;" onclick="switchSection('sectionCounter')">📈 صندوق حجم المعاملات</button>
+                <button class="btn" style="background: #6c757d; color: #fff;" onclick="switchSection('sectionCounter')">📈 صندوق حجم المعاملات</button>
             </div>
         </div>
 
@@ -207,7 +208,30 @@
                 </div>
             </div>
 
-            <!-- 2. قسم إضافة شريك جديد -->
+            <!-- 2. قسم طلبات سحب الأرباح المعلقة الجديد -->
+            <div id="sectionPayoutRequests" class="content-section">
+                <h3 style="color: #d4af37;">🔔 طلبات سحب الأرباح المعلقة من الشركاء</h3>
+                <p style="font-size: 12px; color: #666;">الطلبات الواردة من لوحة تحكم الشركاء التي تتطلب مراجعة وتحويل:</p>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>رمز الشريك</th>
+                                <th>اسم الشريك</th>
+                                <th>مبلغ السحب</th>
+                                <th>طريقة الدفع والتفاصيل</th>
+                                <th>تاريخ الطلب</th>
+                                <th>إجراءات الإدارة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="payoutRequestsTableBody">
+                            <tr><td colspan="6" style="text-align:center; color:#888;">لا توجد طلبات سحب معلقة حالياً.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 3. قسم إضافة شريك جديد -->
             <div id="sectionAdd" class="content-section">
                 <h3>➕ إضافة شريك جديد للشجرة</h3>
                 <div class="form-group">
@@ -231,7 +255,7 @@
                 <button class="btn" style="margin-top: 10px;" onclick="addNewPartner()">حفظ وإضافة الشريك للنظام</button>
             </div>
 
-            <!-- 3. قسم تتبع السلسلة الصعودية (بالبحث برقم الشريك مباشرة) -->
+            <!-- 4. قسم تتبع السلسلة الصعودية (بالبحث برقم الشريك مباشرة) -->
             <div id="sectionSearchPath" class="content-section">
                 <div class="tree-path-box" style="margin-top: 0;">
                     <h3 style="margin-top:0; color:#1565c0; border-color:#90caf9;">🔍 تتبع السلسلة الصعودية لشريك</h3>
@@ -244,7 +268,7 @@
                 </div>
             </div>
 
-            <!-- 4. قسم إدارة الأرصدة والمدفوعات -->
+            <!-- 5. قسم إدارة الأرصدة والمدفوعات -->
             <div id="sectionFinance" class="content-section">
                 <h3 style="color: #27ae60;">💰 إدارة الأرصدة وإصدار الدفعات</h3>
                 <div style="background: #e8f5e9; border: 1px solid #81c784; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
@@ -266,7 +290,7 @@
                 </div>
             </div>
 
-            <!-- 5. قسم صندوق حجم المعاملات -->
+            <!-- 6. قسم صندوق حجم المعاملات -->
             <div id="sectionCounter" class="content-section">
                 <h3 style="color: #d4af37;">📈 صندوق حجم المعاملات والسيولة التراكمية</h3>
                 <div style="background: #fff8e1; border: 1px solid #ffe082; padding: 20px; border-radius: 8px; text-align: center;">
@@ -417,9 +441,11 @@
 
                 const snap = await getDocs(collection(db, "partners"));
                 let rowsHtml = '';
+                let payoutRequestsHtml = '';
                 let uplineOptions = '<option value="EVA-001">EVA-001 (إيفا - رأس الهرم)</option>';
                 let totalBalancesSum = 0;
                 let totalVolumeSum = 0;
+                let hasPayoutRequests = false;
 
                 allPartnersMap = {};
                 snap.forEach(docItem => {
@@ -439,6 +465,24 @@
 
                     if(pId !== "EVA-001") {
                         uplineOptions += `<option value="${pId}">${pId} - ${p.name || 'بدون اسم'}</option>`;
+                    }
+
+                    // تجميع طلبات سحب الأرباح المعلقة
+                    if (p.payoutRequested && p.payoutRequestDetails) {
+                        hasPayoutRequests = true;
+                        let pr = p.payoutRequestDetails;
+                        payoutRequestsHtml += `
+                            <tr>
+                                <td><b>${pId}</b></td>
+                                <td>${p.name || 'بدون اسم'}</td>
+                                <td><b style="color: #2e7d32;">${pr.amount} ₪</b></td>
+                                <td>${pr.method}: ${pr.details}</td>
+                                <td>${pr.date}</td>
+                                <td>
+                                    <button class="btn green-btn" style="padding: 5px 10px; font-size: 11px;" onclick='approvePayoutRequest("${pId}", ${pr.amount})'>✅ قبول وتصفية الطلب</button>
+                                </td>
+                            </tr>
+                        `;
                     }
 
                     let hasLoggedIn = p.firstLogin === false;
@@ -470,11 +514,15 @@
                     rowsHtml = `<tr><td colspan="9" style="text-align:center; color:#888;">لا توجد سجلات شركاء في الشجرة حتى الآن.</td></tr>`;
                 }
 
+                if(!hasPayoutRequests) {
+                    payoutRequestsHtml = `<tr><td colspan="6" style="text-align:center; color:#888;">لا توجد طلبات سحب معلقة حالياً.</td></tr>`;
+                }
+
                 document.getElementById('partnersTableBody').innerHTML = rowsHtml;
+                document.getElementById('payoutRequestsTableBody').innerHTML = payoutRequestsHtml;
                 document.getElementById('uplineSelect').innerHTML = uplineOptions;
                 document.getElementById('totalAllPartnersBalance').innerText = totalBalancesSum.toFixed(2) + " ₪";
 
-                // تحديث عداد حجم المعاملات من إعدادات النظام أو الحساب
                 let savedVolume = localStorage.getItem('eva_transactions_volume');
                 let finalVolume = savedVolume ? parseFloat(savedVolume) : totalVolumeSum;
                 document.getElementById('totalTransactionsVolume').innerText = finalVolume.toFixed(2) + " ₪";
@@ -484,6 +532,46 @@
                 document.getElementById('partnersTableBody').innerHTML = `<tr><td colspan="9" style="color:red;">خطأ في تحميل بيانات الشجرة.</td></tr>`;
             }
         }
+
+        // دالة قبول طلب سحب الأرباح وتصفية الرصيد للشريك
+        window.approvePayoutRequest = async function(pId, amount) {
+            if(!confirm(`هل أنت متأكد من الموافقة على سحب مبلغ ${amount} ₪ للشريك (${pId})؟ سيتم خصم المبلغ من رصيده وإغلاق الطلب.`)) return;
+
+            let pDocRef = doc(db, "partners", pId);
+            let pSnap = await getDoc(pDocRef);
+
+            if(!pSnap.exists()) return alert('الشريك غير موجود.');
+
+            let pData = pSnap.data();
+            let currentBal = parseFloat(pData.balance || 0);
+
+            if(amount > currentBal) {
+                return alert(`⚠️ رصيد الشريك الحالي (${currentBal} ₪) أقل من قيمة السحب المطلوب.`);
+            }
+
+            let newBalance = parseFloat((currentBal - amount).toFixed(2));
+            let paymentTx = {
+                date: new Date().toLocaleString('ar-EG'),
+                chainLength: 0,
+                totalProfit: -amount,
+                shareAmount: -amount // تمثل سحب أرباح مصفاة
+            };
+
+            try {
+                await updateDoc(pDocRef, {
+                    balance: newBalance,
+                    payoutRequested: false,
+                    payoutRequestDetails: null,
+                    transactions: arrayUnion(paymentTx)
+                });
+
+                alert(`✅ تم اعتماد صرف المبلغ للشريك (${pId}) بنجاح وتحديث رصيده.`);
+                loadPartnersData();
+            } catch(e) {
+                console.error(e);
+                alert('حدث خطأ أثناء معالجة الطلب.');
+            }
+        };
 
         window.openPartnerPreview = function(partnerId) {
             let p = allPartnersMap[partnerId];
