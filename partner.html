@@ -38,7 +38,7 @@
             margin: 0 auto;
             box-sizing: border-box;
             padding: 10px;
-            padding-bottom: 70px; /* مساحة لشريط التثبيت السفلي */
+            padding-bottom: 70px;
         }
 
         .container {
@@ -54,7 +54,6 @@
             box-sizing: border-box;
         }
 
-        /* رأس الصفحة العلوي والبارز */
         .header-top {
             display: flex;
             justify-content: space-between;
@@ -97,7 +96,6 @@
             padding: 0;
         }
 
-        /* زر اطلب الأموال بجانب الرصيد */
         .request-money-btn {
             background: linear-gradient(135deg, var(--accent-gold), var(--dark-gold));
             color: white;
@@ -109,14 +107,13 @@
             cursor: pointer;
             box-shadow: 0 3px 10px rgba(212, 175, 55, 0.3);
             transition: transform 0.2s;
-            display: none; /* يظهر فقط إذا تحققت الشروط */
+            display: none;
             text-align: center;
         }
         .request-money-btn:hover {
             transform: translateY(-1px);
         }
 
-        /* القائمة الجانبية (3 شحطات) */
         .menu-icon {
             font-size: 22px;
             cursor: pointer;
@@ -191,7 +188,6 @@
             display: none;
         }
 
-        /* الأزرار والتنسيقات العامة */
         .btn {
             background: linear-gradient(135deg, var(--primary-burgundy), var(--secondary-burgundy));
             color: white;
@@ -247,7 +243,6 @@
         }
         .link-text:hover { text-decoration: underline; }
 
-        /* صندوق التحفيز والإرشاد الجديد */
         .partner-hook-box {
             background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
             border: 1.5px solid #ffb74d;
@@ -429,7 +424,6 @@
                     <h2 class="brand-title">EVA PLUS PARTNER</h2>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <!-- زر اطلب الأموال -->
                     <button id="requestMoneyBtn" class="request-money-btn" onclick="openModal('requestMoneyModal')">💵 اطلب الأموال</button>
                     <div class="balance-badge-top">
                         <span>رصيدك الحالي</span>
@@ -596,19 +590,19 @@
             </div>
         </div>
 
-        <!-- النافذة المنبثقة: سجل الحركات والأرباح -->
+        <!-- النافذة المنبثقة: سجل الحركات والأرباح (مع عمود وصل الدفع) -->
         <div class="modal-overlay" id="txModal">
-            <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-content" style="max-width: 550px;">
                 <button class="modal-close-btn" onclick="closeModal('txModal')">إغلاق ✕</button>
-                <h3 style="color: var(--primary-burgundy); margin-top: 0; border-bottom: 2px solid var(--border-burgundy); padding-bottom: 8px;">📊 سجل الحركات والأرباح</h3>
+                <h3 style="color: var(--primary-burgundy); margin-top: 0; border-bottom: 2px solid var(--border-burgundy); padding-bottom: 8px;">📊 سجل الحركات والأرباح والوصلات</h3>
                 <div style="max-height: 350px; overflow-y: auto; margin-top: 10px;">
                     <table>
                         <thead>
                             <tr>
                                 <th>التاريخ والوقت</th>
-                                <th>عدد الشركاء</th>
-                                <th>إجمالي الربح</th>
-                                <th>حصة الشريك</th>
+                                <th>النوع / التفاصيل</th>
+                                <th>المبلغ</th>
+                                <th>وصل الدفع</th>
                             </tr>
                         </thead>
                         <tbody id="transactionsBody">
@@ -717,7 +711,6 @@
             }
         };
 
-        // تأكيد طلب سحب الأموال وحفظه في قاعدة البيانات للإدارة
         window.confirmPayoutRequest = async function() {
             let method = document.getElementById('payoutMethodSelect').value;
             let detailsText = "";
@@ -761,7 +754,6 @@
                 closeModal('requestMoneyModal');
                 alert('✅ تم إرسال طلب سحب الأرباح للإدارة بنجاح بانتظار التأكيد والتحويل!');
 
-                // فتح الواتساب للإشعار السريع
                 let supportPhone = "970594101632";
                 let msg = `مرحباً إدارة إيفا بلس، أرغب بطلب سحب أرباحي الحالية:\n\n- اسم الشريك: ${currentPartnerName}\n- رقم الشريك: ${currentActivePartnerId}\n- القيمة: ${currentPartnerBalance} ₪\n- الطريقة: ${detailsText}`;
                 let waUrl = `https://wa.me/${supportPhone}?text=${encodeURIComponent(msg)}`;
@@ -866,7 +858,6 @@
 
                     let currentMonthStr = new Date().toISOString().slice(0, 7);
                     let requestBtn = document.getElementById('requestMoneyBtn');
-                    // فحص الشرط: الرصيد >= 100 ولم يتم طلب السحب في الشهر الحالي ولم يتم إرسال طلب معلق مسبقاً
                     if (currentPartnerBalance >= 100 && partnerLastPayoutMonth !== currentMonthStr && !p.payoutRequested) {
                         requestBtn.style.display = 'inline-block';
                     } else {
@@ -911,14 +902,20 @@
                     let txBody = document.getElementById('transactionsBody');
                     let txs = p.transactions || [];
                     if (txs.length > 0) {
-                        txBody.innerHTML = txs.slice().reverse().map(t => `
-                            <tr>
-                                <td>${t.date}</td>
-                                <td>${t.chainLength} أفراد</td>
-                                <td>${t.totalProfit} ₪</td>
-                                <td><b style="color: #2e7d32;">+${t.shareAmount} ₪</b></td>
-                            </tr>
-                        `).join('');
+                        txBody.innerHTML = txs.slice().reverse().map(t => {
+                            let isNegative = parseFloat(t.shareAmount || 0) < 0;
+                            // زر استعراض وصل الدفع إن وجد
+                            let receiptLink = t.receiptUrl ? `<a href="${t.receiptUrl}" target="_blank" style="color: #1976d2; font-weight: bold; text-decoration: underline;">📄 عرض الوصل</a>` : `<span style="color:#aaa;">${t.receiptDeleted ? 'منتهي (>3 أشهر)' : 'لا يوجد وصل'}</span>`;
+                            
+                            return `
+                                <tr>
+                                    <td>${t.date}</td>
+                                    <td>${isNegative ? 'سحب رصيد / دفعة مصفاة' : 'أرباح شبكة تسويق'}</td>
+                                    <td><b style="color: ${isNegative ? '#c0392b' : '#2e7d32'};">${t.shareAmount} ₪</b></td>
+                                    <td>${receiptLink}</td>
+                                </tr>
+                            `;
+                        }).join('');
                     } else {
                         txBody.innerHTML = `<tr><td colspan="4" style="color: #888; text-align: center;">لا توجد حركات أرباح مسجلة حتى الآن.</td></tr>`;
                     }
