@@ -198,8 +198,10 @@
 
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #444; font-size: 12px; }
-        .form-group input { width: 100%; padding: 11px 14px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; background: #fafafa; font-size: 13px; }
-        .form-group input:focus { outline: none; border-color: var(--secondary-burgundy); background: #fff; }
+        .form-group input, .form-group select { width: 100%; padding: 11px 14px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; background: #fafafa; font-size: 13px; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--secondary-burgundy); background: #fff; }
+        
+        .phone-group { display: flex; gap: 8px; }
 
         .partner-card {
             background: var(--light-burgundy);
@@ -467,16 +469,26 @@
                     <p><b>كلمة المرور الخاصة بك:</b> <code id="pPass" style="background:#fff; padding:2px 8px; border-radius:4px; color:var(--secondary-burgundy); font-weight:bold;"></code></p>
                 </div>
 
-                <!-- نموذج تعديل العنوان ورقم الهاتف المباشر -->
+                <!-- نموذج تعديل العنوان ورقم الواتساب للتواصل مع الإدارة -->
                 <div class="form-group">
-                    <label>تحديث رقم الهاتف:</label>
-                    <input type="text" id="editPhoneInput" placeholder="أدخل رقم الهاتف الجديد">
+                    <label>واتساب للتواصل مع الإدارة:</label>
+                    <div class="phone-group">
+                        <select id="editPhonePrefix" style="width: 140px;">
+                            <option value="00970">00970 (فلسطين)</option>
+                            <option value="00972">00972 (إسرائيل)</option>
+                        </select>
+                        <input type="text" id="editPhoneInput" placeholder="590000000" style="flex: 1;">
+                    </div>
                 </div>
+
                 <div class="form-group">
                     <label>تحديث العنوان:</label>
                     <input type="text" id="editAddressInput" placeholder="أدخل العنوان الجديد (مثلاً: رام الله، الماصيون)">
                 </div>
                 <button class="btn" onclick="updatePartnerContactInfo()">حفظ تعديلات البيانات الشخصية</button>
+
+                <!-- زر التواصل المباشر مع النظام/الدعم عبر الواتساب -->
+                <button class="btn whatsapp-btn" onclick="contactAdminWhatsApp()" style="margin-top: 10px;">💬 تواصل مع النظام والدعم</button>
 
                 <hr style="border:0; border-top:1px dashed var(--border-burgundy); margin: 20px 0;">
 
@@ -606,6 +618,7 @@
         let urlParams = new URLSearchParams(window.location.search);
         let partnerUser = urlParams.get('user');
         let currentActivePartnerId = "";
+        let currentPartnerName = "";
 
         // كود تفاعل شريط تثبيت التطبيق (PWA)
         let deferredPrompt;
@@ -678,6 +691,7 @@
                 if (docSnap.exists()) {
                     let p = docSnap.data();
                     currentActivePartnerId = p.partnerId || cleanId;
+                    currentPartnerName = p.name || 'بدون اسم';
 
                     let nowFormatted = new Date().toLocaleString('ar-EG');
                     await updateDoc(docRef, {
@@ -689,14 +703,27 @@
                     document.getElementById('mainContainer').style.display = 'block';
 
                     document.getElementById('partnerIdBadge').innerText = currentActivePartnerId;
-                    document.getElementById('pName').innerText = p.name || 'بدون اسم';
+                    document.getElementById('pName').innerText = currentPartnerName;
                     document.getElementById('pPhone').innerText = p.phone || 'غير مسجل';
                     document.getElementById('pAddress').innerText = p.address || 'غير محدد';
                     document.getElementById('pUpline').innerText = p.uplineId || p.sponsor || 'EVA-001 (رأس الهرم)';
                     document.getElementById('pPass').innerText = p.password || 'غير محدد';
                     document.getElementById('pBalance').innerText = (p.balance || 0) + " ₪";
 
-                    if(document.getElementById('editPhoneInput')) document.getElementById('editPhoneInput').value = p.phone || '';
+                    // تفكيك رقم الهاتف للمقدمة ورقم الحقل
+                    if (p.phone) {
+                        let phoneStr = p.phone.toString().trim();
+                        if (phoneStr.startsWith('00970')) {
+                            document.getElementById('editPhonePrefix').value = '00970';
+                            document.getElementById('editPhoneInput').value = phoneStr.replace('00970', '');
+                        } else if (phoneStr.startsWith('00972')) {
+                            document.getElementById('editPhonePrefix').value = '00972';
+                            document.getElementById('editPhoneInput').value = phoneStr.replace('00972', '');
+                        } else {
+                            document.getElementById('editPhoneInput').value = phoneStr;
+                        }
+                    }
+
                     if(document.getElementById('editAddressInput')) document.getElementById('editAddressInput').value = p.address || '';
 
                     let baseUrl = window.location.origin + window.location.pathname.replace('partner.html', '');
@@ -778,25 +805,35 @@
         };
 
         window.updatePartnerContactInfo = async function() {
-            let newPhone = document.getElementById('editPhoneInput').value.trim();
+            let prefix = document.getElementById('editPhonePrefix').value;
+            let rawPhone = document.getElementById('editPhoneInput').value.trim().replace(/^0+/, '');
             let newAddress = document.getElementById('editAddressInput').value.trim();
 
             if (!currentActivePartnerId) return alert('حدث خطأ في تحديد رقم الشريك.');
 
+            let fullPhone = rawPhone ? (prefix + rawPhone) : '';
+
             try {
                 let docRef = doc(db, "partners", currentActivePartnerId);
                 await updateDoc(docRef, { 
-                    phone: newPhone,
+                    phone: fullPhone,
                     address: newAddress
                 });
-                document.getElementById('pPhone').innerText = newPhone || 'غير مسجل';
+                document.getElementById('pPhone').innerText = fullPhone || 'غير مسجل';
                 document.getElementById('pAddress').innerText = newAddress || 'غير محدد';
-                alert('✅ تم تحديث البيانات الشخصية بنجاح!');
+                alert('✅ تم تحديث بيانات الاتصال والعنوان بنجاح!');
                 closeModal('profileModal');
             } catch(e) {
                 console.error(e);
                 alert('حدث خطأ أثناء تحديث البيانات.');
             }
+        };
+
+        window.contactAdminWhatsApp = function() {
+            let supportPhone = "970594101632";
+            let msg = `مرحباً إدارة إيفا بلس، أنا الشريك الكريم:\n- الاسم: ${currentPartnerName}\n- رقم الشريك: ${currentActivePartnerId}\n\nأرغب بالتواصل معكم بخصوص حسابي ونظام الأرباح.`;
+            let waUrl = `https://wa.me/${supportPhone}?text=${encodeURIComponent(msg)}`;
+            window.open(waUrl, '_blank');
         };
 
         window.updatePartnerPassword = async function() {
