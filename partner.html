@@ -243,7 +243,7 @@
             color: #ef6c00;
         }
 
-        /* تنسيق حاوية فيديو يوتيوب المدمج */
+        /* تنسيق حاوية فيديو يوتيوب داخل النافذة المنبثقة */
         .partner-video-container {
             position: relative;
             width: 100%;
@@ -252,7 +252,7 @@
             background: #000;
             border-radius: 10px;
             overflow: hidden;
-            margin-bottom: 15px;
+            margin-top: 10px;
             border: 1px solid var(--border-burgundy);
             box-shadow: 0 3px 10px rgba(0,0,0,0.1);
         }
@@ -399,6 +399,7 @@
             <div class="drawer-item" onclick="openModal('profileModal'); toggleDrawer();">👤 الملف الشخصي وتعديل البيانات</div>
             <div class="drawer-item" onclick="openModal('treeModal'); toggleDrawer();">🌳 شجرة فريق التسويق</div>
             <div class="drawer-item" onclick="openModal('txModal'); toggleDrawer();">📊 سجل الحركات والأرباح</div>
+            <div class="drawer-item" onclick="openModal('videoModal'); toggleDrawer();">▶️ دليل الانضمام لايفا بلس</div>
             <div class="drawer-item" onclick="window.open('https://linky.ps/eva', '_blank')">🌐 زيارة linky.ps/eva</div>
             <div style="margin-top: auto; padding-top: 15px; border-top: 1px solid #eee; text-align: center;">
                 <button class="btn logout-btn" onclick="logoutPartner()" style="width: 100%; padding: 10px;">🚪 تسجيل الخروج</button>
@@ -430,11 +431,6 @@
                 <p style="margin: 0; color: #5d4037; font-weight: bold;">
                     كل شخص يبحث عن هدية فاخرة أو عطر مميز، ابعث له <b>رابط الكتالوج الخاص بك</b>. وإذا كان صديقك يريد العمل وزيادة دخله، شارك معه <b>رابط الاستقطاب</b> ليدخل في فريقك وتربح من نمو شبكتك بلا توقف!
                 </p>
-            </div>
-
-            <!-- فيديو شرح فكرة النظام المدمج -->
-            <div class="partner-video-container">
-                <iframe src="https://www.youtube.com/embed/XlYoHwowL74" title="شرح فكرة ونظام EVA PLUS" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
 
             <!-- الروابط في مقدمة الشاشة مع أزرار المشاركة والنسخ السريع -->
@@ -523,6 +519,18 @@
                             <tr><td colspan="4" style="color: #888; text-align: center;">لا توجد حركات أرباح مسجلة حتى الآن.</td></tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- النافذة المنبثقة: دليل الانضمام لايفا بلس (الفيديو) -->
+        <div class="modal-overlay" id="videoModal">
+            <div class="modal-content" style="max-width: 520px;">
+                <button class="modal-close-btn" onclick="closeModal('videoModal')">إغلاق ✕</button>
+                <h3 style="color: var(--primary-burgundy); margin-top: 0; border-bottom: 2px solid var(--border-burgundy); padding-bottom: 8px;">▶️ دليل الانضمام لايفا بلس</h3>
+                <p style="font-size: 12px; color: #666; margin-bottom: 10px;">شاهد الفيديو التوضيحي لفهم فكرة ونظام أرباح EVA PLUS:</p>
+                <div class="partner-video-container">
+                    <iframe src="https://www.youtube.com/embed/XlYoHwowL74" title="دليل الانضمام والعمل في نظام EVA PLUS" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 </div>
             </div>
         </div>
